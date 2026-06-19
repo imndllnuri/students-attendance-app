@@ -1,0 +1,11 @@
+__pycache__/
+.mypy_cache/
+*.un~
+*.pyc
+
+# Course material accidentally placed in this folder, not part of the app
+IoT.zip
+
+# Local runtime data
+data/
+accounts.json

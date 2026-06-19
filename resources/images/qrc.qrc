@@ -1,0 +1,39 @@
+<RCC>
+  <qresource prefix="images">
+    <file>search.png</file>
+    <file>user (1).png</file>
+    <file>user.png</file>
+    <file>trend (1).png</file>
+    <file>trend.png</file>
+    <file>settings (1).png</file>
+    <file>settings.png</file>
+    <file>report (1).png</file>
+    <file>report.png</file>
+    <file>open-book.png</file>
+    <file>notification (1).png</file>
+    <file>notification.png</file>
+    <file>logout (1).png</file>
+    <file>logout.png</file>
+    <file>logo000.jpg</file>
+    <file>insurance (1).png</file>
+    <file>insurance.png</file>
+    <file>information-button.png</file>
+    <file>info.png</file>
+    <file>images.png</file>
+    <file>icons8-search-50.png</file>
+    <file>icons8-menu-50.png</file>
+    <file>height692_agu33-6457b-medium-.jpg</file>
+    <file>dashboard (1).png</file>
+    <file>dashboard.png</file>
+    <file>book.png</file>
+    <file>agulogooo.jpg</file>
+    <file>agu_logo1.png</file>
+    <file>abdullah_gul-universitesi-logo (1).png</file>
+    <file>abdullah_gul-universitesi-logo.png</file>
+    <file>38439452-9882-4db8-9abd-97a82dba0fd8.png</file>
+    <file>icons8-search-50.png</file>
+    <file>agu_logo1.png</file>
+    <file>height692_agu33-6457b-medium-.jpg</file>
+    <file>abdullah_gul-universitesi-logo.png</file>
+  </qresource>
+</RCC>
