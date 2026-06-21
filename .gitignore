@@ -2,10 +2,15 @@ __pycache__/
 .mypy_cache/
 *.un~
 *.pyc
+.venv/
 
 # Course material accidentally placed in this folder, not part of the app
 IoT.zip
 
-# Local runtime data
+# Local runtime data (legacy JSON/Excel storage, superseded by server/attendance.db)
 data/
 accounts.json
+
+# Server database and remembered-login marker
+server/attendance.db
+.remembered_email

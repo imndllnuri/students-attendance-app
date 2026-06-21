@@ -1,9 +1,9 @@
-from pathlib import Path
-import json
-import uuid
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 from PyQt5.QtCore import QTime
+
+from services.api_client import ApiClient, ApiError
 
 
 @dataclass
@@ -13,12 +13,13 @@ class ScheduleSlot:
     end_time: QTime
     selected: bool
 
+
 class Class:
-    def __init__(self, class_code: str, class_name: str, instructor_id: str, section: str, 
+    def __init__(self, class_code: str, class_name: str, instructor_id: str, section: str,
                  attendance_policy: float, late_threshold: int, total_weeks: int,
                  total_hours: float, weekly_hours: float, schedule: Dict[str, List[ScheduleSlot]],
-                 spreadsheet_path: Optional[str] = ""):
-        self.class_id = str(uuid.uuid4())
+                 class_id: Optional[str] = None, students: Optional[List[dict]] = None):
+        self.class_id = class_id
         self.class_code = class_code
         self.class_name = class_name
         self.instructor_id = instructor_id
@@ -29,11 +30,10 @@ class Class:
         self.total_hours = total_hours
         self.weekly_hours = weekly_hours
         self.schedule = schedule
-        self.spreadsheet_path = spreadsheet_path
+        self.students = students or []
 
     def to_dict(self):
         return {
-            "class_id": self.class_id,
             "class_code": self.class_code,
             "class_name": self.class_name,
             "instructor_id": self.instructor_id,
@@ -48,15 +48,14 @@ class Class:
                     {
                         "start_time": slot.start_time.toString("HH:mm"),
                         "end_time": slot.end_time.toString("HH:mm"),
-                        "selected": slot.selected
+                        "selected": slot.selected,
                     }
                     for slot in slots
                 ]
                 for day, slots in self.schedule.items()
             },
-            "spreadsheet_path": self.spreadsheet_path
+            "students": self.students,
         }
-
 
     @classmethod
     def from_dict(cls, data):
@@ -66,13 +65,13 @@ class Class:
                     day=day,
                     start_time=QTime.fromString(slot["start_time"], "HH:mm"),
                     end_time=QTime.fromString(slot["end_time"], "HH:mm"),
-                    selected=slot["selected"]
+                    selected=slot["selected"],
                 )
                 for slot in slots
             ]
             for day, slots in data["schedule"].items()
         }
-        
+
         return cls(
             class_code=data["class_code"],
             class_name=data["class_name"],
@@ -84,61 +83,38 @@ class Class:
             total_hours=data["total_hours"],
             weekly_hours=data["weekly_hours"],
             schedule=schedule,
-            spreadsheet_path=data["spreadsheet_path"]
+            class_id=data.get("class_id"),
         )
 
+
 class ClassManager:
-    def __init__(self):
-        self.classes = self.load_classes()
+    """Thin wrapper around the attendance server's class endpoints."""
 
-    def load_classes(self) -> List[Class]:
-        """Load all classes from the data directory structure."""
-        classes = []
-        data_dir = Path("data")
-        
-        if not data_dir.exists():
-            return classes
+    def __init__(self, api_client=None):
+        self.api_client = api_client or ApiClient()
+        self.classes: List[Class] = []
 
-        # Iterate over all instructor directories
-        for instructor_dir in data_dir.iterdir():
-            if instructor_dir.is_dir():
-                instructor_id = instructor_dir.name
-                
-                # Iterate over all class directories
-                for class_dir in instructor_dir.iterdir():
-                    if class_dir.is_dir():
-                        class_info_path = class_dir / "class_info.json"
-                        
-                        if class_info_path.exists():
-                            try:
-                                with open(class_info_path, "r") as f:
-                                    data = json.load(f)
-                                    cls = Class.from_dict(data)
-                                    classes.append(cls)
-                            except Exception as e:
-                                print(f"Error loading {class_info_path}: {e}")
-        return classes
-
-    def save_class_to_fs(self, cls: Class) -> None:
-        """Save a single class to the filesystem."""
-        # Create directory: data/{instructor_id}/{class_code}
-        class_dir = Path("data") / cls.instructor_id / cls.class_code
-        class_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Save class data
-        class_info_path = class_dir / "class_info.json"
-        with open(class_info_path, "w") as f:
-            json.dump(cls.to_dict(), f, indent=4)
+    def load_classes_for_instructor(self, instructor_id: str) -> List[Class]:
+        try:
+            data = self.api_client.list_classes(instructor_id)
+        except ApiError:
+            return []
+        self.classes = [Class.from_dict(c) for c in data]
+        return self.classes
 
     def add_class(self, new_class: Class) -> None:
-        """Add a new class and save it to the filesystem."""
-        self.save_class_to_fs(new_class)
+        """Raises ApiError (e.g. duplicate class code) on failure."""
+        data = self.api_client.create_class(new_class.to_dict())
+        new_class.class_id = data["class_id"]
         self.classes.append(new_class)
 
-    def get_classes_by_instructor(self, instructor_id: str) -> List[Class]:
-        """Get classes for a specific instructor."""
-        return [cls for cls in self.classes if cls.instructor_id == instructor_id]
+    def delete_class(self, class_id: str) -> bool:
+        try:
+            self.api_client.delete_class(class_id)
+        except ApiError:
+            return False
+        self.classes = [c for c in self.classes if c.class_id != class_id]
+        return True
 
-    def get_class_by_code(self, class_code: str) -> Class | None:
-        """Get a class by its code."""
+    def get_class_by_code(self, class_code: str) -> Optional[Class]:
         return next((cls for cls in self.classes if cls.class_code == class_code), None)

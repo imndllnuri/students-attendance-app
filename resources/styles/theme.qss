@@ -1,0 +1,447 @@
+/* Shared theme for the whole app.
+   Palette: dark slate sidebar (#1E293B), single indigo accent (#4F46E5),
+   light slate content background (#F8FAFC), white cards. Soft red is kept
+   only for destructive actions / errors.
+   Error state on inputs is driven by a dynamic Qt property set in Python:
+     widget.setProperty("error", True/False)
+     widget.style().unpolish(widget); widget.style().polish(widget)
+   which makes the QLineEdit[error="true"] selector below take effect.
+   The sidebar's [active="true"] state is driven the same way from
+   views/main_window.py's _set_active_nav(). */
+
+QWidget#background {
+    background-color: #F8FAFC;
+}
+
+QStackedWidget#stackedWidget {
+    background-color: #F8FAFC;
+}
+
+QWidget#sidebar_widget {
+    background-color: #1E293B;
+}
+
+QWidget#addNewClass {
+    background-color: #FFFFFF;
+}
+
+QFrame#card_frame {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid rgba(30, 41, 59, 30);
+}
+
+QLabel#title_lbl {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0F172A;
+}
+
+QLabel#subtitle_lbl {
+    font-size: 11px;
+    color: #64748B;
+}
+
+QLineEdit {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(15, 23, 42, 80);
+    padding: 6px 2px;
+    font-size: 11pt;
+    color: #0F172A;
+}
+
+QLineEdit:focus {
+    border-bottom: 2px solid #4F46E5;
+}
+
+QLineEdit[error="true"] {
+    border-bottom: 2px solid rgb(207, 33, 39);
+}
+
+QLabel[error="true"] {
+    color: rgb(207, 33, 39);
+    font-size: 10px;
+}
+
+QComboBox {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(15, 23, 42, 80);
+    padding: 6px 2px;
+    font-size: 11pt;
+}
+
+QComboBox:focus {
+    border-bottom: 2px solid #4F46E5;
+}
+
+/* --- Primary filled buttons (indigo) --- */
+
+QPushButton#login_btn,
+QPushButton#sign_up_btn,
+QPushButton#next_btn,
+QPushButton#reset_btn,
+QPushButton#save_profile_btn,
+QPushButton#change_password_btn,
+QPushButton#update_security_question_btn,
+QPushButton#create_new_class_btn,
+QPushButton#create_class_btn,
+QPushButton#take_attendance_btn,
+QPushButton#start_attendance_btn,
+QPushButton#submit_attendance_btn {
+    background-color: #4F46E5;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12pt;
+}
+
+QPushButton#login_btn:hover,
+QPushButton#sign_up_btn:hover,
+QPushButton#next_btn:hover,
+QPushButton#reset_btn:hover,
+QPushButton#save_profile_btn:hover,
+QPushButton#change_password_btn:hover,
+QPushButton#update_security_question_btn:hover,
+QPushButton#create_new_class_btn:hover,
+QPushButton#create_class_btn:hover,
+QPushButton#take_attendance_btn:hover,
+QPushButton#start_attendance_btn:hover,
+QPushButton#submit_attendance_btn:hover {
+    background-color: #4338CA;
+}
+
+QPushButton#login_btn:pressed,
+QPushButton#sign_up_btn:pressed,
+QPushButton#next_btn:pressed,
+QPushButton#reset_btn:pressed,
+QPushButton#save_profile_btn:pressed,
+QPushButton#change_password_btn:pressed,
+QPushButton#update_security_question_btn:pressed,
+QPushButton#create_new_class_btn:pressed,
+QPushButton#create_class_btn:pressed,
+QPushButton#take_attendance_btn:pressed,
+QPushButton#start_attendance_btn:pressed,
+QPushButton#submit_attendance_btn:pressed {
+    background-color: #3730A3;
+}
+
+/* --- Secondary outline buttons (indigo) --- */
+
+QPushButton#create_account_btn,
+QPushButton#cancel_btn,
+QPushButton#back_btn,
+QPushButton#edit_profile_btn,
+QPushButton#refresh_student_list_btn,
+QPushButton#back_to_my_classes_btn,
+QPushButton#class_settings_btn,
+QPushButton#export_to_excel_btn,
+QPushButton#spreadsheet_file_btn,
+QPushButton#add_slot_monday_btn,
+QPushButton#add_slot_tuesday_btn,
+QPushButton#add_slot_wednesday_btn,
+QPushButton#add_slot_thursday_btn,
+QPushButton#add_slot_friday_btn {
+    background-color: transparent;
+    color: #4F46E5;
+    border: 1px solid #4F46E5;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12pt;
+}
+
+QPushButton#create_account_btn:hover,
+QPushButton#cancel_btn:hover,
+QPushButton#back_btn:hover,
+QPushButton#edit_profile_btn:hover,
+QPushButton#refresh_student_list_btn:hover,
+QPushButton#back_to_my_classes_btn:hover,
+QPushButton#class_settings_btn:hover,
+QPushButton#export_to_excel_btn:hover,
+QPushButton#spreadsheet_file_btn:hover,
+QPushButton#add_slot_monday_btn:hover,
+QPushButton#add_slot_tuesday_btn:hover,
+QPushButton#add_slot_wednesday_btn:hover,
+QPushButton#add_slot_thursday_btn:hover,
+QPushButton#add_slot_friday_btn:hover {
+    background-color: rgba(79, 70, 229, 20);
+}
+
+/* --- Destructive buttons (kept red) --- */
+
+QPushButton#delete_account_btn,
+QPushButton#remove_slot_monday_btn,
+QPushButton#remove_slot_tuesday_btn,
+QPushButton#remove_slot_wednesday_btn,
+QPushButton#remove_slot_thursday_btn,
+QPushButton#remove_slot_friday_btn {
+    background-color: rgb(178, 24, 30);
+    color: rgba(255, 255, 255, 235);
+    border: 2px solid rgb(140, 20, 26);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12pt;
+    font-weight: 600;
+}
+
+QPushButton#delete_account_btn:hover,
+QPushButton#remove_slot_monday_btn:hover,
+QPushButton#remove_slot_tuesday_btn:hover,
+QPushButton#remove_slot_wednesday_btn:hover,
+QPushButton#remove_slot_thursday_btn:hover,
+QPushButton#remove_slot_friday_btn:hover {
+    background-color: rgb(140, 20, 26);
+}
+
+QPushButton#delete_account_btn:pressed,
+QPushButton#remove_slot_monday_btn:pressed,
+QPushButton#remove_slot_tuesday_btn:pressed,
+QPushButton#remove_slot_wednesday_btn:pressed,
+QPushButton#remove_slot_thursday_btn:pressed,
+QPushButton#remove_slot_friday_btn:pressed {
+    background-color: rgb(110, 15, 20);
+}
+
+QLabel#danger_zone_lbl {
+    color: rgb(178, 24, 30);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* --- Links / icon-only toggles --- */
+
+QPushButton#forgot_password_btn {
+    background-color: transparent;
+    border: none;
+    color: #4F46E5;
+    font-size: 10pt;
+    text-align: left;
+}
+
+QPushButton#forgot_password_btn:hover {
+    color: #4338CA;
+    text-decoration: underline;
+}
+
+QPushButton#close_window_btn {
+    background-color: transparent;
+    border: none;
+    border-radius: 14px;
+}
+
+QPushButton#close_window_btn:hover {
+    background-color: rgba(207, 33, 39, 15);
+}
+
+QToolButton {
+    background-color: transparent;
+    border: none;
+    color: #4F46E5;
+    font-size: 9pt;
+}
+
+QToolButton:hover {
+    color: #4338CA;
+}
+
+QCheckBox {
+    spacing: 6px;
+    font-size: 10pt;
+    color: #64748B;
+}
+
+QCheckBox::indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 2px solid #94A3B8;
+    background: white;
+}
+
+QCheckBox::indicator:hover {
+    border: 2px solid #4F46E5;
+}
+
+QCheckBox::indicator:checked {
+    background: #4F46E5;
+    border: 2px solid #4F46E5;
+}
+
+/* --- Sidebar navigation --- */
+
+QPushButton#my_classes_btn,
+QPushButton#settings_btn,
+QPushButton#statistics_btn,
+QPushButton#log_out_btn {
+    background-color: transparent;
+    color: #CBD5E1;
+    text-align: left;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11pt;
+}
+
+QPushButton#my_classes_btn:hover,
+QPushButton#settings_btn:hover,
+QPushButton#statistics_btn:hover,
+QPushButton#log_out_btn:hover {
+    background-color: rgba(255, 255, 255, 18);
+    color: #FFFFFF;
+}
+
+QPushButton#my_classes_btn:pressed,
+QPushButton#settings_btn:pressed,
+QPushButton#statistics_btn:pressed,
+QPushButton#log_out_btn:pressed {
+    background-color: rgba(255, 255, 255, 28);
+}
+
+QPushButton#my_classes_btn[active="true"],
+QPushButton#settings_btn[active="true"],
+QPushButton#statistics_btn[active="true"] {
+    background-color: rgba(79, 70, 229, 40);
+    color: #FFFFFF;
+    border-left: 3px solid #4F46E5;
+    padding-left: 11px;
+}
+
+QPushButton#search_btn,
+QPushButton#profile_btn {
+    background-color: transparent;
+    border: none;
+    border-radius: 18px;
+    padding: 6px;
+}
+
+QPushButton#search_btn:hover,
+QPushButton#profile_btn:hover {
+    background-color: rgba(79, 70, 229, 15);
+}
+
+/* --- Tables --- */
+
+QTableWidget {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(15, 23, 42, 20);
+    border-radius: 8px;
+    gridline-color: #E2E8F0;
+    alternate-background-color: #F8FAFC;
+}
+
+QTableWidget::item:selected {
+    background-color: rgba(79, 70, 229, 35);
+    color: #0F172A;
+}
+
+QHeaderView::section {
+    background-color: #F1F5F9;
+    color: #334155;
+    padding: 6px;
+    border: none;
+    border-bottom: 2px solid #E2E8F0;
+    font-weight: 600;
+}
+
+/* --- Calendar --- */
+
+QCalendarWidget QToolButton {
+    background-color: transparent;
+    color: #1E293B;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QCalendarWidget QToolButton:hover {
+    background-color: rgba(79, 70, 229, 20);
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    selection-background-color: #4F46E5;
+    selection-color: #FFFFFF;
+}
+
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: #F1F5F9;
+}
+
+/* --- Group boxes (Add New Class day selectors) --- */
+
+QGroupBox {
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    margin-top: 10px;
+    padding-top: 12px;
+    font-weight: 600;
+    color: #334155;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px;
+    color: #1E293B;
+}
+
+/* --- Message boxes --- */
+
+QMessageBox {
+    background-color: #FFFFFF;
+}
+
+QMessageBox QPushButton {
+    background-color: #4F46E5;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    min-width: 70px;
+}
+
+QMessageBox QPushButton:hover {
+    background-color: #4338CA;
+}
+
+/* --- Scrollbars --- */
+
+QScrollBar:vertical {
+    background: #F1F5F9;
+    width: 10px;
+    margin: 2px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    border-radius: 5px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QScrollBar:horizontal {
+    background: #F1F5F9;
+    height: 10px;
+    margin: 2px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #CBD5E1;
+    border-radius: 5px;
+    min-width: 24px;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0;
+}

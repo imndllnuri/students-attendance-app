@@ -1,30 +1,37 @@
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTimeEdit, QCheckBox, QLabel, QHBoxLayout
+import qtawesome as qta
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTimeEdit, QLabel, QHBoxLayout
 from PyQt5 import uic
-from models.classes import Class, ClassManager, ScheduleSlot
 import pandas as pd
-from pathlib import Path
+
+from models.classes import Class, ClassManager, ScheduleSlot
+from services.api_client import ApiError
+
 
 class AddNewClassWindow(QWidget):
     def __init__(self, user_id):
         super().__init__()
         uic.loadUi("ui/add_new_class.ui", self)
+        for col, stretch in enumerate((0, 1, 0, 0, 1)):
+            self.gridLayout.setColumnStretch(col, stretch)
         self.user_id = user_id
         self.class_manager = ClassManager()
-        self.spreadsheet_path = ""
+        self.students = []
 
-        # Connect buttons
         self.spreadsheet_file_btn.clicked.connect(self.load_spreadsheet)
         self.create_class_btn.clicked.connect(self.create_class)
 
-        # Connect add and remove buttons
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         for day in days:
             add_btn = getattr(self, f"add_slot_{day.lower()}_btn")
             remove_btn = getattr(self, f"remove_slot_{day.lower()}_btn")
             add_btn.clicked.connect(lambda _, d=day: self.add_time_slot(d))
             remove_btn.clicked.connect(lambda _, d=day: self.remove_time_slot(d))
+            add_btn.setIcon(qta.icon("fa5s.plus", color="#4F46E5"))
+            remove_btn.setIcon(qta.icon("fa5s.minus", color="white"))
 
-        # Initialize time_slots to store QTimeEdit pairs
+        self.spreadsheet_file_btn.setIcon(qta.icon("fa5s.file-upload", color="#4F46E5"))
+        self.create_class_btn.setIcon(qta.icon("fa5s.check", color="white"))
+
         self.time_slots = {day: [] for day in days}
 
     def add_time_slot(self, day):
@@ -43,7 +50,6 @@ class AddNewClassWindow(QWidget):
         time_slot_layout.addWidget(end_edit)
         layout.addLayout(time_slot_layout)
 
-        # Store QTimeEdit references
         self.time_slots[day].append((start_edit, end_edit))
 
     def remove_time_slot(self, day):
@@ -53,15 +59,12 @@ class AddNewClassWindow(QWidget):
         if not self.time_slots[day]:
             return
 
-        # Remove the last QTimeEdit pair
         self.time_slots[day].pop()
 
-        # Find and remove the last QHBoxLayout
         for i in reversed(range(main_layout.count())):
             item = main_layout.itemAt(i)
             if isinstance(item, QHBoxLayout):
                 layout = main_layout.takeAt(i).layout()
-                # Clear widgets from the layout
                 while layout.count():
                     child = layout.takeAt(0)
                     if child.widget():
@@ -72,7 +75,6 @@ class AddNewClassWindow(QWidget):
         if not self.validate_inputs():
             return
 
-        # Build the schedule based on checked days
         schedule = {}
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         for day in days:
@@ -99,26 +101,20 @@ class AddNewClassWindow(QWidget):
             total_hours=float(self.total_hours_le.text()),
             weekly_hours=float(self.weekly_hours_le.text()),
             schedule=schedule,
-            spreadsheet_path=self.spreadsheet_path
+            students=self.students,
         )
 
-        if self.class_manager.get_class_by_code(new_class.class_code):
-            QMessageBox.warning(self, "Error", "Class code already exists!")
+        try:
+            self.class_manager.add_class(new_class)
+        except ApiError as e:
+            QMessageBox.warning(self, "Error", str(e))
             return
 
-        self.class_manager.add_class(new_class)
         QMessageBox.information(self, "Success", "Class created successfully!")
         self.close()
-            
-    def load_spreadsheet(self):
-        """Load and process student spreadsheet, integrated with ClassManager"""
-        # Get required class information first
-        class_code = self.class_code_le.text().strip()
-        if not class_code:
-            QMessageBox.warning(self, "Missing Information", "Please enter class code first")
-            return
 
-        # Get spreadsheet file
+    def load_spreadsheet(self):
+        """Parse the student spreadsheet into memory; sent to the server on class creation."""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Open Student Spreadsheet", "",
             "Spreadsheet Files (*.csv *.xlsx *.ods *.xls)"
@@ -127,54 +123,31 @@ class AddNewClassWindow(QWidget):
             return
 
         try:
-            # Read and process spreadsheet
             if file_path.endswith(".xls"):
                 df = pd.read_excel(file_path, skiprows=8, header=None, engine="xlrd")
             else:
                 df = pd.read_csv(file_path, skiprows=8, header=None)
 
-            # Process student data
-            processed_data = []
+            students = []
             for _, row in df.iterrows():
-                # Extract student number components
                 student_number = f"{row[2]}{row[3]}".strip().replace(".0nan", "").replace("nannan", "")
-                
-                # Extract full name components
                 name_parts = [str(row[col]) for col in [4, 5, 6] if not pd.isna(row[col])]
                 full_name = " ".join(name_parts).replace("nan", "").strip()
 
                 if student_number and full_name:
-                    processed_data.append({
-                        "Student Number": student_number,
-                        "Student Name Surname": full_name,
-                        "Not Attended Hours": 0,
-                        "Attended Hours": 0,
-                        "Card ID": None
+                    students.append({
+                        "student_number": student_number,
+                        "name_surname": full_name,
                     })
 
-            # Create final DataFrame
-            processed_df = pd.DataFrame(processed_data)
-
-            # Create class directory structure
-            class_dir = Path("data") / str(self.user_id) / class_code
-            class_dir.mkdir(parents=True, exist_ok=True)
-
-            # Save student list
-            spreadsheet_path = class_dir / "student_list.xlsx"
-            processed_df.to_excel(spreadsheet_path, index=False, engine="openpyxl")
-
-            # Store path in class instance
-            self.spreadsheet_path = str(spreadsheet_path)
-
-            QMessageBox.information(self, "Success", 
-                                  "Student list processed and saved with class data!")
+            self.students = students
+            QMessageBox.information(self, "Success",
+                                  f"Loaded {len(students)} students. They'll be saved with the class.")
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Spreadsheet processing failed: {str(e)}")
 
     def validate_inputs(self):
-        print("Validating input fields...")
-
         required_fields = [
             (self.class_code_le.text(), "Class Code"),
             (self.class_name_le.text(), "Class Name"),
@@ -188,7 +161,6 @@ class AddNewClassWindow(QWidget):
 
         for value, field_name in required_fields:
             if not value:
-                print(f"Validation failed: {field_name} is missing!")
                 QMessageBox.warning(self, "Missing Field", f"{field_name} is required!")
                 return False
 
@@ -198,10 +170,8 @@ class AddNewClassWindow(QWidget):
             int(self.number_of_weeks_le.text())
             float(self.total_hours_le.text())
             float(self.weekly_hours_le.text())
-        except ValueError as e:
-            print(f"Validation failed: Invalid number input - {e}")
+        except ValueError:
             QMessageBox.warning(self, "Invalid Input", "Please enter valid numbers in numeric fields")
             return False
 
-        print("Validation passed.")
         return True

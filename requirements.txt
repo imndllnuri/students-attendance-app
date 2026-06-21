@@ -1,6 +1,12 @@
-openpyxl==3.1.2
+# GUI (PyQt5 desktop client)
 PyQt5==5.15.10
+qtawesome==1.4.2
 pandas==2.1.4
 numpy==1.26.4
+openpyxl==3.1.2
+matplotlib==3.8.4
+requests==2.31.0
+pyserial==3.5
 
-
+# Server (Flask + SQLite)
+Flask==3.0.3

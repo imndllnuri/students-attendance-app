@@ -74,16 +74,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="icon">
-           <iconset resource="../resources/images/qrc.qrc">
-            <normaloff>:/images/search.png</normaloff>:/images/search.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
          </widget>
         </item>
         <item>
@@ -97,19 +87,12 @@
           <property name="text">
            <string>Profile</string>
           </property>
-          <property name="icon">
-           <iconset resource="../resources/images/qrc.qrc">
-            <normaloff>:/images/user.png</normaloff>:/images/user.png</iconset>
-          </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(246, 245, 244);</string>
-        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -163,56 +146,322 @@
          </layout>
         </widget>
         <widget class="QWidget" name="settingsPage">
-         <widget class="QLabel" name="label">
-          <property name="geometry">
-           <rect>
-            <x>150</x>
-            <y>180</y>
-            <width>71</width>
-            <height>23</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>settings</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="settingsPageLayout">
+          <item>
+           <spacer name="settings_top_spacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="settings_center_layout">
+            <item>
+             <spacer name="settings_left_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QFrame" name="settings_card_frame">
+              <property name="minimumSize"><size><width>420</width><height>0</height></size></property>
+              <property name="maximumSize"><size><width>420</width><height>16777215</height></size></property>
+              <layout class="QVBoxLayout" name="settings_card_layout">
+               <property name="leftMargin"><number>36</number></property>
+               <property name="topMargin"><number>28</number></property>
+               <property name="rightMargin"><number>36</number></property>
+               <property name="bottomMargin"><number>28</number></property>
+               <property name="spacing"><number>8</number></property>
+               <item>
+                <widget class="QLabel" name="title_lbl_settings">
+                 <property name="alignment"><set>Qt::AlignCenter</set></property>
+                 <property name="text"><string>Settings</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="change_password_section_lbl">
+                 <property name="text"><string>Change Password</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="current_password_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                 <property name="placeholderText"><string> Current password</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="new_password_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                 <property name="placeholderText"><string> New password</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="new_password_error_lbl">
+                 <property name="visible"><bool>false</bool></property>
+                 <property name="wordWrap"><bool>true</bool></property>
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="confirm_new_password_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                 <property name="placeholderText"><string> Confirm new password</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="confirm_new_password_error_lbl">
+                 <property name="visible"><bool>false</bool></property>
+                 <property name="wordWrap"><bool>true</bool></property>
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="settings_show_password_row">
+                 <item>
+                  <spacer name="settings_show_password_spacer">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="settings_show_password_btn">
+                   <property name="text"><string>Show</string></property>
+                   <property name="checkable"><bool>true</bool></property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QPushButton" name="change_password_btn">
+                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="text"><string>Change Password</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="settings_divider_1">
+                 <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="security_question_section_lbl">
+                 <property name="text"><string>Security Question</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="settings_security_question_combo">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="settings_answer_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="placeholderText"><string> Your answer</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="settings_current_password_for_question_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                 <property name="placeholderText"><string> Current password (to confirm)</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="security_question_error_lbl">
+                 <property name="visible"><bool>false</bool></property>
+                 <property name="wordWrap"><bool>true</bool></property>
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="update_security_question_btn">
+                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="text"><string>Update Security Question</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="settings_divider_2">
+                 <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="danger_zone_lbl">
+                 <property name="text"><string>Danger Zone</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="delete_account_btn">
+                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="text"><string>Delete Account</string></property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="settings_right_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="settings_bottom_spacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="searchPage">
-         <widget class="QLabel" name="label_2">
-          <property name="geometry">
-           <rect>
-            <x>100</x>
-            <y>210</y>
-            <width>71</width>
-            <height>23</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>nuri</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="searchPageLayout">
+          <item>
+           <widget class="QLabel" name="search_status_lbl">
+            <property name="text">
+             <string>Search results</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="search_results_layout"/>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="profilePage">
-         <widget class="QLabel" name="label_3">
-          <property name="geometry">
-           <rect>
-            <x>100</x>
-            <y>270</y>
-            <width>71</width>
-            <height>23</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>profile</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="profilePageLayout">
+          <item>
+           <spacer name="profile_top_spacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="profile_center_layout">
+            <item>
+             <spacer name="profile_left_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QFrame" name="profile_card_frame">
+              <property name="minimumSize"><size><width>420</width><height>0</height></size></property>
+              <property name="maximumSize"><size><width>420</width><height>16777215</height></size></property>
+              <layout class="QVBoxLayout" name="profile_card_layout">
+               <property name="leftMargin"><number>36</number></property>
+               <property name="topMargin"><number>28</number></property>
+               <property name="rightMargin"><number>36</number></property>
+               <property name="bottomMargin"><number>28</number></property>
+               <property name="spacing"><number>12</number></property>
+               <item>
+                <widget class="QLabel" name="profile_avatar_lbl">
+                 <property name="minimumSize"><size><width>96</width><height>96</height></size></property>
+                 <property name="maximumSize"><size><width>96</width><height>96</height></size></property>
+                 <property name="alignment"><set>Qt::AlignCenter</set></property>
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="title_lbl">
+                 <property name="alignment"><set>Qt::AlignCenter</set></property>
+                 <property name="text"><string>My Profile</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="profile_name_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="readOnly"><bool>true</bool></property>
+                 <property name="placeholderText"><string> Name</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="profile_surname_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="readOnly"><bool>true</bool></property>
+                 <property name="placeholderText"><string> Surname</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="profile_email_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="readOnly"><bool>true</bool></property>
+                 <property name="placeholderText"><string> Email</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="profile_email_error_lbl">
+                 <property name="visible"><bool>false</bool></property>
+                 <property name="wordWrap"><bool>true</bool></property>
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="edit_profile_btn">
+                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="text"><string>Edit</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="save_profile_btn">
+                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="visible"><bool>false</bool></property>
+                 <property name="text"><string>Save</string></property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="profile_right_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="profile_bottom_spacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="statisticsPage">
+         <layout class="QVBoxLayout" name="statisticsPageLayout">
+          <item>
+           <widget class="QComboBox" name="statistics_class_combo"/>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="statistics_chart_layout"/>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
      </layout>
     </item>
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="sideVerticalLayout">
+     <widget class="QWidget" name="sidebar_widget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>220</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>260</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="sideVerticalLayout">
       <property name="leftMargin">
        <number>9</number>
       </property>
@@ -229,27 +478,21 @@
        <widget class="QLabel" name="agu_logo_lbl">
         <property name="maximumSize">
          <size>
-          <width>150</width>
-          <height>100</height>
+          <width>200</width>
+          <height>60</height>
          </size>
         </property>
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-        <property name="lineWidth">
-         <number>8</number>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
         <property name="text">
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resources/images/qrc.qrc">:/images/agulogooo.jpg</pixmap>
+         <pixmap resource="../resources/images/qrc.qrc">:/images/abdullah_gul-universitesi-logo.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -268,10 +511,6 @@
         <property name="text">
          <string>My Classes</string>
         </property>
-        <property name="icon">
-         <iconset resource="../resources/images/qrc.qrc">
-          <normaloff>:/images/open-book.png</normaloff>:/images/open-book.png</iconset>
-        </property>
        </widget>
       </item>
       <item>
@@ -279,9 +518,12 @@
         <property name="text">
          <string>Settings</string>
         </property>
-        <property name="icon">
-         <iconset resource="../resources/images/qrc.qrc">
-          <normaloff>:/images/settings.png</normaloff>:/images/settings.png</iconset>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="statistics_btn">
+        <property name="text">
+         <string>Statistics</string>
         </property>
        </widget>
       </item>
@@ -310,19 +552,15 @@
         <property name="text">
          <string>Log Out</string>
         </property>
-        <property name="icon">
-         <iconset resource="../resources/images/qrc.qrc">
-          <normaloff>:/images/logout (1).png</normaloff>:/images/logout (1).png</iconset>
-        </property>
        </widget>
       </item>
      </layout>
+    </widget>
     </item>
    </layout>
   </widget>
  </widget>
  <resources>
-  <include location="../resources/images/qrc.qrc"/>
   <include location="../resources/images/qrc.qrc"/>
  </resources>
  <connections/>

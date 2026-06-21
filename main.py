@@ -4,6 +4,8 @@ from views.login_window import LoginWindow
 
 def main():
     app = QApplication(sys.argv)
+    with open("resources/styles/theme.qss") as f:
+        app.setStyleSheet(f.read())
     window = LoginWindow()
     sys.exit(app.exec_())
 

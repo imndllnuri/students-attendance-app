@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Create New Class</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: rgb(255, 255, 255);</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -37,14 +34,8 @@
        <widget class="QLineEdit" name="class_name_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -67,14 +58,8 @@
        <widget class="QLineEdit" name="number_of_weeks_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -96,14 +81,8 @@
        <widget class="QLineEdit" name="class_section_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -132,14 +111,8 @@
        <widget class="QLineEdit" name="weekly_hours_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -161,14 +134,8 @@
        <widget class="QLineEdit" name="class_code_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -197,14 +164,8 @@
        <widget class="QLineEdit" name="total_hours_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -233,14 +194,8 @@
        <widget class="QLineEdit" name="attendance_policy_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -270,14 +225,8 @@
        <widget class="QLineEdit" name="late_threshold_le">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
+          <width>90</width>
+          <height>32</height>
          </size>
         </property>
        </widget>
@@ -490,7 +439,7 @@
        <widget class="QPushButton" name="spreadsheet_file_btn">
         <property name="minimumSize">
          <size>
-          <width>400</width>
+          <width>200</width>
           <height>0</height>
          </size>
         </property>
