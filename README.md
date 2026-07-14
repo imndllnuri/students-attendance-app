@@ -37,11 +37,6 @@ buildable subset of that architecture:
 - Class search
 - Attendance statistics (present/late/absent pie chart per class)
 
-### Known stub
-
-- The **Settings** sidebar page is still a placeholder — wiring it up to
-  account/profile editing is a natural next step.
-
 ## Tech stack
 
 - **GUI**: Python, PyQt5 (`.ui` files via Qt Designer), pandas/matplotlib for
@@ -80,6 +75,7 @@ python -m server.migrate_legacy_data
 
 ```
 main.py              # GUI entry point, launches LoginWindow
+logging_config.py    # console logging setup, called once from main.py
 server/               # Flask + SQLite backend
   app.py              # REST endpoints
   schema.sql          # table definitions
@@ -89,11 +85,36 @@ services/
 models/                 # Account, Class data containers + API-backed managers
 views/                  # PyQt5 window controllers (login, class, attendance, etc.)
 ui/                     # Qt Designer .ui files
-resources/              # images / icons
+resources/              # images / icons, shared theme.qss
+shared/                 # cross-view validation rules (email/password/security questions)
+tests/                  # pytest + pytest-qt test suite
+scripts/                # dev/maintenance helper scripts (e.g. seed_mock_data.py)
 ```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for how these pieces fit together.
 
 ## Status
 
 Functional prototype: GUI + Flask/SQLite server working end to end without
 real RFID/ESP8266 hardware required (a serial RFID reader is optional — the
 attendance window prompts for manual port selection if one isn't found).
+See [ROADMAP.md](ROADMAP.md) for what's planned next (offline/local-storage
+mode, further GUI/architecture cleanup, a written design report, and a
+hardware wiring tutorial).
+
+## Testing
+
+```
+pip install -r requirements-dev.txt
+pytest -q
+```
+
+See [TESTING.md](TESTING.md) for what's covered and the manual QA checklist.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [DEVELOPMENT.md](DEVELOPMENT.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE).

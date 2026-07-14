@@ -1,8 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication
+from logging_config import setup_logging
 from views.login_window import LoginWindow
 
 def main():
+    setup_logging()
     app = QApplication(sys.argv)
     with open("resources/styles/theme.qss") as f:
         app.setStyleSheet(f.read())

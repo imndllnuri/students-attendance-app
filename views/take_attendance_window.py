@@ -1,3 +1,5 @@
+import logging
+
 import qtawesome as qta
 from PyQt5.QtWidgets import QDialog, QMessageBox, QComboBox, QTableWidgetItem, QInputDialog, QHeaderView
 from PyQt5.QtCore import QTimer, QDateTime, QTime
@@ -6,20 +8,23 @@ from PyQt5 import uic
 import serial
 import serial.tools.list_ports
 
-from services.api_client import ApiClient, ApiError
+from services.api_client import ApiError
+
+logger = logging.getLogger(__name__)
 
 
 class TakeAttendance(QDialog):
-    def __init__(self, class_obj, class_window):
+    def __init__(self, class_obj, class_window, class_manager):
         super().__init__()
         uic.loadUi("ui/take_attendance_window.ui", self)
 
         self.class_obj = class_obj
         self.class_window = class_window
-        self.api_client = ApiClient()
+        self.class_manager = class_manager
         self.current_card_id = None
         self.roster = []
         self.staged_records = []
+        self.staged_student_ids = set()
         self.ser = None
 
         self.load_roster()
@@ -29,7 +34,7 @@ class TakeAttendance(QDialog):
     def load_roster(self):
         """Load the class roster (with registered card IDs) from the server."""
         try:
-            self.roster = self.api_client.get_roster(self.class_obj.class_id)
+            self.roster = self.class_manager.get_roster(self.class_obj.class_id)
         except ApiError as e:
             QMessageBox.critical(self, "Error", f"Failed to load roster: {e}")
             self.close()
@@ -112,7 +117,11 @@ class TakeAttendance(QDialog):
     def check_rfid(self):
         """Check for RFID card presence"""
         if self.ser.in_waiting > 0:
-            card_id = self.ser.readline().decode().strip()
+            try:
+                card_id = self.ser.readline().decode().strip()
+            except UnicodeDecodeError:
+                logger.warning("Discarding malformed RFID read (undecodable bytes)")
+                return
             if card_id and card_id != self.current_card_id:
                 self.current_card_id = card_id
                 self.process_card(card_id)
@@ -161,7 +170,7 @@ class TakeAttendance(QDialog):
         student = next(s for s in self.roster if s["name_surname"] == selected_student)
 
         try:
-            self.api_client.register_card(student["student_id"], card_id)
+            self.class_manager.register_card(student["student_id"], card_id)
         except ApiError as e:
             QMessageBox.critical(self, "Error", f"Failed to register card: {e}")
             return
@@ -173,14 +182,23 @@ class TakeAttendance(QDialog):
 
     def record_attendance(self, student, date, time_slot, exact_time, status):
         """Stage attendance row in the table (sent to the server on submit)"""
+        student_id = student["student_id"]
+        if student_id in self.staged_student_ids:
+            QMessageBox.information(
+                self, "Already Recorded",
+                f"{student['name_surname']} was already recorded this session.",
+            )
+            return
+
         try:
             self.staged_records.append({
-                "student_id": student["student_id"],
+                "student_id": student_id,
                 "date": date,
                 "time_slot": time_slot,
                 "time": exact_time,
                 "status": status,
             })
+            self.staged_student_ids.add(student_id)
 
             row_position = self.take_attendance_tableWidget.rowCount()
             self.take_attendance_tableWidget.insertRow(row_position)
@@ -200,8 +218,8 @@ class TakeAttendance(QDialog):
             for col in range(len(items)):
                 self.take_attendance_tableWidget.item(row_position, col).setBackground(color)
 
-        except Exception as e:
-            print(f"Error adding to table: {str(e)}")
+        except Exception:
+            logger.exception("Error adding attendance row to table")
 
     def submit_attendance(self):
         """Send staged attendance records to the server."""
@@ -210,7 +228,7 @@ class TakeAttendance(QDialog):
             return
 
         try:
-            self.api_client.submit_attendance(self.class_obj.class_id, self.staged_records)
+            self.class_manager.submit_attendance(self.class_obj.class_id, self.staged_records)
         except ApiError as e:
             QMessageBox.critical(self, "Error", f"Failed to submit attendance:\n{e}")
             return

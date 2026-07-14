@@ -204,6 +204,19 @@ QPushButton#remove_slot_friday_btn:pressed {
     background-color: rgb(110, 15, 20);
 }
 
+/* Small inline "X" delete button on each class row (My Classes / Search) */
+QPushButton#class_delete_btn {
+    background-color: transparent;
+    color: rgb(178, 24, 30);
+    border: none;
+    font-weight: 600;
+}
+
+QPushButton#class_delete_btn:hover {
+    background-color: rgba(178, 24, 30, 25);
+    border-radius: 4px;
+}
+
 QLabel#danger_zone_lbl {
     color: rgb(178, 24, 30);
     font-size: 11px;

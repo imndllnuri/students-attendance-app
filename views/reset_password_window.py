@@ -3,7 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDialog, QGraphicsDropShadowEffect, QLineEdit, QMessageBox
 
-MIN_PASSWORD_LENGTH = 8
+from shared.validation import MIN_PASSWORD_LENGTH, is_valid_password
 
 
 class ResetPasswordWindow(QDialog):
@@ -55,10 +55,11 @@ class ResetPasswordWindow(QDialog):
         if not answer:
             self._show_error(self.error_lbl_step2, "Please answer the security question.")
             return
-        if len(new_password) < MIN_PASSWORD_LENGTH:
+        if not is_valid_password(new_password):
             self._show_error(
                 self.error_lbl_step2,
-                f"Password must be at least {MIN_PASSWORD_LENGTH} characters.",
+                f"Password must be at least {MIN_PASSWORD_LENGTH} characters "
+                "and include both letters and numbers.",
             )
             return
         if new_password != confirm_password:

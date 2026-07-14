@@ -1,4 +1,5 @@
 import qtawesome as qta
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTimeEdit, QLabel, QHBoxLayout
 from PyQt5 import uic
 import pandas as pd
@@ -8,6 +9,8 @@ from services.api_client import ApiError
 
 
 class AddNewClassWindow(QWidget):
+    class_created = pyqtSignal()
+
     def __init__(self, user_id):
         super().__init__()
         uic.loadUi("ui/add_new_class.ui", self)
@@ -111,6 +114,7 @@ class AddNewClassWindow(QWidget):
             return
 
         QMessageBox.information(self, "Success", "Class created successfully!")
+        self.class_created.emit()
         self.close()
 
     def load_spreadsheet(self):

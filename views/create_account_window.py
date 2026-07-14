@@ -1,14 +1,10 @@
-import re
-
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDialog, QGraphicsDropShadowEffect, QLineEdit, QMessageBox
 
 from models.accounts import Account
-
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-MIN_PASSWORD_LENGTH = 8
+from shared.validation import MIN_PASSWORD_LENGTH, SECURITY_QUESTIONS, is_valid_email, is_valid_password
 
 
 class CreateAccountWindow(QDialog):
@@ -31,9 +27,7 @@ class CreateAccountWindow(QDialog):
         self.password_le.textChanged.connect(self.validate_password)
         self.password_again_le.textChanged.connect(self.validate_password_match)
 
-        security_questions = ["What is your mother's maiden name?",
-                              "What was your first pet's name?"]
-        self.security_question_ComboBox.addItems(security_questions)
+        self.security_question_ComboBox.addItems(SECURITY_QUESTIONS)
 
         for btn in (self.show_password_btn, self.show_password_again_btn):
             btn.setText("")
@@ -57,7 +51,7 @@ class CreateAccountWindow(QDialog):
 
     def validate_email(self):
         email = self.email_le.text().strip()
-        if email and not EMAIL_RE.match(email):
+        if email and not is_valid_email(email):
             self._set_error(self.email_le, self.email_error_lbl, "Enter a valid email address.")
             return False
         self._clear_error(self.email_le, self.email_error_lbl)
@@ -65,11 +59,7 @@ class CreateAccountWindow(QDialog):
 
     def validate_password(self):
         password = self.password_le.text()
-        if password and not (
-            len(password) >= MIN_PASSWORD_LENGTH
-            and any(c.isalpha() for c in password)
-            and any(c.isdigit() for c in password)
-        ):
+        if password and not is_valid_password(password):
             self._set_error(
                 self.password_le,
                 self.password_error_lbl,

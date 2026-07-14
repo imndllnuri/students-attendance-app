@@ -6,17 +6,17 @@ from PyQt5 import uic
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QHeaderView, QMainWindow, QMessageBox, QTableWidgetItem
 
-from services.api_client import ApiClient, ApiError
+from services.api_client import ApiError
 
 
 class ClassWindow(QMainWindow):
-    def __init__(self, class_obj, main_window):
+    def __init__(self, class_obj, main_window, class_manager):
         super().__init__()
         uic.loadUi("ui/class_window.ui", self)
 
         self.class_obj = class_obj
         self.main_window = main_window
-        self.api_client = ApiClient()
+        self.class_manager = class_manager
         self.failure = math.ceil((self.class_obj.total_hours) * (100 - self.class_obj.attendance_policy) / 100)
         self.safe = self.failure * 50 / 100
         self.student_list_tableWidget.setAlternatingRowColors(True)
@@ -34,7 +34,7 @@ class ClassWindow(QMainWindow):
     def load_student_list(self):
         """Load student list + attendance history from the server into the table widget."""
         try:
-            table = self.api_client.get_student_table(self.class_obj.class_id)
+            table = self.class_manager.get_student_table(self.class_obj.class_id)
         except ApiError as e:
             QMessageBox.critical(self, "Server Error", f"Failed to load student list:\n{e}")
             return
@@ -100,7 +100,7 @@ class ClassWindow(QMainWindow):
 
     def attendance_page_show(self):
         from views.take_attendance_window import TakeAttendance
-        self.take_attendance_page = TakeAttendance(self.class_obj, self)
+        self.take_attendance_page = TakeAttendance(self.class_obj, self, self.class_manager)
         self.take_attendance_page.show()
 
     def format_schedule(self, schedule):

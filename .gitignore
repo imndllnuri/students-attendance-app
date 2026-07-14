@@ -14,3 +14,13 @@ accounts.json
 # Server database and remembered-login marker
 server/attendance.db
 .remembered_email
+
+# Test/CI artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor/OS cruft
+.vscode/
+.idea/
+.DS_Store

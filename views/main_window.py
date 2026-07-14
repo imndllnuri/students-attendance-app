@@ -1,5 +1,3 @@
-import re
-
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, QSize
@@ -18,18 +16,17 @@ from matplotlib.figure import Figure
 
 from resources.images import qrc
 from services.api_client import ApiError
+from shared.validation import (
+    MIN_PASSWORD_LENGTH,
+    SECURITY_QUESTIONS,
+    is_valid_email,
+    is_valid_password,
+)
 from views.add_new_class_window import AddNewClassWindow
 from models.accounts import AccountManager
 from models.classes import Class, ClassManager
 
 MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(5)
-
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-MIN_PASSWORD_LENGTH = 8
-SECURITY_QUESTIONS = [
-    "What is your mother's maiden name?",
-    "What was your first pet's name?",
-]
 
 
 class MainWindow(QMainWindow):
@@ -152,7 +149,7 @@ class MainWindow(QMainWindow):
         class_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
 
         delete_btn = QPushButton("X")
-        delete_btn.setStyleSheet("color: red; font-weight: bold;")
+        delete_btn.setObjectName("class_delete_btn")
         delete_btn.setFixedSize(25, 25)
         delete_btn.clicked.connect(lambda _, c=cls: self.delete_class(c))
 
@@ -185,7 +182,7 @@ class MainWindow(QMainWindow):
         else:
             from views.class_window import ClassWindow
 
-            class_page = ClassWindow(class_obj, self)
+            class_page = ClassWindow(class_obj, self, self.class_manager)
             index = self.stackedWidget.addWidget(class_page)
             class_page.setProperty("class_code", class_obj.class_code)
             self.stackedWidget.setCurrentIndex(index)
@@ -199,6 +196,7 @@ class MainWindow(QMainWindow):
 
     def open_add_new_class_window(self):
         self.add_new_class_window = AddNewClassWindow(user_id=self.user_id)
+        self.add_new_class_window.class_created.connect(self.load_classes)
         self.add_new_class_window.show()
 
     def confirm_logout(self):
@@ -283,7 +281,7 @@ class MainWindow(QMainWindow):
 
     def validate_profile_email(self):
         email = self.profile_email_le.text().strip()
-        if email and not EMAIL_RE.match(email):
+        if email and not is_valid_email(email):
             self._set_error(self.profile_email_le, self.profile_email_error_lbl,
                              "Enter a valid email address.")
             return False
@@ -330,11 +328,7 @@ class MainWindow(QMainWindow):
 
     def validate_new_password(self):
         password = self.new_password_le.text()
-        if password and not (
-            len(password) >= MIN_PASSWORD_LENGTH
-            and any(c.isalpha() for c in password)
-            and any(c.isdigit() for c in password)
-        ):
+        if password and not is_valid_password(password):
             self._set_error(
                 self.new_password_le,
                 self.new_password_error_lbl,
@@ -466,7 +460,7 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            stats = self.class_manager.api_client.get_statistics(cls.class_id)
+            stats = self.class_manager.get_statistics(cls.class_id)
         except ApiError as e:
             QMessageBox.critical(self, "Server Error", str(e))
             return

@@ -118,3 +118,21 @@ class ClassManager:
 
     def get_class_by_code(self, class_code: str) -> Optional[Class]:
         return next((cls for cls in self.classes if cls.class_code == class_code), None)
+
+    # --- Roster / attendance / statistics ---
+    # Proxied so views never need to touch ApiClient directly.
+
+    def get_student_table(self, class_id: str) -> dict:
+        return self.api_client.get_student_table(class_id)
+
+    def get_roster(self, class_id: str) -> list:
+        return self.api_client.get_roster(class_id)
+
+    def register_card(self, student_id: str, card_id: str) -> None:
+        self.api_client.register_card(student_id, card_id)
+
+    def submit_attendance(self, class_id: str, records: list) -> None:
+        self.api_client.submit_attendance(class_id, records)
+
+    def get_statistics(self, class_id: str) -> dict:
+        return self.api_client.get_statistics(class_id)
