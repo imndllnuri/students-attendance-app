@@ -56,6 +56,7 @@ class TakeAttendance(QDialog):
         self.start_attendance_btn.clicked.connect(self.start_attendance)
         self.submit_attendance_btn.clicked.connect(self.submit_attendance)
         self.mark_all_present_btn.clicked.connect(self.mark_all_present)
+        self.undo_last_scan_btn.clicked.connect(self.undo_last_scan)
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
 
         self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#4F46E5"))
@@ -234,6 +235,21 @@ class TakeAttendance(QDialog):
         self._set_scan_status(
             "success", f"✓ Marked {len(remaining)} student(s) Present.", revert_after_ms=1500
         )
+
+    def undo_last_scan(self):
+        """Remove the most recently staged attendance row (the table and
+        staged_records/staged_student_ids are always kept in lockstep by
+        record_attendance, so the last table row always matches the last
+        staged record)."""
+        if not self.staged_records:
+            self._set_scan_status("warning", "Nothing to undo.", revert_after_ms=1500)
+            return
+
+        last = self.staged_records.pop()
+        self.staged_student_ids.discard(last["student_id"])
+        self.take_attendance_tableWidget.removeRow(self.take_attendance_tableWidget.rowCount() - 1)
+        self._update_progress_label()
+        self._set_scan_status("warning", "Undid the last scan.", revert_after_ms=1500)
 
     def register_card(self, card_id):
         """Register new RFID card to student and add to attendance"""

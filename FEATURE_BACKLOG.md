@@ -29,7 +29,7 @@ marked "not selected" were intentionally left out of this batch.
 ## Take Attendance
 - [ ] 17. Manual attendance mode (mark by clicking, no RFID needed)
 - [x] 18. "Mark All Present" bulk action
-- [ ] 19. "Undo Last Scan"
+- [x] 19. "Undo Last Scan"
 - [ ] 20. Audio feedback on successful scan (not selected)
 - [ ] 21. QR code as an RFID alternative (not selected)
 - [x] 22. Live "X/Y students recorded" counter
