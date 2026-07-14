@@ -4,7 +4,7 @@ import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMainWindow
 
 from models.accounts import AccountManager
 from views.create_account_window import CreateAccountWindow
@@ -38,6 +38,9 @@ class LoginWindow(QMainWindow):
         shadow.setColor(QColor(15, 23, 42, 40))
         self.card_frame.setGraphicsEffect(shadow)
 
+        self.email_le.textChanged.connect(self._clear_login_error)
+        self.password_le.textChanged.connect(self._clear_login_error)
+
         self.load_remembered_email()
         self.show()
 
@@ -60,7 +63,17 @@ class LoginWindow(QMainWindow):
 
             self.open_main_window(account)
         else:
-            QMessageBox.warning(self, "Login Failed", "Incorrect email or password")
+            self._show_login_error("Incorrect email or password.")
+
+    def _show_login_error(self, message):
+        self.login_error_lbl.setText(message)
+        self.login_error_lbl.setProperty("error", True)
+        self.login_error_lbl.setVisible(True)
+        self.login_error_lbl.style().unpolish(self.login_error_lbl)
+        self.login_error_lbl.style().polish(self.login_error_lbl)
+
+    def _clear_login_error(self):
+        self.login_error_lbl.setVisible(False)
 
     def open_create_account_window(self):
         self.create_account_window = CreateAccountWindow(self.account_manager)

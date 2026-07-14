@@ -5,10 +5,12 @@ from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QGraphicsDropShadowEffect,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QVBoxLayout,
     QWidget,
 )
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -16,6 +18,7 @@ from matplotlib.figure import Figure
 
 from resources.images import qrc
 from services.api_client import ApiError
+from shared.palette import PALETTE
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -137,24 +140,38 @@ class MainWindow(QMainWindow):
                 item.widget().deleteLater()
 
         classes = sorted(self.fetch_classes(), key=lambda c: c.class_code)
+        self.empty_state_lbl.setVisible(not classes)
         for row, cls in enumerate(classes):
             self.class_btns_layout.addWidget(self._make_class_row_widget(cls), row, 0)
 
     def _make_class_row_widget(self, cls):
         class_widget = QWidget()
-        class_layout = QHBoxLayout(class_widget)
-        class_layout.setContentsMargins(0, 0, 0, 0)
+        class_widget.setObjectName("class_row_widget")
+        row_layout = QHBoxLayout(class_widget)
+        row_layout.setContentsMargins(4, 4, 4, 4)
+
+        text_layout = QVBoxLayout()
+        text_layout.setSpacing(0)
 
         class_btn = QPushButton(f"{cls.class_name} ({cls.class_code})")
+        class_btn.setObjectName("class_row_name_btn")
+        class_btn.setCursor(Qt.PointingHandCursor)
         class_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
+
+        caption_lbl = QLabel(f"Section {cls.section}")
+        caption_lbl.setObjectName("class_row_caption_lbl")
+
+        text_layout.addWidget(class_btn)
+        text_layout.addWidget(caption_lbl)
 
         delete_btn = QPushButton("X")
         delete_btn.setObjectName("class_delete_btn")
         delete_btn.setFixedSize(25, 25)
+        delete_btn.setCursor(Qt.PointingHandCursor)
         delete_btn.clicked.connect(lambda _, c=cls: self.delete_class(c))
 
-        class_layout.addWidget(class_btn)
-        class_layout.addWidget(delete_btn)
+        row_layout.addLayout(text_layout, 1)
+        row_layout.addWidget(delete_btn)
         return class_widget
 
     def delete_class(self, cls):
@@ -457,6 +474,8 @@ class MainWindow(QMainWindow):
 
         cls = self.statistics_class_combo.currentData()
         if cls is None:
+            self.statistics_empty_lbl.setText("Select a class to view its statistics.")
+            self.statistics_empty_lbl.setVisible(True)
             return
 
         try:
@@ -466,16 +485,24 @@ class MainWindow(QMainWindow):
             return
 
         figure = Figure(figsize=(4, 4))
+        figure.patch.set_facecolor(PALETTE["bg_card"])
         axes = figure.add_subplot(111)
         labels = ["Present", "Late", "Absent"]
         values = [stats["present"], stats["late"], stats["absent"]]
         if sum(values) == 0:
-            axes.text(0.5, 0.5, "No attendance recorded yet", ha="center", va="center")
+            self.statistics_empty_lbl.setText("No attendance recorded yet for this class.")
+            self.statistics_empty_lbl.setVisible(True)
             axes.axis("off")
         else:
-            axes.pie(values, labels=labels, autopct="%1.1f%%",
-                     colors=["#90ee90", "#ffdf80", "#ff9696"])
-            axes.set_title(f"Attendance for {cls.class_code}")
+            self.statistics_empty_lbl.setVisible(False)
+            axes.pie(
+                values,
+                labels=labels,
+                autopct="%1.1f%%",
+                colors=[PALETTE["success"], PALETTE["warning"], PALETTE["error"]],
+                textprops={"color": PALETTE["text_primary"]},
+            )
+            axes.set_title(f"Attendance for {cls.class_code}", color=PALETTE["text_primary"])
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)

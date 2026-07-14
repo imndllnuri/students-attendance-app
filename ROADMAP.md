@@ -92,3 +92,9 @@ attendance stored in `.xlsx` files.
   `BUILDING.md`, `VERSIONING.md`, and `RELEASE_PROCESS.md`, intentionally
   skipped in Phase 1 since there's currently no compiled/packaged release
   process to document.
+- Turkish (or other) language support — no i18n infrastructure exists today;
+  every string is hardcoded English in both `.ui` files and Python
+  (`QMessageBox` text, f-strings). Two options when this becomes a priority:
+  Qt's built-in translation workflow (`pylupdate5` → `.ts` → `.qm` →
+  `QTranslator`, the standard/maintainable Qt approach) or a lighter
+  dict-based runtime language switch. Not started — revisit if/when needed.

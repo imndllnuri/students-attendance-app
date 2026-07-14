@@ -18,16 +18,33 @@
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="0">
+       <widget class="QFrame" name="scan_status_card">
+        <layout class="QHBoxLayout" name="scan_status_layout">
+         <item>
+          <widget class="QLabel" name="scan_status_icon_lbl">
+           <property name="minimumSize"><size><width>24</width><height>0</height></size></property>
+           <property name="text"><string/></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="scan_status_text_lbl">
+           <property name="text"><string>Press Start Attendance to begin scanning.</string></property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QTableWidget" name="take_attendance_tableWidget"/>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QPushButton" name="submit_attendance_btn">
         <property name="text">
          <string>Submit Attendance</string>

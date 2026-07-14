@@ -1,16 +1,26 @@
 import logging
 
 import qtawesome as qta
-from PyQt5.QtWidgets import QDialog, QMessageBox, QComboBox, QTableWidgetItem, QInputDialog, QHeaderView
-from PyQt5.QtCore import QTimer, QDateTime, QTime
-from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QDialog,
+    QGraphicsOpacityEffect,
+    QHeaderView,
+    QInputDialog,
+    QMessageBox,
+    QTableWidgetItem,
+)
+from PyQt5.QtCore import QDateTime, QEasingCurve, QPropertyAnimation, QTime, QTimer
 from PyQt5 import uic
 import serial
 import serial.tools.list_ports
 
 from services.api_client import ApiError
+from shared.palette import qcolor
 
 logger = logging.getLogger(__name__)
+
+_SCAN_ICONS = {"idle": "●", "success": "✓", "warning": "!", "error": "✗"}
 
 
 class TakeAttendance(QDialog):
@@ -26,6 +36,8 @@ class TakeAttendance(QDialog):
         self.staged_records = []
         self.staged_student_ids = set()
         self.ser = None
+        self._listening = False
+        self._closed = False
 
         self.load_roster()
         self.setup_ui()
@@ -61,6 +73,12 @@ class TakeAttendance(QDialog):
         self.take_attendance_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.update_date_info()
 
+        self._scan_opacity_effect = QGraphicsOpacityEffect(self.scan_status_card)
+        self.scan_status_card.setGraphicsEffect(self._scan_opacity_effect)
+        self._scan_opacity_effect.setOpacity(1.0)
+        self._scan_animation = None
+        self._set_scan_status("idle", "Press Start Attendance to begin scanning.")
+
     def setup_serial(self):
         """Improved serial connection setup with manual fallback"""
         ports = list(serial.tools.list_ports.comports())
@@ -74,7 +92,9 @@ class TakeAttendance(QDialog):
         if not rfid_port:
             port_names = [f"{p.device} ({p.description})" for p in ports]
             if not port_names:
-                QMessageBox.critical(self, "Error", "No serial ports found!")
+                self._set_scan_status(
+                    "error", "No serial ports found - check your RFID reader connection."
+                )
                 return
 
             selected, ok = QInputDialog.getItem(
@@ -88,6 +108,7 @@ class TakeAttendance(QDialog):
             if ok:
                 rfid_port = selected.split(" ")[0]
             else:
+                self._set_scan_status("error", "No reader selected. Take Attendance won't work.")
                 return
 
         try:
@@ -96,11 +117,12 @@ class TakeAttendance(QDialog):
                 baudrate=9600,
                 timeout=1
             )
-            QMessageBox.information(self, "Connected",
-                                f"Connected to {rfid_port}!")
+            self._set_scan_status(
+                "idle", f"Reader connected ({rfid_port}). Press Start to begin scanning."
+            )
         except Exception as e:
-            QMessageBox.critical(self, "Connection Failed",
-                                f"Failed to connect to {rfid_port}:\n{str(e)}")
+            logger.warning("Failed to connect to RFID reader %s: %s", rfid_port, e)
+            self._set_scan_status("error", f"Couldn't connect to {rfid_port}: {e}")
             self.ser = None
 
     def start_attendance(self):
@@ -112,7 +134,39 @@ class TakeAttendance(QDialog):
         self.timer = QTimer()
         self.timer.timeout.connect(self.check_rfid)
         self.timer.start(100)  # Check every 100ms
-        QMessageBox.information(self, "Started", "Listening for RFID cards...")
+        self._listening = True
+        self._set_scan_status("idle", "Listening for scans...")
+
+    def _set_scan_status(self, state, text, revert_after_ms=None):
+        """Update the live scan-status card (idle/success/warning/error) and
+        play a brief opacity pulse via QPropertyAnimation so a new event is
+        noticeable even though the instructor is watching students, not the
+        screen, most of the time."""
+        self.scan_status_card.setProperty("state", state)
+        self.scan_status_card.style().unpolish(self.scan_status_card)
+        self.scan_status_card.style().polish(self.scan_status_card)
+        self.scan_status_icon_lbl.setText(_SCAN_ICONS.get(state, ""))
+        self.scan_status_text_lbl.setText(text)
+
+        self._scan_opacity_effect.setOpacity(0.4)
+        animation = QPropertyAnimation(self._scan_opacity_effect, b"opacity", self)
+        animation.setDuration(250)
+        animation.setStartValue(0.4)
+        animation.setEndValue(1.0)
+        animation.setEasingCurve(QEasingCurve.OutCubic)
+        animation.start(QPropertyAnimation.DeleteWhenStopped)
+        self._scan_animation = animation
+
+        if revert_after_ms:
+            QTimer.singleShot(revert_after_ms, self._revert_scan_status_to_idle)
+
+    def _revert_scan_status_to_idle(self):
+        if self._closed:
+            return
+        if self._listening:
+            self._set_scan_status("idle", "Listening for scans...")
+        else:
+            self._set_scan_status("idle", "Press Start Attendance to begin scanning.")
 
     def check_rfid(self):
         """Check for RFID card presence"""
@@ -176,17 +230,19 @@ class TakeAttendance(QDialog):
             return
         student["card_id"] = card_id
 
+        # mark_attendance() -> record_attendance() flashes the scan-status
+        # card with the attendance result, so no separate "Registered!"
+        # confirmation is needed here.
         self.mark_attendance(student)
-        QMessageBox.information(self, "Registered",
-                            f"Card {card_id} registered to {selected_student}")
 
     def record_attendance(self, student, date, time_slot, exact_time, status):
         """Stage attendance row in the table (sent to the server on submit)"""
         student_id = student["student_id"]
         if student_id in self.staged_student_ids:
-            QMessageBox.information(
-                self, "Already Recorded",
+            self._set_scan_status(
+                "warning",
                 f"{student['name_surname']} was already recorded this session.",
+                revert_after_ms=1500,
             )
             return
 
@@ -214,12 +270,21 @@ class TakeAttendance(QDialog):
             for col, item in enumerate(items):
                 self.take_attendance_tableWidget.setItem(row_position, col, item)
 
-            color = QColor(255, 223, 128) if status == "Late" else QColor(144, 238, 144)
+            color = qcolor("warning_tint") if status == "Late" else qcolor("success_tint")
             for col in range(len(items)):
                 self.take_attendance_tableWidget.item(row_position, col).setBackground(color)
 
+            self._set_scan_status(
+                "success",
+                f"✓ {student['name_surname']} — {status} at {exact_time}",
+                revert_after_ms=1500,
+            )
+
         except Exception:
             logger.exception("Error adding attendance row to table")
+            self._set_scan_status(
+                "error", "Couldn't record that scan - check the logs.", revert_after_ms=2500
+            )
 
     def submit_attendance(self):
         """Send staged attendance records to the server."""
@@ -258,6 +323,7 @@ class TakeAttendance(QDialog):
 
     def closeEvent(self, event):
         """Cleanup when window closes"""
+        self._closed = True
         if hasattr(self, 'timer'):
             self.timer.stop()
         if self.ser:

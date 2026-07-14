@@ -107,6 +107,17 @@
           <item>
            <layout class="QVBoxLayout" name="myClassesLayout">
             <item>
+             <widget class="QLabel" name="my_classes_title_lbl">
+              <property name="text"><string>My Classes</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="empty_state_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="text"><string>You haven't created any classes yet. Use &quot;Create New Class&quot; below to get started.</string></property>
+             </widget>
+            </item>
+            <item>
              <layout class="QGridLayout" name="class_btns_layout"/>
             </item>
             <item>
@@ -436,10 +447,43 @@
         <widget class="QWidget" name="statisticsPage">
          <layout class="QVBoxLayout" name="statisticsPageLayout">
           <item>
-           <widget class="QComboBox" name="statistics_class_combo"/>
+           <widget class="QLabel" name="statistics_title_lbl">
+            <property name="text"><string>Attendance Statistics</string></property>
+           </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="statistics_chart_layout"/>
+           <layout class="QHBoxLayout" name="statistics_filter_row">
+            <item>
+             <widget class="QLabel" name="statistics_filter_lbl">
+              <property name="text"><string>Class:</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="statistics_class_combo"/>
+            </item>
+            <item>
+             <spacer name="statistics_filter_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QFrame" name="statistics_card">
+            <layout class="QVBoxLayout" name="statistics_card_layout">
+             <item>
+              <widget class="QLabel" name="statistics_empty_lbl">
+               <property name="visible"><bool>false</bool></property>
+               <property name="wordWrap"><bool>true</bool></property>
+               <property name="alignment"><set>Qt::AlignCenter</set></property>
+               <property name="text"><string/></property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="statistics_chart_layout"/>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>

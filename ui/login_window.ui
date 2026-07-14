@@ -94,6 +94,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="login_error_lbl">
+             <property name="visible"><bool>false</bool></property>
+             <property name="wordWrap"><bool>true</bool></property>
+             <property name="text"><string/></property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="options_row">
              <item>
               <widget class="QCheckBox" name="remember_me_cb">
