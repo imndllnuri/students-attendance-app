@@ -112,6 +112,27 @@
              </widget>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="class_sort_row">
+              <item>
+               <widget class="QLabel" name="class_sort_lbl">
+                <property name="text"><string>Sort by:</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="class_sort_combo">
+                <item><property name="text"><string>Class Code</string></property></item>
+                <item><property name="text"><string>Class Name</string></property></item>
+                <item><property name="text"><string>Day</string></property></item>
+               </widget>
+              </item>
+              <item>
+               <spacer name="class_sort_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
              <widget class="QLabel" name="empty_state_lbl">
               <property name="visible"><bool>false</bool></property>
               <property name="text"><string>You haven't created any classes yet. Use &quot;Create New Class&quot; below to get started.</string></property>

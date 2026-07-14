@@ -31,6 +31,11 @@ from models.classes import Class, ClassManager
 
 MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(5)
 
+_WEEKDAY_ORDER = {
+    "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3,
+    "Friday": 4, "Saturday": 5, "Sunday": 6,
+}
+
 
 class MainWindow(QMainWindow):
     def __init__(self, user):
@@ -56,6 +61,7 @@ class MainWindow(QMainWindow):
         self.search_btn.clicked.connect(self.show_search)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
+        self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
 
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
@@ -132,6 +138,15 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Server Error", str(e))
             return []
 
+    def _class_sort_key(self, cls):
+        mode = self.class_sort_combo.currentText()
+        if mode == "Class Name":
+            return (cls.class_name.lower(), cls.class_code.lower())
+        if mode == "Day":
+            days = [_WEEKDAY_ORDER.get(day, 99) for day, slots in cls.schedule.items() if slots]
+            return (min(days) if days else 99, cls.class_code.lower())
+        return (cls.class_code.lower(),)
+
     def load_classes(self):
         """Load class buttons into class_btns_layout"""
         while self.class_btns_layout.count():
@@ -139,7 +154,7 @@ class MainWindow(QMainWindow):
             if item.widget():
                 item.widget().deleteLater()
 
-        classes = sorted(self.fetch_classes(), key=lambda c: c.class_code)
+        classes = sorted(self.fetch_classes(), key=self._class_sort_key)
         self.empty_state_lbl.setVisible(not classes)
         for row, cls in enumerate(classes):
             self.class_btns_layout.addWidget(self._make_class_row_widget(cls), row, 0)
@@ -451,7 +466,7 @@ class MainWindow(QMainWindow):
             self.search_status_lbl.setText("No matching classes found.")
         else:
             self.search_status_lbl.setText(f"{len(matches)} class(es) found:")
-            for row, cls in enumerate(sorted(matches, key=lambda c: c.class_code)):
+            for row, cls in enumerate(sorted(matches, key=self._class_sort_key)):
                 self.search_results_layout.addWidget(self._make_class_row_widget(cls), row, 0)
 
     # --- Statistics ---
