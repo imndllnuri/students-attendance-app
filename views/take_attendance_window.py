@@ -55,6 +55,7 @@ class TakeAttendance(QDialog):
         self.class_name_lbl.setText(f"Taking attendance for {self.class_obj.class_name}")
         self.start_attendance_btn.clicked.connect(self.start_attendance)
         self.submit_attendance_btn.clicked.connect(self.submit_attendance)
+        self.mark_all_present_btn.clicked.connect(self.mark_all_present)
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
 
         self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#4F46E5"))
@@ -210,6 +211,29 @@ class TakeAttendance(QDialog):
         time_slot = self.hours_comboBox.currentText()
         status, exact_time_str = self.compute_status(time_slot)
         self.record_attendance(student, selected_date, time_slot, exact_time_str, status)
+
+    def mark_all_present(self):
+        """Bulk-mark every not-yet-recorded roster student as Present for
+        the currently selected date/time slot."""
+        if not self.roster:
+            QMessageBox.warning(self, "Error", "No students in roster to mark.")
+            return
+
+        selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
+        time_slot = self.hours_comboBox.currentText()
+        now_str = QDateTime.currentDateTime().toString("HH:mm")
+
+        remaining = [s for s in self.roster if s["student_id"] not in self.staged_student_ids]
+        if not remaining:
+            self._set_scan_status("idle", "Everyone is already recorded.", revert_after_ms=1500)
+            return
+
+        for student in remaining:
+            self.record_attendance(student, selected_date, time_slot, now_str, "Present")
+
+        self._set_scan_status(
+            "success", f"✓ Marked {len(remaining)} student(s) Present.", revert_after_ms=1500
+        )
 
     def register_card(self, card_id):
         """Register new RFID card to student and add to attendance"""
