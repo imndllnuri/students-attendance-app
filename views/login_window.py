@@ -4,7 +4,7 @@ import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMainWindow
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QLineEdit, QMainWindow
 
 from models.accounts import AccountManager
 from views.create_account_window import CreateAccountWindow
@@ -40,9 +40,13 @@ class LoginWindow(QMainWindow):
 
         self.email_le.textChanged.connect(self._clear_login_error)
         self.password_le.textChanged.connect(self._clear_login_error)
+        self.show_password_cb.toggled.connect(self._toggle_password_visibility)
 
         self.load_remembered_email()
         self.show()
+
+    def _toggle_password_visibility(self, checked):
+        self.password_le.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
 
     def load_remembered_email(self):
         if REMEMBERED_EMAIL_PATH.exists():

@@ -108,6 +108,11 @@
               </widget>
              </item>
              <item>
+              <widget class="QCheckBox" name="show_password_cb">
+               <property name="text"><string>Show password</string></property>
+              </widget>
+             </item>
+             <item>
               <spacer name="options_spacer">
                <property name="orientation"><enum>Qt::Horizontal</enum></property>
               </spacer>
