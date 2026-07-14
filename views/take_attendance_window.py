@@ -78,6 +78,12 @@ class TakeAttendance(QDialog):
         self._scan_opacity_effect.setOpacity(1.0)
         self._scan_animation = None
         self._set_scan_status("idle", "Press Start Attendance to begin scanning.")
+        self._update_progress_label()
+
+    def _update_progress_label(self):
+        self.attendance_progress_lbl.setText(
+            f"{len(self.staged_student_ids)}/{len(self.roster)} recorded"
+        )
 
     def setup_serial(self):
         """Improved serial connection setup with manual fallback"""
@@ -274,6 +280,7 @@ class TakeAttendance(QDialog):
             for col in range(len(items)):
                 self.take_attendance_tableWidget.item(row_position, col).setBackground(color)
 
+            self._update_progress_label()
             self._set_scan_status(
                 "success",
                 f"✓ {student['name_surname']} — {status} at {exact_time}",

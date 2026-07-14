@@ -35,16 +35,40 @@
        </widget>
       </item>
       <item row="2" column="0">
+       <layout class="QHBoxLayout" name="attendance_actions_row">
+        <item>
+         <widget class="QPushButton" name="mark_all_present_btn">
+          <property name="text"><string>Mark All Present</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="undo_last_scan_btn">
+          <property name="text"><string>Undo Last Scan</string></property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="attendance_actions_spacer">
+          <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="attendance_progress_lbl">
+          <property name="text"><string>0/0 recorded</string></property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QTableWidget" name="take_attendance_tableWidget"/>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QPushButton" name="submit_attendance_btn">
         <property name="text">
          <string>Submit Attendance</string>

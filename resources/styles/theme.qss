@@ -71,9 +71,14 @@ QLabel#class_row_caption_lbl,
 QLabel#login_error_lbl,
 QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
-QLabel#roster_status_lbl {
+QLabel#roster_status_lbl,
+QLabel#attendance_progress_lbl {
     font-size: 9pt;
     color: #64748B;
+}
+
+QLabel#attendance_progress_lbl {
+    font-weight: 600;
 }
 
 QLabel#roster_status_lbl {
