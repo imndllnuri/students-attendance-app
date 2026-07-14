@@ -53,6 +53,13 @@ PALETTE = {
     "border_strong": "#CBD5E1",
 }
 
+# Class-card color tags: a small, hand-picked set of distinct hues (not an
+# arbitrary hash-to-RGB, which tends to produce muddy colors).
+CLASS_TAG_COLORS = [
+    "#4F46E5", "#0EA5E9", "#16A34A", "#D97706",
+    "#DC2626", "#DB2777", "#7C3AED", "#0D9488",
+]
+
 
 def qcolor(token: str):
     """Return a QColor for a palette token. Imports PyQt5 lazily so this
@@ -61,3 +68,13 @@ def qcolor(token: str):
     from PyQt5.QtGui import QColor
 
     return QColor(PALETTE[token])
+
+
+def class_tag_color(class_code: str) -> str:
+    """Deterministic color per class code, stable across app restarts
+    (Python's built-in hash() is randomized per-process, so it can't be
+    used here - crc32 is stable)."""
+    import zlib
+
+    index = zlib.crc32(class_code.encode("utf-8")) % len(CLASS_TAG_COLORS)
+    return CLASS_TAG_COLORS[index]

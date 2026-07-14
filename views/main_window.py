@@ -3,6 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
 from PyQt5.QtWidgets import (
+    QFrame,
     QGraphicsDropShadowEffect,
     QHBoxLayout,
     QLabel,
@@ -18,7 +19,7 @@ from matplotlib.figure import Figure
 
 from resources.images import qrc
 from services.api_client import ApiError
-from shared.palette import PALETTE
+from shared.palette import PALETTE, class_tag_color
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -164,6 +165,14 @@ class MainWindow(QMainWindow):
         class_widget.setObjectName("class_row_widget")
         row_layout = QHBoxLayout(class_widget)
         row_layout.setContentsMargins(4, 4, 4, 4)
+
+        color_chip = QFrame()
+        color_chip.setFixedWidth(4)
+        color_chip.setMinimumHeight(40)
+        color_chip.setStyleSheet(
+            f"background-color: {class_tag_color(cls.class_code)}; border-radius: 2px;"
+        )
+        row_layout.addWidget(color_chip)
 
         text_layout = QVBoxLayout()
         text_layout.setSpacing(0)
