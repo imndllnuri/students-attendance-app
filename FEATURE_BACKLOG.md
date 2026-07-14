@@ -47,7 +47,7 @@ marked "not selected" were intentionally left out of this batch.
 
 ## Cross-cutting
 - [ ] 29. Notification/activity feed
-- [ ] 30. Keyboard shortcuts (Ctrl+N new class, Ctrl+F search, ...)
+- [x] 30. Keyboard shortcuts (Ctrl+N new class, Ctrl+F search, ...)
 
 ## Also implemented (not in the original 30, explicitly requested)
 - [x] Show-password checkbox on the login screen

@@ -1,7 +1,7 @@
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QFont, QPainter, QPixmap
+from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QFrame,
     QGraphicsDropShadowEffect,
@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QShortcut,
     QVBoxLayout,
     QWidget,
 )
@@ -80,6 +81,7 @@ class MainWindow(QMainWindow):
         self._setup_icons()
         self._apply_card_shadows()
         self._set_active_nav(self.my_classes_btn)
+        self._setup_shortcuts()
 
         self.load_classes()
         self.show()
@@ -97,11 +99,28 @@ class MainWindow(QMainWindow):
         self.profile_btn.setIconSize(QSize(18, 18))
         self.search_btn.setIconSize(QSize(16, 16))
 
+        self.my_classes_btn.setToolTip("My Classes (Ctrl+1)")
+        self.settings_btn.setToolTip("Settings (Ctrl+2)")
+        self.statistics_btn.setToolTip("Statistics (Ctrl+3)")
+        self.search_btn.setToolTip("Search (Ctrl+F)")
+        self.create_new_class_btn.setToolTip("Create New Class (Ctrl+N)")
         self.create_new_class_btn.setIcon(qta.icon("fa5s.plus", color="white"))
         self.settings_show_password_btn.setIcon(qta.icon("fa5s.eye", color="#64748B"))
         self.settings_show_password_btn.setText("")
         self.settings_show_password_btn.setAccessibleName("Toggle password visibility")
         self.settings_show_password_btn.setToolTip("Show password")
+
+    def _setup_shortcuts(self):
+        QShortcut(QKeySequence("Ctrl+N"), self, self.open_add_new_class_window)
+        QShortcut(QKeySequence("Ctrl+F"), self, self._focus_search)
+        QShortcut(QKeySequence("Ctrl+1"), self, self.show_my_classes)
+        QShortcut(QKeySequence("Ctrl+2"), self, self.show_settings)
+        QShortcut(QKeySequence("Ctrl+3"), self, self.show_statistics)
+
+    def _focus_search(self):
+        self.show_search()
+        self.search_bar_le.setFocus()
+        self.search_bar_le.selectAll()
 
     def _apply_card_shadows(self):
         for frame in (self.profile_card_frame, self.settings_card_frame):
