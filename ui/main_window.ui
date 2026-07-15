@@ -246,6 +246,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="import_classes_btn">
+              <property name="text">
+               <string>Import Classes From Spreadsheet</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>

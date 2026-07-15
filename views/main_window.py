@@ -2,6 +2,7 @@ import csv
 import json
 from datetime import datetime
 
+import pandas as pd
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import QEvent, Qt, QSize, QTimer
@@ -86,6 +87,7 @@ class MainWindow(QMainWindow):
         self.statistics_btn.clicked.connect(self.show_statistics)
         self.log_out_btn.clicked.connect(self.confirm_logout)
         self.create_new_class_btn.clicked.connect(self.open_add_new_class_window)
+        self.import_classes_btn.clicked.connect(self.import_classes_from_spreadsheet)
         self.search_btn.clicked.connect(self.show_search)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.notifications_btn.clicked.connect(self.show_notifications_menu)
@@ -660,6 +662,68 @@ class MainWindow(QMainWindow):
             lambda msg: self.add_notification(f"Roster upload failed: {msg}")
         )
         self.add_new_class_window.show()
+
+    _IMPORT_REQUIRED_COLUMNS = (
+        "class_code", "class_name", "section", "attendance_policy",
+        "late_threshold", "total_weeks", "total_hours", "weekly_hours",
+    )
+
+    def import_classes_from_spreadsheet(self):
+        """Bulk-creates classes from a spreadsheet with one row per class
+        (header row required); schedule isn't included, use Edit Class
+        afterwards to set it."""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Import Classes", "", "Spreadsheet Files (*.csv *.xlsx *.xls)"
+        )
+        if not file_path:
+            return
+
+        try:
+            if file_path.endswith((".xlsx", ".xls")):
+                df = pd.read_excel(file_path)
+            else:
+                df = pd.read_csv(file_path)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to read spreadsheet:\n{e}")
+            return
+
+        missing = set(self._IMPORT_REQUIRED_COLUMNS) - set(df.columns)
+        if missing:
+            QMessageBox.critical(
+                self, "Invalid Spreadsheet",
+                f"Missing required column(s): {', '.join(sorted(missing))}",
+            )
+            return
+
+        created = 0
+        errors = []
+        for _, row in df.iterrows():
+            new_class = Class(
+                class_code=str(row["class_code"]),
+                class_name=str(row["class_name"]),
+                instructor_id=self.user_id,
+                section=str(row["section"]),
+                attendance_policy=float(row["attendance_policy"]),
+                late_threshold=int(row["late_threshold"]),
+                total_weeks=int(row["total_weeks"]),
+                total_hours=float(row["total_hours"]),
+                weekly_hours=float(row["weekly_hours"]),
+                schedule={},
+            )
+            try:
+                self.class_manager.add_class(new_class)
+                created += 1
+            except ApiError as e:
+                errors.append(f"{new_class.class_code}: {e}")
+
+        self.load_classes()
+        if errors:
+            QMessageBox.warning(
+                self, "Partially Completed",
+                f"Created {created} class(es). Errors:\n" + "\n".join(errors),
+            )
+        else:
+            QMessageBox.information(self, "Success", f"Created {created} class(es).")
 
     def confirm_logout(self):
         reply = QMessageBox.question(self, 'Log Out', 'Are you sure you want to log out?',
