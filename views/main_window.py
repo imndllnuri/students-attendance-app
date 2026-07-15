@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QFrame,
     QGraphicsDropShadowEffect,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QLineEdit,
     QMainWindow,
@@ -813,6 +814,16 @@ class MainWindow(QMainWindow):
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
         )
         if reply != QMessageBox.Yes:
+            return
+
+        typed_email, ok = QInputDialog.getText(
+            self, "Confirm Deletion",
+            f"Type your email ({self.user.email}) to confirm permanent deletion:",
+        )
+        if not ok:
+            return
+        if typed_email.strip().lower() != self.user.email.strip().lower():
+            QMessageBox.warning(self, "Email Didn't Match", "Account deletion cancelled.")
             return
 
         success, error = self.account_manager.delete_account(self.user_id)

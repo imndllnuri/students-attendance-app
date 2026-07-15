@@ -56,6 +56,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 13. CSV export of the class list
 - [x] 16. Roster CSV/Excel re-export
 - [x] 5. Export/download your own account data as JSON
+- [x] 38. Type-your-email confirmation before permanent account deletion
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope
