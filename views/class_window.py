@@ -127,16 +127,56 @@ class ClassWindow(QMainWindow):
         self.class_settings_btn.clicked.connect(self.open_edit_class_window)
         self.add_student_btn.clicked.connect(self.add_roster_student)
         self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
-        self.student_list_tableWidget.cellDoubleClicked.connect(self.correct_attendance_cell)
+        self.student_list_tableWidget.cellDoubleClicked.connect(self.handle_roster_cell_double_click)
 
     _FIRST_SESSION_COLUMN = 4  # Student Number, Name Surname, Not Attended, Attended
+
+    def handle_roster_cell_double_click(self, row, col):
+        """Session columns open the attendance-correction prompt (#15);
+        the Student Number/Name/hours columns open a per-student detail
+        view (#23) instead."""
+        if col < self._FIRST_SESSION_COLUMN:
+            self.show_student_detail(row)
+        else:
+            self.correct_attendance_cell(row, col)
+
+    def show_student_detail(self, row):
+        student_number_item = self.student_list_tableWidget.item(row, 0)
+        student_name_item = self.student_list_tableWidget.item(row, 1)
+        if student_number_item is None or student_name_item is None:
+            return
+
+        lines = [f"{student_name_item.text()} ({student_number_item.text()})", ""]
+
+        not_attended_item = self.student_list_tableWidget.item(row, 2)
+        attended_item = self.student_list_tableWidget.item(row, 3)
+        if attended_item is not None and not_attended_item is not None:
+            try:
+                attended = float(attended_item.text())
+                not_attended = float(not_attended_item.text())
+                total = attended + not_attended
+                pct = (attended / total * 100) if total else 0
+                lines.append(f"Attended: {attended_item.text()}  |  Not Attended: {not_attended_item.text()}"
+                              f"  |  Attendance Rate: {pct:.0f}%")
+            except ValueError:
+                lines.append(f"Attended: {attended_item.text()}  |  Not Attended: {not_attended_item.text()}")
+            lines.append("")
+
+        for col in range(self._FIRST_SESSION_COLUMN, self.student_list_tableWidget.columnCount()):
+            header_item = self.student_list_tableWidget.horizontalHeaderItem(col)
+            cell_item = self.student_list_tableWidget.item(row, col)
+            if header_item is None or cell_item is None:
+                continue
+            value = cell_item.text()
+            status = value.split(" ", 1)[1] if value.startswith("1 ") else "Absent"
+            lines.append(f"{header_item.text()}: {status}")
+
+        QMessageBox.information(self, "Student Detail", "\n".join(lines))
 
     def correct_attendance_cell(self, row, col):
         """Double-clicking a session cell in the roster table lets the
         instructor correct a past attendance record (e.g. it was marked
         wrong during the live session)."""
-        if col < self._FIRST_SESSION_COLUMN:
-            return
         header_item = self.student_list_tableWidget.horizontalHeaderItem(col)
         if header_item is None or " - " not in header_item.text():
             return
