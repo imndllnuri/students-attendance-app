@@ -35,6 +35,9 @@ class CreateAccountWindow(QDialog):
         self.password_again_le.textChanged.connect(self.validate_password_match)
 
         self.security_question_ComboBox.addItems(SECURITY_QUESTIONS)
+        self.security_question_2_ComboBox.addItems(SECURITY_QUESTIONS)
+        if len(SECURITY_QUESTIONS) > 1:
+            self.security_question_2_ComboBox.setCurrentIndex(1)
 
         for btn in (self.show_password_btn, self.show_password_again_btn):
             btn.setText("")
@@ -115,8 +118,10 @@ class CreateAccountWindow(QDialog):
         password_again = self.password_again_le.text()
         name = self.name_le.text().strip()
         surname = self.surname_le.text().strip()
-        security_question = self.security_question_ComboBox.currentText()
-        answer = self.answer_le.text()
+        security_question_1 = self.security_question_ComboBox.currentText()
+        answer_1 = self.answer_le.text()
+        security_question_2 = self.security_question_2_ComboBox.currentText()
+        answer_2 = self.answer_2_le.text()
 
         email_ok = self.validate_email()
         password_ok = self.validate_password()
@@ -124,11 +129,21 @@ class CreateAccountWindow(QDialog):
 
         if not (email_ok and password_ok and match_ok):
             return
-        if not email or not password or not name or not surname or not answer:
+        if not email or not password or not name or not surname or not answer_1 or not answer_2:
             QMessageBox.warning(self, "Missing Information", "Please fill in all fields.")
             return
+        if security_question_1 == security_question_2:
+            self._set_error(
+                self.answer_2_le, self.security_questions_error_lbl,
+                "Please choose two different security questions.",
+            )
+            return
+        self._clear_error(self.answer_2_le, self.security_questions_error_lbl)
 
-        new_account = Account(email, password, name, surname, security_question, answer)
+        new_account = Account(
+            email, password, name, surname,
+            security_question_1, answer_1, security_question_2, answer_2,
+        )
         if not self.account_manager.add_account(new_account):
             QMessageBox.warning(self, "Account Exists", "An account with this email already exists!")
             return

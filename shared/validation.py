@@ -13,6 +13,7 @@ MIN_PASSWORD_LENGTH = 8
 SECURITY_QUESTIONS = [
     "What is your mother's maiden name?",
     "What was your first pet's name?",
+    "What city were you born in?",
 ]
 
 

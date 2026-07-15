@@ -393,6 +393,115 @@ def test_trigger_backup_creates_a_backup_file(client, monkeypatch, tmp_path):
     assert len(list(backup_dir.glob("*.db"))) == 1
 
 
+def test_create_account_rejects_two_identical_security_questions(client):
+    payload = dict(SAMPLE_INSTRUCTOR)
+    payload["security_question_2"] = payload["security_question_1"]
+
+    resp = client.post("/accounts", json=payload)
+
+    assert resp.status_code == 400
+
+
+def test_security_questions_endpoint_returns_both_questions(client):
+    create_instructor(client)
+
+    resp = client.post("/security-questions", json={"email": SAMPLE_INSTRUCTOR["email"]})
+
+    assert resp.status_code == 200
+    assert resp.get_json()["security_questions"] == [
+        SAMPLE_INSTRUCTOR["security_question_1"], SAMPLE_INSTRUCTOR["security_question_2"],
+    ]
+
+
+def test_reset_password_requires_both_answers_to_be_correct(client):
+    create_instructor(client)
+
+    wrong_first = client.post(
+        "/reset-password",
+        json={
+            "email": SAMPLE_INSTRUCTOR["email"],
+            "answer_1": "wrong", "answer_2": SAMPLE_INSTRUCTOR["answer_2"],
+            "new_password": "NewPassword123",
+        },
+    )
+    assert wrong_first.status_code == 401
+
+    wrong_second = client.post(
+        "/reset-password",
+        json={
+            "email": SAMPLE_INSTRUCTOR["email"],
+            "answer_1": SAMPLE_INSTRUCTOR["answer_1"], "answer_2": "wrong",
+            "new_password": "NewPassword123",
+        },
+    )
+    assert wrong_second.status_code == 401
+
+    both_correct = client.post(
+        "/reset-password",
+        json={
+            "email": SAMPLE_INSTRUCTOR["email"],
+            "answer_1": SAMPLE_INSTRUCTOR["answer_1"], "answer_2": SAMPLE_INSTRUCTOR["answer_2"],
+            "new_password": "NewPassword123",
+        },
+    )
+    assert both_correct.status_code == 200
+
+    reauth = client.post(
+        "/authenticate",
+        json={"email": SAMPLE_INSTRUCTOR["email"], "password": "NewPassword123"},
+    )
+    assert reauth.status_code == 200
+
+
+def test_update_security_questions_requires_current_password_and_distinct_questions(client):
+    instructor_id = create_instructor(client)
+
+    wrong_password = client.post(
+        f"/accounts/{instructor_id}/security-questions",
+        json={
+            "current_password": "wrong",
+            "security_question_1": "New Q1", "answer_1": "a1",
+            "security_question_2": "New Q2", "answer_2": "a2",
+        },
+    )
+    assert wrong_password.status_code == 401
+
+    same_question = client.post(
+        f"/accounts/{instructor_id}/security-questions",
+        json={
+            "current_password": SAMPLE_INSTRUCTOR["password"],
+            "security_question_1": "New Q1", "answer_1": "a1",
+            "security_question_2": "New Q1", "answer_2": "a2",
+        },
+    )
+    assert same_question.status_code == 400
+
+    updated = client.post(
+        f"/accounts/{instructor_id}/security-questions",
+        json={
+            "current_password": SAMPLE_INSTRUCTOR["password"],
+            "security_question_1": "New Q1", "answer_1": "new-answer-1",
+            "security_question_2": "New Q2", "answer_2": "new-answer-2",
+        },
+    )
+    assert updated.status_code == 200
+
+    questions = client.post(
+        "/security-questions", json={"email": SAMPLE_INSTRUCTOR["email"]}
+    ).get_json()["security_questions"]
+    assert questions == ["New Q1", "New Q2"]
+
+    reset = client.post(
+        "/reset-password",
+        json={
+            "email": SAMPLE_INSTRUCTOR["email"],
+            "answer_1": "new-answer-1", "answer_2": "new-answer-2",
+            "new_password": "AnotherPass123",
+        },
+    )
+    assert reset.status_code == 200
+
+
 def test_roster_attend_and_statistics_flow(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

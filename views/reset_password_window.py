@@ -38,23 +38,25 @@ class ResetPasswordWindow(QDialog):
             self._show_error(self.error_lbl_step1, "Please enter your email.")
             return
 
-        question = self.account_manager.get_security_question(email)
-        if not question:
+        questions = self.account_manager.get_security_questions(email)
+        if not questions:
             self._show_error(self.error_lbl_step1, "No account found with this email.")
             return
 
         self._email = email
         self.error_lbl_step1.setVisible(False)
-        self.security_question_lbl.setText(question)
+        self.security_question_lbl.setText(questions[0])
+        self.security_question_2_lbl.setText(questions[1])
         self.steps_stack.setCurrentIndex(1)
 
     def submit_reset(self):
-        answer = self.answer_le.text().strip()
+        answer_1 = self.answer_le.text().strip()
+        answer_2 = self.answer_2_le.text().strip()
         new_password = self.new_password_le.text()
         confirm_password = self.confirm_password_le.text()
 
-        if not answer:
-            self._show_error(self.error_lbl_step2, "Please answer the security question.")
+        if not answer_1 or not answer_2:
+            self._show_error(self.error_lbl_step2, "Please answer both security questions.")
             return
         if not is_valid_password(new_password):
             self._show_error(
@@ -68,7 +70,7 @@ class ResetPasswordWindow(QDialog):
             return
 
         success, error_message = self.account_manager.reset_password(
-            self._email, answer, new_password
+            self._email, answer_1, answer_2, new_password
         )
         if not success:
             self._show_error(self.error_lbl_step2, error_message)

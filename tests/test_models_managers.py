@@ -49,6 +49,22 @@ class FakeApiClient:
         self.calls.append(("correct_attendance", class_id, student_id, date, time_slot, status))
         return {"deleted": status == "Absent"}
 
+    def get_security_questions(self, email):
+        self.calls.append(("get_security_questions", email))
+        return {"security_questions": ["Q1?", "Q2?"]}
+
+    def reset_password(self, email, answer_1, answer_2, new_password):
+        self.calls.append(("reset_password", email, answer_1, answer_2, new_password))
+
+    def update_security_questions(
+        self, user_id, current_password,
+        security_question_1, answer_1, security_question_2, answer_2,
+    ):
+        self.calls.append((
+            "update_security_questions", user_id, current_password,
+            security_question_1, answer_1, security_question_2, answer_2,
+        ))
+
 
 class FailingApiClient(FakeApiClient):
     def create_class(self, class_data):
@@ -65,6 +81,18 @@ class FailingApiClient(FakeApiClient):
 
     def merge_students(self, keep_student_id, remove_student_id):
         raise ApiError("boom")
+
+    def get_security_questions(self, email):
+        raise ApiError("boom")
+
+    def reset_password(self, email, answer_1, answer_2, new_password):
+        raise ApiError("Incorrect security answer")
+
+    def update_security_questions(
+        self, user_id, current_password,
+        security_question_1, answer_1, security_question_2, answer_2,
+    ):
+        raise ApiError("Current password is incorrect")
 
 
 def make_class(class_id=None):
@@ -153,10 +181,69 @@ def test_class_from_dict_parses_pinned_field():
 def test_account_manager_add_account_wraps_api_client():
     fake = FakeApiClient()
     manager = AccountManager(api_client=fake)
-    account = Account("a@b.com", "Password123", "A", "B", "Q?", "answer")
+    account = Account("a@b.com", "Password123", "A", "B", "Q1?", "answer1", "Q2?", "answer2")
 
     assert manager.add_account(account) is True
     assert fake.calls == [("create_account", account.to_dict())]
+
+
+def test_account_manager_get_security_questions_returns_both_questions():
+    fake = FakeApiClient()
+    manager = AccountManager(api_client=fake)
+
+    assert manager.get_security_questions("a@b.com") == ["Q1?", "Q2?"]
+    assert fake.calls == [("get_security_questions", "a@b.com")]
+
+
+def test_account_manager_get_security_questions_returns_none_on_api_error():
+    manager = AccountManager(api_client=FailingApiClient())
+    assert manager.get_security_questions("a@b.com") is None
+
+
+def test_account_manager_reset_password_wraps_both_answers():
+    fake = FakeApiClient()
+    manager = AccountManager(api_client=fake)
+
+    success, error = manager.reset_password("a@b.com", "ans1", "ans2", "NewPass123")
+
+    assert success is True
+    assert error == ""
+    assert fake.calls == [("reset_password", "a@b.com", "ans1", "ans2", "NewPass123")]
+
+
+def test_account_manager_reset_password_returns_false_on_api_error():
+    manager = AccountManager(api_client=FailingApiClient())
+
+    success, error = manager.reset_password("a@b.com", "ans1", "ans2", "NewPass123")
+
+    assert success is False
+    assert error == "Incorrect security answer"
+
+
+def test_account_manager_update_security_questions_wraps_api_client():
+    fake = FakeApiClient()
+    manager = AccountManager(api_client=fake)
+
+    success, error = manager.update_security_questions(
+        "u1", "current-pass", "Q1?", "ans1", "Q2?", "ans2"
+    )
+
+    assert success is True
+    assert error == ""
+    assert fake.calls == [
+        ("update_security_questions", "u1", "current-pass", "Q1?", "ans1", "Q2?", "ans2")
+    ]
+
+
+def test_account_manager_update_security_questions_returns_false_on_api_error():
+    manager = AccountManager(api_client=FailingApiClient())
+
+    success, error = manager.update_security_questions(
+        "u1", "wrong-pass", "Q1?", "ans1", "Q2?", "ans2"
+    )
+
+    assert success is False
+    assert error == "Current password is incorrect"
 
 
 def test_class_manager_add_class_sets_id_and_tracks_it():

@@ -88,6 +88,8 @@ marked "not selected" were intentionally left out of this batch.
       student merges, attendance corrections)
 - [x] 41. Scheduled automatic database backup (daily, retains last 10)
 - [x] 50. Plugin-style hook for real RFID/ESP8266 hardware integration
+- [x] 6. Multiple security questions (pick 2 of 3) for signup, password
+      reset, and updating security questions from Settings
 
 ## Notes on scope
 - **#29 Notifications**: in-app bell-icon feed only (in-memory, not
@@ -135,3 +137,16 @@ marked "not selected" were intentionally left out of this batch.
   whichever backend is active; no real ESP8266 hardware was available to
   test against, so the TCP transport is verified against a local loopback
   server in `tests/test_card_reader_plugin.py` instead.
+- **#6 Two security questions**: `SECURITY_QUESTIONS` now has 3 entries;
+  signup, reset-password, and the Settings page's "Update Security
+  Question" form each collect two answers from two questions that must
+  differ (enforced client-side and again server-side in
+  `server/app.py`'s `create_account`/`update_security_questions`).
+  `accounts.security_question`/`answer_hash` became
+  `security_question_1`/`answer_hash_1`/`security_question_2`/
+  `answer_hash_2`; existing dev databases get the new columns via the
+  same defensive `ALTER TABLE ... ADD COLUMN` pattern used elsewhere in
+  `server/db.py`, defaulting to `''` (no data migration for accounts
+  created under the old single-question scheme, consistent with this
+  project's dev-database-maturity trade-offs noted elsewhere in this
+  file). Resetting a password now requires both answers to be correct.

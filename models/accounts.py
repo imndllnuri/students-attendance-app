@@ -2,14 +2,20 @@ from services.api_client import ApiClient, ApiError
 
 
 class Account:
-    def __init__(self, email, password, name, surname, security_question, answer, user_id=None):
+    def __init__(
+        self, email, password, name, surname,
+        security_question_1, answer_1, security_question_2, answer_2,
+        user_id=None,
+    ):
         self.user_id = user_id
         self.email = email
         self.password = password
         self.name = name
         self.surname = surname
-        self.security_question = security_question
-        self.answer = answer
+        self.security_question_1 = security_question_1
+        self.answer_1 = answer_1
+        self.security_question_2 = security_question_2
+        self.answer_2 = answer_2
 
     def to_dict(self):
         return {
@@ -17,8 +23,10 @@ class Account:
             "password": self.password,
             "name": self.name,
             "surname": self.surname,
-            "security_question": self.security_question,
-            "answer": self.answer,
+            "security_question_1": self.security_question_1,
+            "answer_1": self.answer_1,
+            "security_question_2": self.security_question_2,
+            "answer_2": self.answer_2,
         }
 
     @staticmethod
@@ -28,8 +36,10 @@ class Account:
             data.get("password", ""),
             data["name"],
             data["surname"],
-            data.get("security_question", ""),
-            data.get("answer", ""),
+            data.get("security_question_1", ""),
+            data.get("answer_1", ""),
+            data.get("security_question_2", ""),
+            data.get("answer_2", ""),
             user_id=data["user_id"],
         )
 
@@ -54,16 +64,16 @@ class AccountManager:
             return None
         return Account.from_dict(data) if data else None
 
-    def get_security_question(self, email):
+    def get_security_questions(self, email):
         try:
-            data = self.api_client.get_security_question(email)
+            data = self.api_client.get_security_questions(email)
         except ApiError:
             return None
-        return data["security_question"] if data else None
+        return data["security_questions"] if data else None
 
-    def reset_password(self, email, answer, new_password):
+    def reset_password(self, email, answer_1, answer_2, new_password):
         try:
-            self.api_client.reset_password(email, answer, new_password)
+            self.api_client.reset_password(email, answer_1, answer_2, new_password)
         except ApiError as e:
             return False, str(e)
         return True, ""
@@ -82,10 +92,14 @@ class AccountManager:
             return False, str(e)
         return True, ""
 
-    def update_security_question(self, user_id, current_password, security_question, answer):
+    def update_security_questions(
+        self, user_id, current_password,
+        security_question_1, answer_1, security_question_2, answer_2,
+    ):
         try:
-            self.api_client.update_security_question(
-                user_id, current_password, security_question, answer
+            self.api_client.update_security_questions(
+                user_id, current_password,
+                security_question_1, answer_1, security_question_2, answer_2,
             )
         except ApiError as e:
             return False, str(e)

@@ -440,6 +440,17 @@
                 </widget>
                </item>
                <item>
+                <widget class="QComboBox" name="settings_security_question_2_combo">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="settings_answer_2_le">
+                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="placeholderText"><string> Your answer</string></property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLineEdit" name="settings_current_password_for_question_le">
                  <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>

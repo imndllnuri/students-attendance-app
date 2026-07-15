@@ -25,6 +25,10 @@ def init_db():
         "ALTER TABLE classes ADD COLUMN notes TEXT NOT NULL DEFAULT ''",
         "ALTER TABLE classes ADD COLUMN color TEXT",
         "ALTER TABLE classes ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE accounts ADD COLUMN security_question_1 TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE accounts ADD COLUMN answer_hash_1 TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE accounts ADD COLUMN security_question_2 TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE accounts ADD COLUMN answer_hash_2 TEXT NOT NULL DEFAULT ''",
     ):
         try:
             conn.execute(statement)

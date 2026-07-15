@@ -40,14 +40,17 @@ class ApiClient:
     def create_account(self, account_data):
         return self._request("POST", "/accounts", json=account_data)
 
-    def get_security_question(self, email):
-        return self._request("POST", "/security-question", json={"email": email})
+    def get_security_questions(self, email):
+        return self._request("POST", "/security-questions", json={"email": email})
 
-    def reset_password(self, email, answer, new_password):
+    def reset_password(self, email, answer_1, answer_2, new_password):
         return self._request(
             "POST",
             "/reset-password",
-            json={"email": email, "answer": answer, "new_password": new_password},
+            json={
+                "email": email, "answer_1": answer_1, "answer_2": answer_2,
+                "new_password": new_password,
+            },
         )
 
     def update_account(self, user_id, email=None, name=None, surname=None):
@@ -64,14 +67,17 @@ class ApiClient:
             json={"current_password": current_password, "new_password": new_password},
         )
 
-    def update_security_question(self, user_id, current_password, security_question, answer):
+    def update_security_questions(
+        self, user_id, current_password,
+        security_question_1, answer_1, security_question_2, answer_2,
+    ):
         return self._request(
             "POST",
-            f"/accounts/{user_id}/security-question",
+            f"/accounts/{user_id}/security-questions",
             json={
                 "current_password": current_password,
-                "security_question": security_question,
-                "answer": answer,
+                "security_question_1": security_question_1, "answer_1": answer_1,
+                "security_question_2": security_question_2, "answer_2": answer_2,
             },
         )
 

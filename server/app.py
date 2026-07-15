@@ -69,18 +69,25 @@ def create_account():
         conn.close()
         return jsonify({"error": "Email already exists"}), 409
 
+    if data["security_question_1"] == data["security_question_2"]:
+        conn.close()
+        return jsonify({"error": "Please choose two different security questions."}), 400
+
     user_id = str(uuid.uuid4())
     conn.execute(
         "INSERT INTO accounts (user_id, email, password_hash, name, surname, "
-        "security_question, answer_hash) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "security_question_1, answer_hash_1, security_question_2, answer_hash_2) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             user_id,
             data["email"],
             generate_password_hash(data["password"]),
             data["name"],
             data["surname"],
-            data["security_question"],
-            generate_password_hash(data["answer"]),
+            data["security_question_1"],
+            generate_password_hash(data["answer_1"]),
+            data["security_question_2"],
+            generate_password_hash(data["answer_2"]),
         ),
     )
     conn.commit()
@@ -134,17 +141,20 @@ def login_history(user_id):
     return jsonify([row["logged_in_at"] for row in rows])
 
 
-@app.post("/security-question")
-def security_question():
+@app.post("/security-questions")
+def security_questions():
     data = request.get_json()
     conn = get_connection()
     account = conn.execute(
-        "SELECT security_question FROM accounts WHERE email = ?", (data["email"],)
+        "SELECT security_question_1, security_question_2 FROM accounts WHERE email = ?",
+        (data["email"],),
     ).fetchone()
     conn.close()
     if not account:
         return jsonify({"error": "No account found with this email"}), 404
-    return jsonify({"security_question": account["security_question"]})
+    return jsonify(
+        {"security_questions": [account["security_question_1"], account["security_question_2"]]}
+    )
 
 
 @app.post("/reset-password")
@@ -157,9 +167,11 @@ def reset_password():
     if not account:
         conn.close()
         return jsonify({"error": "No account found with this email"}), 404
-    if not check_password_hash(account["answer_hash"], data["answer"]):
+    if not check_password_hash(account["answer_hash_1"], data["answer_1"]) or not check_password_hash(
+        account["answer_hash_2"], data["answer_2"]
+    ):
         conn.close()
-        return jsonify({"error": "Incorrect security answer"}), 401
+        return jsonify({"error": "One or more security answers are incorrect"}), 401
     conn.execute(
         "UPDATE accounts SET password_hash = ? WHERE email = ?",
         (generate_password_hash(data["new_password"]), data["email"]),
@@ -226,8 +238,8 @@ def change_password(user_id):
     return jsonify({"user_id": user_id})
 
 
-@app.post("/accounts/<user_id>/security-question")
-def update_security_question(user_id):
+@app.post("/accounts/<user_id>/security-questions")
+def update_security_questions(user_id):
     data = request.get_json()
     conn = get_connection()
     account = conn.execute(
@@ -239,10 +251,20 @@ def update_security_question(user_id):
     if not check_password_hash(account["password_hash"], data["current_password"]):
         conn.close()
         return jsonify({"error": "Current password is incorrect"}), 401
+    if data["security_question_1"] == data["security_question_2"]:
+        conn.close()
+        return jsonify({"error": "Please choose two different security questions."}), 400
 
     conn.execute(
-        "UPDATE accounts SET security_question = ?, answer_hash = ? WHERE user_id = ?",
-        (data["security_question"], generate_password_hash(data["answer"]), user_id),
+        "UPDATE accounts SET security_question_1 = ?, answer_hash_1 = ?, "
+        "security_question_2 = ?, answer_hash_2 = ? WHERE user_id = ?",
+        (
+            data["security_question_1"],
+            generate_password_hash(data["answer_1"]),
+            data["security_question_2"],
+            generate_password_hash(data["answer_2"]),
+            user_id,
+        ),
     )
     conn.commit()
     conn.close()

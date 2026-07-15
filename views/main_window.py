@@ -131,8 +131,11 @@ class MainWindow(QMainWindow):
         self._setup_language_combo()
 
         self.settings_security_question_combo.addItems(SECURITY_QUESTIONS)
+        self.settings_security_question_2_combo.addItems(SECURITY_QUESTIONS)
+        if len(SECURITY_QUESTIONS) > 1:
+            self.settings_security_question_2_combo.setCurrentIndex(1)
         self.change_password_btn.clicked.connect(self.change_password)
-        self.update_security_question_btn.clicked.connect(self.update_security_question)
+        self.update_security_question_btn.clicked.connect(self.update_security_questions)
         self.delete_account_btn.clicked.connect(self.confirm_delete_account)
         self.settings_show_password_btn.toggled.connect(self._toggle_settings_password_echo)
         self.new_password_le.textChanged.connect(self.validate_new_password)
@@ -1115,13 +1118,16 @@ class MainWindow(QMainWindow):
     def _clear_settings_form(self):
         for line_edit in (
             self.current_password_le, self.new_password_le, self.confirm_new_password_le,
-            self.settings_answer_le, self.settings_current_password_for_question_le,
+            self.settings_answer_le, self.settings_answer_2_le,
+            self.settings_current_password_for_question_le,
         ):
             line_edit.clear()
         self._clear_error(self.new_password_le, self.new_password_error_lbl)
         self._clear_error(self.confirm_new_password_le, self.confirm_new_password_error_lbl)
         self._clear_error(self.settings_answer_le, self.security_question_error_lbl)
         self.settings_security_question_combo.setCurrentIndex(0)
+        if len(SECURITY_QUESTIONS) > 1:
+            self.settings_security_question_2_combo.setCurrentIndex(1)
         self._update_settings_password_strength()
 
     def validate_new_password(self):
@@ -1176,31 +1182,37 @@ class MainWindow(QMainWindow):
         self._clear_settings_form()
         QMessageBox.information(self, "Password Changed", "Your password has been changed successfully!")
 
-    def update_security_question(self):
+    def update_security_questions(self):
         current_password = self.settings_current_password_for_question_le.text()
-        question = self.settings_security_question_combo.currentText()
-        answer = self.settings_answer_le.text().strip()
+        question_1 = self.settings_security_question_combo.currentText()
+        answer_1 = self.settings_answer_le.text().strip()
+        question_2 = self.settings_security_question_2_combo.currentText()
+        answer_2 = self.settings_answer_2_le.text().strip()
 
         if not current_password:
             QMessageBox.warning(self, "Missing Information",
                                  "Please enter your current password to confirm.")
             return
-        if not answer:
+        if not answer_1 or not answer_2:
             self._set_error(self.settings_answer_le, self.security_question_error_lbl,
-                             "Please provide an answer.")
+                             "Please provide an answer to both security questions.")
+            return
+        if question_1 == question_2:
+            self._set_error(self.settings_answer_le, self.security_question_error_lbl,
+                             "Please choose two different security questions.")
             return
         self._clear_error(self.settings_answer_le, self.security_question_error_lbl)
 
-        success, error = self.account_manager.update_security_question(
-            self.user_id, current_password, question, answer
+        success, error = self.account_manager.update_security_questions(
+            self.user_id, current_password, question_1, answer_1, question_2, answer_2
         )
         if not success:
             QMessageBox.critical(self, "Update Failed", error)
             return
 
         self._clear_settings_form()
-        QMessageBox.information(self, "Security Question Updated",
-                                 "Your security question has been updated.")
+        QMessageBox.information(self, "Security Questions Updated",
+                                 "Your security questions have been updated.")
 
     def confirm_delete_account(self):
         reply = QMessageBox.question(

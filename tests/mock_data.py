@@ -8,8 +8,10 @@ SAMPLE_INSTRUCTOR = {
     "password": "Password123",
     "name": "Ada",
     "surname": "Lovelace",
-    "security_question": "What was your first pet's name?",
-    "answer": "Rex",
+    "security_question_1": "What was your first pet's name?",
+    "answer_1": "Rex",
+    "security_question_2": "What city were you born in?",
+    "answer_2": "London",
 }
 
 SAMPLE_STUDENTS = [

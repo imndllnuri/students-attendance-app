@@ -7,8 +7,10 @@ CREATE TABLE IF NOT EXISTS accounts (
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
     surname TEXT NOT NULL,
-    security_question TEXT NOT NULL,
-    answer_hash TEXT NOT NULL
+    security_question_1 TEXT NOT NULL,
+    answer_hash_1 TEXT NOT NULL,
+    security_question_2 TEXT NOT NULL,
+    answer_hash_2 TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS classes (
