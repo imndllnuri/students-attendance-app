@@ -33,6 +33,28 @@ def test_authenticate_success_and_failure(client):
     assert bad.status_code == 401
 
 
+def test_login_history_records_successful_logins_only(client):
+    user_id = create_instructor(client)
+
+    client.post(
+        "/authenticate",
+        json={"email": SAMPLE_INSTRUCTOR["email"], "password": SAMPLE_INSTRUCTOR["password"]},
+    )
+    client.post(
+        "/authenticate",
+        json={"email": SAMPLE_INSTRUCTOR["email"], "password": "wrong"},
+    )
+    client.post(
+        "/authenticate",
+        json={"email": SAMPLE_INSTRUCTOR["email"], "password": SAMPLE_INSTRUCTOR["password"]},
+    )
+
+    history = client.get(f"/accounts/{user_id}/login-history")
+    assert history.status_code == 200
+    timestamps = history.get_json()
+    assert len(timestamps) == 2
+
+
 def test_create_class_then_duplicate_code_conflicts(client):
     instructor_id = create_instructor(client)
     payload = sample_class_payload(instructor_id)

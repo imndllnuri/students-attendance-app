@@ -75,6 +75,11 @@ class ApiClient:
     def delete_account(self, user_id):
         return self._request("DELETE", f"/accounts/{user_id}")
 
+    def get_login_history(self, user_id, limit=10):
+        return self._request(
+            "GET", f"/accounts/{user_id}/login-history", params={"limit": limit}
+        )
+
     # Classes
     def list_classes(self, instructor_id):
         return self._request("GET", "/classes", params={"instructor_id": instructor_id})

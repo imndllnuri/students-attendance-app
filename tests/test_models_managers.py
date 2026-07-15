@@ -27,12 +27,19 @@ class FakeApiClient:
         self.calls.append(("get_statistics", class_id))
         return {"present": 2, "late": 1, "absent": 0}
 
+    def get_login_history(self, user_id, limit=10):
+        self.calls.append(("get_login_history", user_id, limit))
+        return ["2026-07-14T10:00:00+00:00"]
+
 
 class FailingApiClient(FakeApiClient):
     def create_class(self, class_data):
         raise ApiError("Class code already exists", 409)
 
     def delete_class(self, class_id):
+        raise ApiError("boom")
+
+    def get_login_history(self, user_id, limit=10):
         raise ApiError("boom")
 
 
@@ -96,6 +103,19 @@ def test_class_manager_add_class_sets_id_and_tracks_it():
 def test_class_manager_delete_class_returns_false_on_api_error():
     manager = ClassManager(api_client=FailingApiClient())
     assert manager.delete_class("does-not-matter") is False
+
+
+def test_account_manager_get_login_history_returns_data():
+    fake = FakeApiClient()
+    manager = AccountManager(api_client=fake)
+
+    assert manager.get_login_history("u1") == ["2026-07-14T10:00:00+00:00"]
+    assert fake.calls == [("get_login_history", "u1", 10)]
+
+
+def test_account_manager_get_login_history_returns_empty_on_api_error():
+    manager = AccountManager(api_client=FailingApiClient())
+    assert manager.get_login_history("u1") == []
 
 
 def test_class_manager_proxies_statistics_without_touching_api_client_directly():

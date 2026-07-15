@@ -1,5 +1,6 @@
 import uuid
 from collections import defaultdict
+from datetime import datetime, timezone
 
 from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -82,8 +83,13 @@ def authenticate():
     account = conn.execute(
         "SELECT * FROM accounts WHERE email = ?", (data["email"],)
     ).fetchone()
-    conn.close()
     if account and check_password_hash(account["password_hash"], data["password"]):
+        conn.execute(
+            "INSERT INTO login_history (user_id, logged_in_at) VALUES (?, ?)",
+            (account["user_id"], datetime.now(timezone.utc).isoformat()),
+        )
+        conn.commit()
+        conn.close()
         return jsonify(
             {
                 "user_id": account["user_id"],
@@ -92,7 +98,21 @@ def authenticate():
                 "surname": account["surname"],
             }
         )
+    conn.close()
     return jsonify({"error": "Incorrect email or password"}), 401
+
+
+@app.get("/accounts/<user_id>/login-history")
+def login_history(user_id):
+    limit = request.args.get("limit", default=10, type=int)
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT logged_in_at FROM login_history WHERE user_id = ? "
+        "ORDER BY logged_in_at DESC LIMIT ?",
+        (user_id, limit),
+    ).fetchall()
+    conn.close()
+    return jsonify([row["logged_in_at"] for row in rows])
 
 
 @app.post("/security-question")

@@ -50,3 +50,9 @@ CREATE TABLE IF NOT EXISTS attendance_records (
     time TEXT NOT NULL,
     status TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS login_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL REFERENCES accounts(user_id) ON DELETE CASCADE,
+    logged_in_at TEXT NOT NULL
+);

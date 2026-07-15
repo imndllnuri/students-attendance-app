@@ -453,6 +453,17 @@
                  <property name="text"><string>Save</string></property>
                 </widget>
                </item>
+               <item>
+                <widget class="QLabel" name="recent_logins_title_lbl">
+                 <property name="text"><string>Recent Logins</string></property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="recent_logins_lbl">
+                 <property name="wordWrap"><bool>true</bool></property>
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>

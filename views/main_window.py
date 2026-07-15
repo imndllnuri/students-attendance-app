@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import QEvent, Qt, QSize, QTimer
@@ -363,6 +365,21 @@ class MainWindow(QMainWindow):
             self._make_initials_avatar(self.user.name, self.user.surname)
         )
         self._set_profile_editing(False)
+        self._populate_recent_logins()
+
+    def _populate_recent_logins(self):
+        timestamps = self.account_manager.get_login_history(self.user_id, limit=5)
+        if not timestamps:
+            self.recent_logins_lbl.setText("No login history yet.")
+            return
+        lines = []
+        for raw in timestamps:
+            try:
+                dt = datetime.fromisoformat(raw).astimezone()
+                lines.append(dt.strftime("%b %d, %Y %H:%M"))
+            except ValueError:
+                lines.append(raw)
+        self.recent_logins_lbl.setText("\n".join(lines))
 
     def _set_profile_editing(self, editing):
         for line_edit in (self.profile_name_le, self.profile_surname_le, self.profile_email_le):

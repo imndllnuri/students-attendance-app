@@ -97,3 +97,9 @@ class AccountManager:
         except ApiError as e:
             return False, str(e)
         return True, ""
+
+    def get_login_history(self, user_id, limit=10):
+        try:
+            return self.api_client.get_login_history(user_id, limit=limit)
+        except ApiError:
+            return []
