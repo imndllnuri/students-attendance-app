@@ -115,6 +115,13 @@ class ApiClient:
     def remove_student(self, student_id):
         return self._request("DELETE", f"/roster/{student_id}")
 
+    def merge_students(self, keep_student_id, remove_student_id):
+        return self._request(
+            "POST",
+            "/roster/merge",
+            json={"keep_student_id": keep_student_id, "remove_student_id": remove_student_id},
+        )
+
     def register_card(self, student_id, card_id):
         return self._request("POST", f"/roster/{student_id}/card", json={"card_id": card_id})
 

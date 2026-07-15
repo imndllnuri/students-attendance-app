@@ -421,6 +421,25 @@ def remove_student(student_id):
     return "", 204
 
 
+@app.post("/roster/merge")
+def merge_students():
+    """Merges two roster entries that turned out to be the same student
+    added twice (e.g. with different card IDs): re-points the duplicate's
+    attendance history onto the kept student, then removes the duplicate."""
+    data = request.get_json()
+    keep_id = data["keep_student_id"]
+    remove_id = data["remove_student_id"]
+    conn = get_connection()
+    conn.execute(
+        "UPDATE attendance_records SET student_id = ? WHERE student_id = ?",
+        (keep_id, remove_id),
+    )
+    conn.execute("DELETE FROM students WHERE student_id = ?", (remove_id,))
+    conn.commit()
+    conn.close()
+    return "", 204
+
+
 @app.post("/roster/<int:student_id>/card")
 def register_card(student_id):
     data = request.get_json()

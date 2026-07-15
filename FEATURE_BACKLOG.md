@@ -66,6 +66,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 19. Class notes/memo field
 - [x] 20. Manual class tag color override
 - [x] 21. Copy roster from another class
+- [x] 18. Merge student tool
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

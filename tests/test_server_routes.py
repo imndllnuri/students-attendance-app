@@ -177,6 +177,46 @@ def test_add_and_remove_individual_roster_student(client):
     assert all(s["student_id"] != student_id for s in roster_after)
 
 
+def test_merge_students_moves_attendance_and_deletes_duplicate(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+    roster = client.get("/roster", query_string={"class_id": class_id}).get_json()
+    keep_id = roster[0]["student_id"]
+
+    duplicate = client.post(
+        "/roster",
+        json={"class_id": class_id, "student_number": "99999999", "name_surname": "Duplicate Entry"},
+    ).get_json()
+    duplicate_id = duplicate["student_id"]
+
+    client.post(
+        "/attend",
+        json={
+            "class_id": class_id,
+            "records": [{
+                "student_id": duplicate_id, "date": "01-09-2025",
+                "time_slot": "09:00-10:50", "time": "09:05", "status": "Present",
+            }],
+        },
+    )
+
+    merged = client.post(
+        "/roster/merge", json={"keep_student_id": keep_id, "remove_student_id": duplicate_id}
+    )
+    assert merged.status_code == 204
+
+    roster_after = client.get("/roster", query_string={"class_id": class_id}).get_json()
+    assert all(s["student_id"] != duplicate_id for s in roster_after)
+
+    sheet = client.get(
+        "/attendance_sheet", query_string={"class_id": class_id, "date": "01-09-2025"}
+    ).get_json()
+    assert len(sheet) == 1
+    assert sheet[0]["student_number"] == roster[0]["student_number"]
+
+
 def test_correct_attendance_upserts_and_deletes_by_natural_key(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

@@ -42,6 +42,9 @@ class FakeApiClient:
     def remove_student(self, student_id):
         self.calls.append(("remove_student", student_id))
 
+    def merge_students(self, keep_student_id, remove_student_id):
+        self.calls.append(("merge_students", keep_student_id, remove_student_id))
+
     def correct_attendance(self, class_id, student_id, date, time_slot, status):
         self.calls.append(("correct_attendance", class_id, student_id, date, time_slot, status))
         return {"deleted": status == "Absent"}
@@ -58,6 +61,9 @@ class FailingApiClient(FakeApiClient):
         raise ApiError("boom")
 
     def remove_student(self, student_id):
+        raise ApiError("boom")
+
+    def merge_students(self, keep_student_id, remove_student_id):
         raise ApiError("boom")
 
 
@@ -193,6 +199,19 @@ def test_class_manager_add_student_wraps_api_client():
 def test_class_manager_remove_student_returns_false_on_api_error():
     manager = ClassManager(api_client=FailingApiClient())
     assert manager.remove_student(1) is False
+
+
+def test_class_manager_merge_students_wraps_api_client():
+    fake = FakeApiClient()
+    manager = ClassManager(api_client=fake)
+
+    assert manager.merge_students(1, 2) is True
+    assert fake.calls == [("merge_students", 1, 2)]
+
+
+def test_class_manager_merge_students_returns_false_on_api_error():
+    manager = ClassManager(api_client=FailingApiClient())
+    assert manager.merge_students(1, 2) is False
 
 
 def test_class_manager_correct_attendance_wraps_api_client():

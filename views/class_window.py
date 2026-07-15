@@ -179,6 +179,7 @@ class ClassWindow(QMainWindow):
         self.student_list_tableWidget.cellDoubleClicked.connect(self.handle_roster_cell_double_click)
         self.export_roster_btn.clicked.connect(self.export_roster)
         self.copy_roster_btn.clicked.connect(self.copy_roster_from_class)
+        self.merge_students_btn.clicked.connect(self.merge_students)
 
     _FIRST_SESSION_COLUMN = 4  # Student Number, Name Surname, Not Attended, Attended
 
@@ -454,6 +455,56 @@ class ClassWindow(QMainWindow):
             self.load_student_list()
         else:
             QMessageBox.critical(self, "Error", "Could not remove that student.")
+
+    def merge_students(self):
+        """Merges an accidental duplicate roster entry into the correct
+        one: attendance history moves onto the kept student, then the
+        duplicate entry is deleted."""
+        try:
+            roster = self.class_manager.get_roster(self.class_obj.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load roster:\n{e}")
+            return
+
+        if len(roster) < 2:
+            QMessageBox.information(
+                self, "Nothing to Merge", "Need at least two students in the roster to merge."
+            )
+            return
+
+        labels = [f"{s['name_surname']} ({s['student_number']})" for s in roster]
+
+        keep_label, ok = QInputDialog.getItem(
+            self, "Merge Students", "Keep this student (the correct entry):", labels, 0, False
+        )
+        if not ok:
+            return
+        keep_student = roster[labels.index(keep_label)]
+
+        remaining_labels = [label for label in labels if label != keep_label]
+        remove_label, ok = QInputDialog.getItem(
+            self, "Merge Students", "Merge and remove this duplicate entry:", remaining_labels, 0, False
+        )
+        if not ok:
+            return
+        remove_student = next(
+            s for s in roster if f"{s['name_surname']} ({s['student_number']})" == remove_label
+        )
+
+        reply = QMessageBox.question(
+            self, "Confirm Merge",
+            f"Merge '{remove_label}' into '{keep_label}'? This moves all attendance history onto "
+            f"'{keep_label}' and permanently deletes the '{remove_label}' entry.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        if self.class_manager.merge_students(keep_student["student_id"], remove_student["student_id"]):
+            self.load_student_list()
+            QMessageBox.information(self, "Success", "Students merged.")
+        else:
+            QMessageBox.critical(self, "Error", "Could not merge students.")
 
     def open_edit_class_window(self):
         from views.add_new_class_window import AddNewClassWindow

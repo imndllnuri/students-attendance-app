@@ -165,6 +165,13 @@ class ClassManager:
             return False
         return True
 
+    def merge_students(self, keep_student_id, remove_student_id) -> bool:
+        try:
+            self.api_client.merge_students(keep_student_id, remove_student_id)
+        except ApiError:
+            return False
+        return True
+
     def register_card(self, student_id: str, card_id: str) -> None:
         self.api_client.register_card(student_id, card_id)
 
