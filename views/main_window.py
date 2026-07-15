@@ -214,6 +214,42 @@ class MainWindow(QMainWindow):
         for row, cls in enumerate(classes):
             self.class_btns_layout.addWidget(self._make_class_row_widget(cls), row, 0)
 
+        self._populate_today_classes(classes)
+
+    def _classes_scheduled_today(self, classes):
+        today = datetime.now().strftime("%A")
+        return [
+            cls for cls in classes
+            if any(slot.selected for slot in cls.schedule.get(today, []))
+        ]
+
+    def _populate_today_classes(self, classes):
+        while self.today_classes_layout.count():
+            item = self.today_classes_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        todays_classes = self._classes_scheduled_today(classes)
+        self.no_classes_today_lbl.setVisible(not todays_classes)
+        for cls in todays_classes:
+            self.today_classes_layout.addWidget(self._make_today_class_row_widget(cls))
+
+    def _make_today_class_row_widget(self, cls):
+        row = QWidget()
+        row.setObjectName("today_class_row_widget")
+        layout = QHBoxLayout(row)
+        layout.setContentsMargins(4, 4, 4, 4)
+
+        label = QLabel(f"{cls.class_name} ({cls.class_code})")
+        layout.addWidget(label, 1)
+
+        take_attendance_btn = QPushButton("Take Attendance")
+        take_attendance_btn.setCursor(Qt.PointingHandCursor)
+        take_attendance_btn.clicked.connect(lambda _, c=cls: self.open_take_attendance_for(c))
+        layout.addWidget(take_attendance_btn)
+
+        return row
+
     def _make_class_row_widget(self, cls):
         class_widget = QWidget()
         class_widget.setObjectName("class_row_widget")
@@ -274,13 +310,19 @@ class MainWindow(QMainWindow):
 
         if existing_index is not None:
             self.stackedWidget.setCurrentIndex(existing_index)
-        else:
-            from views.class_window import ClassWindow
+            return self.stackedWidget.widget(existing_index)
 
-            class_page = ClassWindow(class_obj, self, self.class_manager)
-            index = self.stackedWidget.addWidget(class_page)
-            class_page.setProperty("class_code", class_obj.class_code)
-            self.stackedWidget.setCurrentIndex(index)
+        from views.class_window import ClassWindow
+
+        class_page = ClassWindow(class_obj, self, self.class_manager)
+        index = self.stackedWidget.addWidget(class_page)
+        class_page.setProperty("class_code", class_obj.class_code)
+        self.stackedWidget.setCurrentIndex(index)
+        return class_page
+
+    def open_take_attendance_for(self, cls):
+        class_page = self.open_class_window(cls)
+        class_page.attendance_page_show()
 
     def find_class_tab(self, class_code):
         for i in range(self.stackedWidget.count()):

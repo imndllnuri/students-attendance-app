@@ -11,7 +11,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 4. "Recent logins" log on the Profile page
 
 ## Dashboard / My Classes / Search
-- [ ] 5. "Today's Classes" widget with a quick Take Attendance shortcut
+- [x] 5. "Today's Classes" widget with a quick Take Attendance shortcut
 - [x] 6. Sort/filter classes (by code, name, day)
 - [x] 7. Color tag per class card
 - [ ] 8. Archive a class instead of hard delete
