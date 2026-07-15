@@ -53,6 +53,12 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="mark_selected_absent_btn">
+          <property name="text"><string>Mark Selected Absent</string></property>
+          <property name="toolTip"><string>Explicitly record chosen students as absent (e.g. a cancelled session)</string></property>
+         </widget>
+        </item>
+        <item>
          <spacer name="attendance_actions_spacer">
           <property name="orientation"><enum>Qt::Horizontal</enum></property>
          </spacer>

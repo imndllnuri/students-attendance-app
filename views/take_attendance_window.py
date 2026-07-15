@@ -3,14 +3,19 @@ import logging
 import pandas as pd
 import qtawesome as qta
 from PyQt5.QtWidgets import (
+    QAbstractItemView,
     QComboBox,
     QDialog,
+    QDialogButtonBox,
     QFileDialog,
     QGraphicsOpacityEffect,
     QHeaderView,
     QInputDialog,
+    QLabel,
+    QListWidget,
     QMessageBox,
     QTableWidgetItem,
+    QVBoxLayout,
 )
 from PyQt5.QtCore import QDate, QDateTime, QEasingCurve, QPropertyAnimation, QTime, QTimer
 from PyQt5 import uic
@@ -60,6 +65,7 @@ class TakeAttendance(QDialog):
         self.mark_all_present_btn.clicked.connect(self.mark_all_present)
         self.undo_last_scan_btn.clicked.connect(self.undo_last_scan)
         self.manual_attendance_btn.clicked.connect(self.manual_attendance_entry)
+        self.mark_selected_absent_btn.clicked.connect(self.mark_selected_absent)
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
 
         self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#4F46E5"))
@@ -245,6 +251,52 @@ class TakeAttendance(QDialog):
             "success", f"✓ Marked {len(remaining)} student(s) Present.", revert_after_ms=1500
         )
 
+    def mark_selected_absent(self):
+        """Explicitly record chosen students as Absent for the current
+        date/time slot - useful for a cancelled session where the
+        instructor wants a formal record rather than just leaving those
+        students unmarked."""
+        remaining = [s for s in self.roster if s["student_id"] not in self.staged_student_ids]
+        if not remaining:
+            QMessageBox.information(self, "Nothing to Mark", "Everyone has already been recorded.")
+            return
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Mark Selected Absent")
+        layout = QVBoxLayout(dialog)
+        layout.addWidget(QLabel("Select students to mark absent:"))
+
+        list_widget = QListWidget()
+        list_widget.setSelectionMode(QAbstractItemView.MultiSelection)
+        list_widget.addItems([s["name_surname"] for s in remaining])
+        layout.addWidget(list_widget)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+
+        if dialog.exec_() != QDialog.Accepted:
+            return
+
+        selected_names = {item.text() for item in list_widget.selectedItems()}
+        if not selected_names:
+            return
+
+        selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
+        time_slot = self.hours_comboBox.currentText()
+        now_str = QDateTime.currentDateTime().toString("HH:mm")
+
+        marked = 0
+        for student in remaining:
+            if student["name_surname"] in selected_names:
+                self.record_attendance(student, selected_date, time_slot, now_str, "Absent")
+                marked += 1
+
+        self._set_scan_status(
+            "warning", f"Marked {marked} student(s) Absent.", revert_after_ms=1500
+        )
+
     def manual_attendance_entry(self):
         """Mark a student's attendance by picking them from a list, for
         when the RFID reader is unavailable or malfunctioning."""
@@ -370,7 +422,12 @@ class TakeAttendance(QDialog):
             for col, item in enumerate(items):
                 self.take_attendance_tableWidget.setItem(row_position, col, item)
 
-            color = qcolor("warning_tint") if status == "Late" else qcolor("success_tint")
+            if status == "Late":
+                color = qcolor("warning_tint")
+            elif status == "Absent":
+                color = qcolor("error_tint")
+            else:
+                color = qcolor("success_tint")
             for col in range(len(items)):
                 self.take_attendance_tableWidget.item(row_position, col).setBackground(color)
 
