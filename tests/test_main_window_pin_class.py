@@ -68,7 +68,7 @@ def test_pinned_class_sorts_before_unpinned_by_class_code(qtbot, monkeypatch):
     window = build_window(qtbot, monkeypatch, classes)
 
     row0 = window.class_btns_layout.itemAt(0).widget()
-    label = row0.findChild(QPushButton, "class_row_name_btn")
+    label = row0.findChild(QPushButton, "class_card_title_btn")
     assert "ZZZ" in label.text()
 
 

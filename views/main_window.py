@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtCore import QEvent, Qt, QSize, QTimer
+from PyQt5.QtCore import QEasingCurve, QEvent, QPropertyAnimation, Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QAbstractItemView,
@@ -38,7 +38,8 @@ from shared.class_order import load_class_order, save_class_order
 from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
-from shared.palette import PALETTE, active_palette, class_tag_color
+from shared.palette import PALETTE, RADIUS, active_palette, class_tag_color
+from shared.qt_style import set_dynamic_property
 from shared.shadow import apply_card_shadow
 from shared.session_timeout import (
     TIMEOUT_OPTIONS,
@@ -46,6 +47,7 @@ from shared.session_timeout import (
     save_session_timeout_minutes,
 )
 from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
+from shared.widgets import make_stat_card, make_tag_pill
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -79,6 +81,7 @@ class MainWindow(QMainWindow):
         uic.loadUi("ui/main_window.ui", self)
         self.gridLayout.setColumnStretch(0, 0)
         self.gridLayout.setColumnStretch(1, 1)
+        self.gridLayout.setColumnStretch(2, 0)
 
         self.user = user
         self.user_id = user.user_id
@@ -90,7 +93,9 @@ class MainWindow(QMainWindow):
         self.recently_viewed_class_ids = []
         self.selected_class_ids = set()
 
-        self.user_info_lbl.setText(f"{user.name} {user.surname}")
+        self.sidebar_user_name_lbl.setText(f"{user.name} {user.surname}")
+        self.sidebar_user_email_lbl.setText(getattr(user, "email", ""))
+        self.sidebar_avatar_lbl.setPixmap(self._make_initials_avatar(user.name, user.surname, size=36))
 
         self.profile_btn.clicked.connect(self.show_profile)
         self.my_classes_btn.clicked.connect(self.show_my_classes)
@@ -100,6 +105,7 @@ class MainWindow(QMainWindow):
         self.create_new_class_btn.clicked.connect(self.open_add_new_class_window)
         self.import_classes_btn.clicked.connect(self.import_classes_from_spreadsheet)
         self.search_btn.clicked.connect(self.show_search)
+        self.search_bar_le.addAction(qta.icon("fa5s.search", color="#C7C7D1"), QLineEdit.LeadingPosition)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.notifications_btn.clicked.connect(self.show_notifications_menu)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
@@ -113,6 +119,8 @@ class MainWindow(QMainWindow):
         self.compact_view_cb.setChecked(load_list_density() == "compact")
         self.compact_view_cb.blockSignals(False)
         self.compact_view_cb.toggled.connect(self.toggle_list_density)
+        set_dynamic_property(self.export_class_list_btn, "variant", "secondary")
+        set_dynamic_property(self.bulk_archive_btn, "variant", "secondary")
         self.export_class_list_btn.clicked.connect(self.export_class_list)
         self.bulk_archive_btn.clicked.connect(self.bulk_archive_selected)
         self.custom_order_listWidget.setDragDropMode(QAbstractItemView.InternalMove)
@@ -139,7 +147,7 @@ class MainWindow(QMainWindow):
         self.update_security_question_btn.clicked.connect(self.update_security_questions)
         self.delete_account_btn.clicked.connect(self.confirm_delete_account)
         self._settings_password_toggle = self.new_password_le.addAction(
-            qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition
+            qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
         )
         self._settings_password_toggle.setCheckable(True)
         self._settings_password_toggle.setToolTip("Show password")
@@ -147,6 +155,12 @@ class MainWindow(QMainWindow):
         self.new_password_le.textChanged.connect(self.validate_new_password)
         self.new_password_le.textChanged.connect(self._update_settings_password_strength)
         self.confirm_new_password_le.textChanged.connect(self.validate_new_password_match)
+
+        self._info_panel_expanded = True
+        self._info_panel_animation = None
+        self.info_panel_collapse_btn.clicked.connect(self.toggle_info_panel)
+        self.info_panel_pinned_btn.clicked.connect(self.show_pinned_classes)
+        self.info_panel_activity_btn.clicked.connect(self.show_notifications_menu)
 
         self._nav_buttons = (self.my_classes_btn, self.settings_btn, self.statistics_btn)
         self._setup_icons()
@@ -326,16 +340,16 @@ class MainWindow(QMainWindow):
         )
 
     def _setup_icons(self):
-        self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#94A3B8"))
-        self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#94A3B8"))
-        self.statistics_btn.setIcon(qta.icon("fa5s.chart-bar", color="#94A3B8"))
-        self.log_out_btn.setIcon(qta.icon("fa5s.sign-out-alt", color="#94A3B8"))
+        self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#6B6B76"))
+        self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#6B6B76"))
+        self.statistics_btn.setIcon(qta.icon("fa5s.chart-bar", color="#6B6B76"))
+        self.log_out_btn.setIcon(qta.icon("fa5s.sign-out-alt", color="#6B6B76"))
         for btn in (self.my_classes_btn, self.settings_btn, self.statistics_btn, self.log_out_btn):
             btn.setIconSize(QSize(16, 16))
 
-        self.profile_btn.setIcon(qta.icon("fa5s.user-circle", color="#2563EB"))
-        self.search_btn.setIcon(qta.icon("fa5s.search", color="#2563EB"))
-        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#2563EB"))
+        self.profile_btn.setIcon(qta.icon("fa5s.user-circle", color="#2F5CF0"))
+        self.search_btn.setIcon(qta.icon("fa5s.search", color="#2F5CF0"))
+        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#2F5CF0"))
         self.profile_btn.setIconSize(QSize(18, 18))
         self.search_btn.setIconSize(QSize(16, 16))
         self.notifications_btn.setIconSize(QSize(16, 16))
@@ -383,6 +397,77 @@ class MainWindow(QMainWindow):
         for frame in (self.profile_card_frame, self.settings_card_frame):
             apply_card_shadow(frame, strength="md")
 
+    # --- Info panel (right-hand collapsible panel: My Classes/Class
+    # Detail/Statistics) ---
+
+    def toggle_info_panel(self):
+        """Animates info_panel_widget's maximumWidth between its full
+        width and 0, then hides it outright once collapsed so it stops
+        receiving layout/paint passes - the same QPropertyAnimation idiom
+        already used for Take Attendance's scan-status pulse."""
+        expanding = not self._info_panel_expanded
+        self._info_panel_expanded = expanding
+
+        if expanding:
+            self.info_panel_widget.setVisible(True)
+
+        animation = QPropertyAnimation(self.info_panel_widget, b"maximumWidth", self)
+        animation.setDuration(180)
+        animation.setEasingCurve(QEasingCurve.OutCubic)
+        animation.setStartValue(self.info_panel_widget.width())
+        animation.setEndValue(230 if expanding else 0)
+        if not expanding:
+            animation.finished.connect(lambda: self.info_panel_widget.setVisible(False))
+        animation.start(QPropertyAnimation.DeleteWhenStopped)
+        self._info_panel_animation = animation
+
+        self.info_panel_collapse_btn.setText("»" if expanding else "«")
+        self.info_panel_collapse_btn.setToolTip(
+            "Collapse info panel" if expanding else "Expand info panel"
+        )
+
+    def _sync_info_panel_visibility(self):
+        """The Info panel only applies to My Classes (and, once its content
+        is wired in a later phase, Statistics) - Settings/Profile/Search
+        keep the 3rd grid column hidden entirely, per the redesign's scope
+        decision that the panel is not a global chrome element."""
+        applicable = self.stackedWidget.currentIndex() in (MY_CLASSES_PAGE,)
+        self.info_panel_widget.setVisible(applicable and self._info_panel_expanded)
+
+    def set_info_panel_content(self, stats=(), properties=(), tags=()):
+        """Repopulates the Info panel's 3 dynamic sections.
+        `stats`: iterable of (label, value, percent, fill_color_or_None) tuples.
+        `properties`: iterable of (label, value) tuples.
+        `tags`: iterable of (text, color_key) tuples."""
+        for layout in (
+            self.info_panel_stats_layout,
+            self.info_panel_properties_layout,
+            self.info_panel_tags_layout,
+        ):
+            self._clear_layout(layout)
+
+        for label, value, percent, fill_color in stats:
+            self.info_panel_stats_layout.addWidget(
+                make_stat_card(label, value, percent, fill_color)
+            )
+
+        for label, value in properties:
+            row = QWidget()
+            row_layout = QHBoxLayout(row)
+            row_layout.setContentsMargins(0, 0, 0, 0)
+            label_lbl = QLabel(label)
+            label_lbl.setProperty("fieldLabel", True)
+            value_lbl = QLabel(value)
+            value_lbl.setProperty("fieldValue", True)
+            row_layout.addWidget(label_lbl)
+            row_layout.addStretch(1)
+            row_layout.addWidget(value_lbl)
+            self.info_panel_properties_layout.addWidget(row)
+
+        for text, color_key in tags:
+            self.info_panel_tags_layout.addWidget(make_tag_pill(text, color_key))
+        self.info_panel_tags_layout.addStretch(1)
+
     def _set_active_nav(self, active_btn):
         for btn in self._nav_buttons:
             btn.setProperty("active", btn is active_btn)
@@ -392,16 +477,25 @@ class MainWindow(QMainWindow):
     def show_profile(self):
         self.populate_profile_fields()
         self.stackedWidget.setCurrentIndex(PROFILE_PAGE)
+        self._sync_info_panel_visibility()
 
     def show_my_classes(self):
         self._set_active_nav(self.my_classes_btn)
         self.stackedWidget.setCurrentIndex(MY_CLASSES_PAGE)
         self.load_classes()
+        self._sync_info_panel_visibility()
+
+    def show_pinned_classes(self):
+        """Info panel's "Pinned items" row - pinned classes already sort
+        first in every My Classes sort mode, so this is just a shortcut
+        back to that page rather than a separate filtered view."""
+        self.show_my_classes()
 
     def show_settings(self):
         self._set_active_nav(self.settings_btn)
         self._clear_settings_form()
         self.stackedWidget.setCurrentIndex(SETTINGS_PAGE)
+        self._sync_info_panel_visibility()
 
     def fetch_classes(self):
         showing_archived = self.show_archived_cb.isChecked()
@@ -465,12 +559,28 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(self, "Success", f"Class list exported to:\n{file_path}")
 
+    @staticmethod
+    def _clear_layout(layout):
+        """Empties a layout's widgets. Reparents to None immediately (not
+        just deleteLater(), which only schedules destruction for the next
+        event-loop pass) so a stale widget can never still be visible/
+        painted at its old position if this layout is repopulated again
+        before that deferred deletion actually runs - e.g. the class-card
+        grid's column count can change between calls (it depends on the
+        container's live width, which isn't final until the window is
+        actually shown), so an old, wrong-column-count card layout must be
+        fully gone before the next one is laid out, not just "on its way
+        out"."""
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+                widget.deleteLater()
+
     def load_classes(self):
         """Load class buttons into class_btns_layout"""
-        while self.class_btns_layout.count():
-            item = self.class_btns_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+        self._clear_layout(self.class_btns_layout)
 
         self.selected_class_ids = set()
         showing_archived = self.show_archived_cb.isChecked()
@@ -488,10 +598,11 @@ class MainWindow(QMainWindow):
         self.custom_order_listWidget.setVisible(custom_order_mode)
         if custom_order_mode:
             self._populate_custom_order_list(classes)
-        else:
-            row_builder = self._make_archived_class_row_widget if showing_archived else self._make_class_row_widget
+        elif showing_archived:
             for row, cls in enumerate(classes):
-                self.class_btns_layout.addWidget(row_builder(cls), row, 0)
+                self.class_btns_layout.addWidget(self._make_archived_class_row_widget(cls), row, 0)
+        else:
+            self._add_class_cards_to_grid(self.class_btns_layout, classes)
 
         self.today_classes_title_lbl.setVisible(not showing_archived)
         self.recently_viewed_title_lbl.setVisible(not showing_archived)
@@ -503,6 +614,39 @@ class MainWindow(QMainWindow):
         else:
             self._populate_today_classes(classes)
             self._populate_recently_viewed(classes)
+
+        self._update_info_panel_for_my_classes()
+
+    def _update_info_panel_for_my_classes(self):
+        """My Classes' Info panel shows an at-a-glance overview rather than
+        a single class's detail: unlike Kintsugi's file browser, clicking a
+        class here navigates away to Class Window (which gets its own Info
+        panel of per-class detail in a later phase) rather than selecting
+        it in place, so there's no single "currently selected" class to
+        show here."""
+        try:
+            all_classes = self.class_manager.load_classes_for_instructor(self.user_id, include_archived=True)
+        except ApiError:
+            all_classes = []
+
+        total = len(all_classes)
+        archived = sum(1 for c in all_classes if c.archived)
+        active = total - archived
+        pinned = sum(1 for c in all_classes if c.pinned)
+
+        stats = [
+            ("Active Classes", str(active), int(active / total * 100) if total else 0, None),
+            (
+                "Pinned", str(pinned), int(pinned / total * 100) if total else 0,
+                PALETTE["warning"],
+            ),
+        ]
+        properties = [
+            ("Instructor", f"{self.user.name} {self.user.surname}"),
+            ("Total Classes", str(total)),
+            ("Archived", str(archived)),
+        ]
+        self.set_info_panel_content(stats=stats, properties=properties, tags=[])
 
     def _populate_custom_order_list(self, classes):
         self.custom_order_listWidget.clear()
@@ -532,10 +676,7 @@ class MainWindow(QMainWindow):
         ]
 
     def _populate_today_classes(self, classes):
-        while self.today_classes_layout.count():
-            item = self.today_classes_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+        self._clear_layout(self.today_classes_layout)
 
         todays_classes = self._classes_scheduled_today(classes)
         self.no_classes_today_lbl.setVisible(not todays_classes)
@@ -566,10 +707,7 @@ class MainWindow(QMainWindow):
         self.recently_viewed_class_ids = self.recently_viewed_class_ids[:5]
 
     def _populate_recently_viewed(self, classes):
-        while self.recently_viewed_layout.count():
-            item = self.recently_viewed_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+        self._clear_layout(self.recently_viewed_layout)
 
         by_id = {c.class_id: c for c in classes}
         recent_classes = [
@@ -595,65 +733,98 @@ class MainWindow(QMainWindow):
 
         return row
 
-    def _make_class_row_widget(self, cls):
-        compact = self.compact_view_cb.isChecked()
-        class_widget = QWidget()
-        class_widget.setObjectName("class_row_widget")
-        row_layout = QHBoxLayout(class_widget)
-        row_layout.setContentsMargins(*((4, 2, 4, 2) if compact else (4, 4, 4, 4)))
+    MIN_CARD_WIDTH = 220
 
+    def _num_class_grid_columns(self):
+        width = self.class_grid_widget.width()
+        if width <= 0:
+            return 3
+        return max(1, width // self.MIN_CARD_WIDTH)
+
+    def _add_class_cards_to_grid(self, layout, classes):
+        columns = self._num_class_grid_columns()
+        for index, cls in enumerate(classes):
+            row, col = divmod(index, columns)
+            layout.addWidget(self._make_class_card_widget(cls), row, col)
+
+    def _make_class_card_widget(self, cls):
+        """A Kintsugi-style card: a select checkbox + pin toggle up top, a
+        tinted "folder" illustration, the class name/code, and a bottom row
+        of secondary actions - replaces the old flat class_row_widget."""
+        compact = self.compact_view_cb.isChecked()
+        color = cls.color or class_tag_color(cls.class_code)
+        tint = QColor(color).lighter(175).name()
+
+        card = QFrame()
+        card.setObjectName("class_card_widget")
+        card.setFixedWidth(self.MIN_CARD_WIDTH - 10)
+        card_layout = QVBoxLayout(card)
+        card_layout.setContentsMargins(12, 12, 12, 12)
+        card_layout.setSpacing(6)
+        apply_card_shadow(card, strength="sm")
+
+        top_row = QHBoxLayout()
         select_cb = QCheckBox()
         select_cb.setToolTip("Select for bulk actions")
         select_cb.setChecked(cls.class_id in self.selected_class_ids)
         select_cb.toggled.connect(lambda checked, c=cls: self.toggle_class_selection(c, checked))
-        row_layout.addWidget(select_cb)
-
-        color_chip = QFrame()
-        color_chip.setFixedWidth(4)
-        color_chip.setMinimumHeight(40)
-        color_chip.setStyleSheet(
-            f"background-color: {cls.color or class_tag_color(cls.class_code)}; border-radius: 2px;"
-        )
-        row_layout.addWidget(color_chip)
-
-        text_layout = QVBoxLayout()
-        text_layout.setSpacing(0)
-
-        class_btn = QPushButton(f"{cls.class_name} ({cls.class_code})")
-        class_btn.setObjectName("class_row_name_btn")
-        class_btn.setCursor(Qt.PointingHandCursor)
-        class_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
-
-        caption_lbl = QLabel(f"Section {cls.section}")
-        caption_lbl.setObjectName("class_row_caption_lbl")
-        caption_lbl.setVisible(not compact)
-
-        text_layout.addWidget(class_btn)
-        text_layout.addWidget(caption_lbl)
+        top_row.addWidget(select_cb)
+        top_row.addStretch(1)
 
         pin_btn = QPushButton("★" if cls.pinned else "☆")
-        pin_btn.setFixedSize(28, 28)
+        pin_btn.setObjectName("card_icon_btn")
+        pin_btn.setFixedSize(24, 24)
         pin_btn.setCursor(Qt.PointingHandCursor)
         pin_btn.setToolTip("Unpin class" if cls.pinned else "Pin class to the top")
         pin_btn.clicked.connect(lambda _, c=cls: self.toggle_pin_class(c))
+        top_row.addWidget(pin_btn)
+        card_layout.addLayout(top_row)
 
+        illustration_btn = QPushButton()
+        illustration_btn.setObjectName("class_card_illustration_btn")
+        illustration_btn.setFixedHeight(40 if compact else 64)
+        illustration_btn.setCursor(Qt.PointingHandCursor)
+        illustration_btn.setIcon(qta.icon("fa5s.folder", color=color))
+        illustration_btn.setIconSize(QSize(26, 26))
+        illustration_btn.setStyleSheet(
+            f"background-color: {tint}; border-radius: {RADIUS['control_sm']}px; border: none;"
+        )
+        illustration_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
+        card_layout.addWidget(illustration_btn)
+
+        title_btn = QPushButton(cls.class_name)
+        title_btn.setObjectName("class_card_title_btn")
+        title_btn.setCursor(Qt.PointingHandCursor)
+        title_btn.setToolTip(f"{cls.class_name} ({cls.class_code})")
+        title_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
+        card_layout.addWidget(title_btn)
+
+        caption_lbl = QLabel(f"{cls.class_code} · Section {cls.section}")
+        caption_lbl.setObjectName("class_row_caption_lbl")
+        caption_lbl.setVisible(not compact)
+        card_layout.addWidget(caption_lbl)
+
+        card_layout.addStretch(1)
+
+        bottom_row = QHBoxLayout()
         duplicate_btn = QPushButton("Duplicate")
+        set_dynamic_property(duplicate_btn, "variant", "ghost")
         duplicate_btn.setCursor(Qt.PointingHandCursor)
         duplicate_btn.setToolTip("Create a new class with the same schedule and policy")
         duplicate_btn.clicked.connect(lambda _, c=cls: self.open_duplicate_class_window(c))
+        bottom_row.addWidget(duplicate_btn)
+        bottom_row.addStretch(1)
 
-        archive_btn = QPushButton("X")
+        archive_btn = QPushButton("✕")
         archive_btn.setObjectName("class_delete_btn")
-        archive_btn.setFixedSize(25, 25)
+        archive_btn.setFixedSize(24, 24)
         archive_btn.setCursor(Qt.PointingHandCursor)
         archive_btn.setToolTip("Archive class")
         archive_btn.clicked.connect(lambda _, c=cls: self.archive_class(c))
+        bottom_row.addWidget(archive_btn)
+        card_layout.addLayout(bottom_row)
 
-        row_layout.addLayout(text_layout, 1)
-        row_layout.addWidget(pin_btn)
-        row_layout.addWidget(duplicate_btn)
-        row_layout.addWidget(archive_btn)
-        return class_widget
+        return card
 
     def toggle_pin_class(self, cls):
         try:
@@ -681,12 +852,13 @@ class MainWindow(QMainWindow):
         row_layout.addWidget(label, 1)
 
         unarchive_btn = QPushButton("Unarchive")
+        set_dynamic_property(unarchive_btn, "variant", "secondary")
         unarchive_btn.setCursor(Qt.PointingHandCursor)
         unarchive_btn.clicked.connect(lambda _, c=cls: self.unarchive_class(c))
         row_layout.addWidget(unarchive_btn)
 
         delete_btn = QPushButton("Delete Permanently")
-        delete_btn.setObjectName("class_delete_btn")
+        set_dynamic_property(delete_btn, "variant", "destructive")
         delete_btn.setCursor(Qt.PointingHandCursor)
         delete_btn.clicked.connect(lambda _, c=cls: self.permanently_delete_class(c))
         row_layout.addWidget(delete_btn)
@@ -884,7 +1056,7 @@ class MainWindow(QMainWindow):
         self.confirm_new_password_le.setEchoMode(echo_mode)
         self.current_password_le.setEchoMode(echo_mode)
         glyph = "fa5s.eye-slash" if checked else "fa5s.eye"
-        self._settings_password_toggle.setIcon(qta.icon(glyph, color="#64748B"))
+        self._settings_password_toggle.setIcon(qta.icon(glyph, color="#6B6B76"))
         self._settings_password_toggle.setToolTip("Hide password" if checked else "Show password")
 
     def _set_error(self, line_edit, label, message):
@@ -1023,7 +1195,11 @@ class MainWindow(QMainWindow):
         self.user.name = data["name"]
         self.user.surname = data["surname"]
         self.user.email = data["email"]
-        self.user_info_lbl.setText(f"{self.user.name} {self.user.surname}")
+        self.sidebar_user_name_lbl.setText(f"{self.user.name} {self.user.surname}")
+        self.sidebar_user_email_lbl.setText(self.user.email)
+        self.sidebar_avatar_lbl.setPixmap(
+            self._make_initials_avatar(self.user.name, self.user.surname, size=36)
+        )
         self._set_profile_editing(False)
         QMessageBox.information(self, "Profile Updated", "Your profile has been updated successfully!")
 
@@ -1245,10 +1421,8 @@ class MainWindow(QMainWindow):
 
     def show_search(self):
         self.stackedWidget.setCurrentIndex(SEARCH_PAGE)
-        while self.search_results_layout.count():
-            item = self.search_results_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+        self._sync_info_panel_visibility()
+        self._clear_layout(self.search_results_layout)
 
         query = self.search_bar_le.text().strip().lower()
         classes = self.fetch_classes()
@@ -1258,8 +1432,9 @@ class MainWindow(QMainWindow):
             self.search_status_lbl.setText("No matching classes found.")
         else:
             self.search_status_lbl.setText(f"{len(matches)} class(es) found:")
-            for row, cls in enumerate(sorted(matches, key=self._class_sort_key)):
-                self.search_results_layout.addWidget(self._make_class_row_widget(cls), row, 0)
+            self._add_class_cards_to_grid(
+                self.search_results_layout, sorted(matches, key=self._class_sort_key)
+            )
 
     def _class_matches_query(self, cls, query):
         if query in cls.class_name.lower() or query in cls.class_code.lower():
@@ -1275,6 +1450,7 @@ class MainWindow(QMainWindow):
     def show_statistics(self):
         self._set_active_nav(self.statistics_btn)
         self.stackedWidget.setCurrentIndex(STATISTICS_PAGE)
+        self._sync_info_panel_visibility()
         self.statistics_class_combo.blockSignals(True)
         self.statistics_class_combo.clear()
         for cls in self.fetch_classes():

@@ -53,17 +53,21 @@ def build_window(qtbot, monkeypatch):
     return window
 
 
-def test_row_uses_manual_color_override_when_set(qtbot, monkeypatch):
+def test_card_illustration_uses_manual_color_override_when_set(qtbot, monkeypatch):
+    from PyQt5.QtGui import QColor
+    from PyQt5.QtWidgets import QPushButton
     window = build_window(qtbot, monkeypatch)
-    from PyQt5.QtWidgets import QFrame
-    row_widget = window._make_class_row_widget(make_class(color="#123456"))
-    chip = row_widget.findChild(QFrame)
-    assert "#123456" in chip.styleSheet()
+    card = window._make_class_card_widget(make_class(color="#123456"))
+    illustration = card.findChild(QPushButton, "class_card_illustration_btn")
+    expected_tint = QColor("#123456").lighter(175).name()
+    assert expected_tint in illustration.styleSheet()
 
 
-def test_row_falls_back_to_auto_color_when_unset(qtbot, monkeypatch):
+def test_card_illustration_falls_back_to_auto_color_when_unset(qtbot, monkeypatch):
+    from PyQt5.QtGui import QColor
+    from PyQt5.QtWidgets import QPushButton
     window = build_window(qtbot, monkeypatch)
-    from PyQt5.QtWidgets import QFrame
-    row_widget = window._make_class_row_widget(make_class(color=None))
-    chip = row_widget.findChild(QFrame)
-    assert class_tag_color("COMP101") in chip.styleSheet()
+    card = window._make_class_card_widget(make_class(color=None))
+    illustration = card.findChild(QPushButton, "class_card_illustration_btn")
+    expected_tint = QColor(class_tag_color("COMP101")).lighter(175).name()
+    assert expected_tint in illustration.styleSheet()

@@ -66,6 +66,41 @@ QWidget#topSideWidget {
     background-color: {{bg_card}};
 }
 
+QWidget#info_panel_widget {
+    background-color: {{bg_hover}};
+    border-left: 1px solid {{border}};
+}
+
+QPushButton#info_panel_collapse_btn {
+    background-color: transparent;
+    color: {{text_secondary}};
+    border: none;
+    border-radius: {{radius_control_sm}}px;
+    font-size: 11pt;
+}
+
+QPushButton#info_panel_collapse_btn:hover {
+    background-color: {{bg_card}};
+    color: {{text_primary}};
+}
+
+QPushButton#info_panel_pinned_btn,
+QPushButton#info_panel_activity_btn {
+    background-color: transparent;
+    color: {{text_secondary}};
+    text-align: left;
+    border: none;
+    border-radius: {{radius_control_sm}}px;
+    padding: 6px 8px;
+    font-size: 9.5pt;
+}
+
+QPushButton#info_panel_pinned_btn:hover,
+QPushButton#info_panel_activity_btn:hover {
+    background-color: {{bg_card}};
+    color: {{text_primary}};
+}
+
 QWidget#addNewClass {
     background-color: {{bg_card}};
 }
@@ -117,9 +152,16 @@ QLabel#login_error_lbl,
 QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
 QLabel#roster_status_lbl,
-QLabel#attendance_progress_lbl {
+QLabel#attendance_progress_lbl,
+QLabel#sidebar_user_email_lbl {
     font-size: 9pt;
     color: {{text_secondary}};
+}
+
+QLabel#sidebar_user_name_lbl {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: {{text_primary}};
 }
 
 QLabel#attendance_progress_lbl {
@@ -219,10 +261,19 @@ QLabel#statistics_filter_lbl,
 QLabel#search_status_lbl,
 QLabel#title_lbl_2,
 QLabel#security_question_lbl,
-QLabel#security_question_2_lbl {
+QLabel#security_question_2_lbl,
+QLabel#info_panel_title_lbl {
     font-size: 12pt;
     font-weight: 600;
     color: {{text_primary}};
+}
+
+QLabel#info_panel_properties_title_lbl,
+QLabel#info_panel_tags_title_lbl {
+    font-size: 10pt;
+    font-weight: 600;
+    color: {{text_primary}};
+    padding-top: 4px;
 }
 
 QLabel#class_name_header_lbl {
@@ -584,6 +635,48 @@ QPushButton#class_row_name_btn {
 
 QPushButton#class_row_name_btn:hover {
     color: {{accent}};
+}
+
+/* --- Class card grid (My Classes / Search) --- */
+
+QFrame#class_card_widget {
+    background-color: {{bg_card}};
+    border: 1px solid {{border}};
+    border-radius: {{radius_card}}px;
+}
+
+QFrame#class_card_widget:hover {
+    border: 1px solid {{accent_subtle}};
+}
+
+QPushButton#class_card_title_btn {
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    color: {{text_primary}};
+    font-size: 10.5pt;
+    font-weight: 700;
+    padding: 0;
+}
+
+QPushButton#class_card_title_btn:hover {
+    color: {{accent}};
+}
+
+QPushButton#class_card_illustration_btn {
+    border: none;
+}
+
+QPushButton#card_icon_btn {
+    background-color: transparent;
+    border: none;
+    border-radius: {{radius_control_sm}}px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+QPushButton#card_icon_btn:hover {
+    background-color: {{bg_hover}};
 }
 
 /* --- RFID scan status card (Take Attendance) --- */
