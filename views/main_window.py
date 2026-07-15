@@ -137,7 +137,12 @@ class MainWindow(QMainWindow):
         self.change_password_btn.clicked.connect(self.change_password)
         self.update_security_question_btn.clicked.connect(self.update_security_questions)
         self.delete_account_btn.clicked.connect(self.confirm_delete_account)
-        self.settings_show_password_btn.toggled.connect(self._toggle_settings_password_echo)
+        self._settings_password_toggle = self.new_password_le.addAction(
+            qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition
+        )
+        self._settings_password_toggle.setCheckable(True)
+        self._settings_password_toggle.setToolTip("Show password")
+        self._settings_password_toggle.toggled.connect(self._toggle_settings_password_echo)
         self.new_password_le.textChanged.connect(self.validate_new_password)
         self.new_password_le.textChanged.connect(self._update_settings_password_strength)
         self.confirm_new_password_le.textChanged.connect(self.validate_new_password_match)
@@ -326,9 +331,9 @@ class MainWindow(QMainWindow):
         for btn in (self.my_classes_btn, self.settings_btn, self.statistics_btn, self.log_out_btn):
             btn.setIconSize(QSize(16, 16))
 
-        self.profile_btn.setIcon(qta.icon("fa5s.user-circle", color="#4F46E5"))
-        self.search_btn.setIcon(qta.icon("fa5s.search", color="#4F46E5"))
-        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#4F46E5"))
+        self.profile_btn.setIcon(qta.icon("fa5s.user-circle", color="#2563EB"))
+        self.search_btn.setIcon(qta.icon("fa5s.search", color="#2563EB"))
+        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#2563EB"))
         self.profile_btn.setIconSize(QSize(18, 18))
         self.search_btn.setIconSize(QSize(16, 16))
         self.notifications_btn.setIconSize(QSize(16, 16))
@@ -339,10 +344,6 @@ class MainWindow(QMainWindow):
         self.search_btn.setToolTip("Search (Ctrl+F)")
         self.create_new_class_btn.setToolTip("Create New Class (Ctrl+N)")
         self.create_new_class_btn.setIcon(qta.icon("fa5s.plus", color="white"))
-        self.settings_show_password_btn.setIcon(qta.icon("fa5s.eye", color="#64748B"))
-        self.settings_show_password_btn.setText("")
-        self.settings_show_password_btn.setAccessibleName("Toggle password visibility")
-        self.settings_show_password_btn.setToolTip("Show password")
 
     def _setup_shortcuts(self):
         QShortcut(QKeySequence("Ctrl+N"), self, self.open_add_new_class_window)
@@ -881,8 +882,8 @@ class MainWindow(QMainWindow):
         self.confirm_new_password_le.setEchoMode(echo_mode)
         self.current_password_le.setEchoMode(echo_mode)
         glyph = "fa5s.eye-slash" if checked else "fa5s.eye"
-        self.settings_show_password_btn.setIcon(qta.icon(glyph, color="#64748B"))
-        self.settings_show_password_btn.setToolTip("Hide password" if checked else "Show password")
+        self._settings_password_toggle.setIcon(qta.icon(glyph, color="#64748B"))
+        self._settings_password_toggle.setToolTip("Hide password" if checked else "Show password")
 
     def _set_error(self, line_edit, label, message):
         label.setText(message)

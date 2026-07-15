@@ -24,7 +24,8 @@
     <item row="0" column="1">
      <layout class="QVBoxLayout" name="mainVerticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="topHorizontalLayout">
+       <widget class="QWidget" name="top_bar_widget" native="true">
+        <layout class="QHBoxLayout" name="topHorizontalLayout">
         <property name="spacing">
          <number>6</number>
         </property>
@@ -116,6 +117,7 @@
          </widget>
         </item>
        </layout>
+       </widget>
       </item>
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
@@ -366,14 +368,14 @@
                </item>
                <item>
                 <widget class="QLineEdit" name="current_password_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>
                  <property name="placeholderText"><string> Current password</string></property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="new_password_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>
                  <property name="placeholderText"><string> New password</string></property>
                 </widget>
@@ -392,7 +394,7 @@
                </item>
                <item>
                 <widget class="QLineEdit" name="confirm_new_password_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>
                  <property name="placeholderText"><string> Confirm new password</string></property>
                 </widget>
@@ -405,25 +407,8 @@
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="settings_show_password_row">
-                 <item>
-                  <spacer name="settings_show_password_spacer">
-                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-   </spacer>
-                 </item>
-                 <item>
-                  <widget class="QToolButton" name="settings_show_password_btn">
-                   <property name="text"><string>Show</string></property>
-                   <property name="checkable"><bool>true</bool></property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
                 <widget class="QPushButton" name="change_password_btn">
-                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="text"><string>Change Password</string></property>
                 </widget>
                </item>
@@ -439,29 +424,29 @@
                </item>
                <item>
                 <widget class="QComboBox" name="settings_security_question_combo">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="settings_answer_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="placeholderText"><string> Your answer</string></property>
                 </widget>
                </item>
                <item>
                 <widget class="QComboBox" name="settings_security_question_2_combo">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="settings_answer_2_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="placeholderText"><string> Your answer</string></property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="settings_current_password_for_question_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>
                  <property name="placeholderText"><string> Current password (to confirm)</string></property>
                 </widget>
@@ -475,7 +460,7 @@
                </item>
                <item>
                 <widget class="QPushButton" name="update_security_question_btn">
-                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="text"><string>Update Security Question</string></property>
                 </widget>
                </item>
@@ -491,7 +476,7 @@
                </item>
                <item>
                 <widget class="QPushButton" name="delete_account_btn">
-                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="text"><string>Delete Account</string></property>
                 </widget>
                </item>
@@ -588,21 +573,21 @@
                </item>
                <item>
                 <widget class="QLineEdit" name="profile_name_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="readOnly"><bool>true</bool></property>
                  <property name="placeholderText"><string> Name</string></property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="profile_surname_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="readOnly"><bool>true</bool></property>
                  <property name="placeholderText"><string> Surname</string></property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="profile_email_le">
-                 <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="readOnly"><bool>true</bool></property>
                  <property name="placeholderText"><string> Email</string></property>
                 </widget>
@@ -616,13 +601,13 @@
                </item>
                <item>
                 <widget class="QPushButton" name="edit_profile_btn">
-                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="text"><string>Edit</string></property>
                 </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="save_profile_btn">
-                 <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
                  <property name="visible"><bool>false</bool></property>
                  <property name="text"><string>Save</string></property>
                 </widget>
@@ -712,6 +697,11 @@
           </item>
           <item>
            <widget class="QFrame" name="statistics_card">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch><verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
             <layout class="QVBoxLayout" name="statistics_card_layout">
              <item>
               <widget class="QLabel" name="statistics_empty_lbl">

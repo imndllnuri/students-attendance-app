@@ -43,10 +43,10 @@ class AddNewClassWindow(QWidget):
             remove_btn = getattr(self, f"remove_slot_{day.lower()}_btn")
             add_btn.clicked.connect(lambda _, d=day: self.add_time_slot(d))
             remove_btn.clicked.connect(lambda _, d=day: self.remove_time_slot(d))
-            add_btn.setIcon(qta.icon("fa5s.plus", color="#4F46E5"))
+            add_btn.setIcon(qta.icon("fa5s.plus", color="#2563EB"))
             remove_btn.setIcon(qta.icon("fa5s.minus", color="white"))
 
-        self.spreadsheet_file_btn.setIcon(qta.icon("fa5s.file-upload", color="#4F46E5"))
+        self.spreadsheet_file_btn.setIcon(qta.icon("fa5s.file-upload", color="#2563EB"))
         self.create_class_btn.setIcon(qta.icon("fa5s.check", color="white"))
 
         self.time_slots = {day: [] for day in days}

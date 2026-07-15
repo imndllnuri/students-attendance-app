@@ -73,7 +73,7 @@ class TakeAttendance(QDialog):
         self.mark_selected_absent_btn.clicked.connect(self.mark_selected_absent)
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
 
-        self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#4F46E5"))
+        self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#2563EB"))
         self.export_to_excel_btn.clicked.connect(self.export_attendance_sheet)
         self.start_attendance_btn.setIcon(qta.icon("fa5s.play", color="white"))
         self.submit_attendance_btn.setIcon(qta.icon("fa5s.check-circle", color="white"))

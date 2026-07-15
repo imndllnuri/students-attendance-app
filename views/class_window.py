@@ -39,11 +39,11 @@ class ClassWindow(QWidget):
 
     def _setup_icons(self):
         self.take_attendance_btn.setIcon(qta.icon("fa5s.clipboard-check", color="white"))
-        self.refresh_student_list_btn.setIcon(qta.icon("fa5s.sync-alt", color="#4F46E5"))
+        self.refresh_student_list_btn.setIcon(qta.icon("fa5s.sync-alt", color="#2563EB"))
         self.refresh_student_list_btn.setToolTip("Refresh roster")
         self.refresh_student_list_btn.setAccessibleName("Refresh roster")
-        self.back_to_my_classes_btn.setIcon(qta.icon("fa5s.arrow-left", color="#4F46E5"))
-        self.class_settings_btn.setIcon(qta.icon("fa5s.cog", color="#4F46E5"))
+        self.back_to_my_classes_btn.setIcon(qta.icon("fa5s.arrow-left", color="#2563EB"))
+        self.class_settings_btn.setIcon(qta.icon("fa5s.cog", color="#2563EB"))
 
     def _show_roster_status(self, message, show_retry):
         self.roster_status_lbl.setText(message)

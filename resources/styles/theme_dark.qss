@@ -43,6 +43,16 @@ QWidget#sidebar_widget {
     background-color: #0B1120;
 }
 
+QWidget#top_bar_widget,
+QWidget#class_header_widget {
+    background-color: #1E293B;
+    border-bottom: 1px solid #334155;
+}
+
+QWidget#topSideWidget {
+    background-color: #1E293B;
+}
+
 QWidget#addNewClass {
     background-color: #1E293B;
 }
@@ -70,6 +80,13 @@ QFrame#statistics_card {
 }
 
 /* --- Typography --- */
+
+/* Fallback for every QLabel with no more specific #id rule below - without
+   this, unstyled labels inherit Qt's default (near-black) text color,
+   which is invisible against a dark-mode background. */
+QLabel {
+    color: #F1F5F9;
+}
 
 QLabel#title_lbl,
 QLabel#title_lbl_settings,
@@ -185,7 +202,7 @@ QLabel#security_question_lbl,
 QLabel#security_question_2_lbl {
     font-size: 12pt;
     font-weight: 600;
-    color: #0B1120;
+    color: #CBD5E1;
 }
 
 QLabel#class_name_header_lbl {
@@ -620,7 +637,7 @@ QHeaderView::section {
 
 QCalendarWidget QToolButton {
     background-color: transparent;
-    color: #0B1120;
+    color: #CBD5E1;
     border-radius: 6px;
     padding: 4px;
 }
@@ -653,7 +670,7 @@ QGroupBox::title {
     subcontrol-origin: margin;
     left: 10px;
     padding: 0 4px;
-    color: #0B1120;
+    color: #CBD5E1;
 }
 
 /* --- Message boxes --- */
