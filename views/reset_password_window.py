@@ -2,6 +2,7 @@ import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog, QLineEdit, QMessageBox
 
+from shared.qt_style import set_dynamic_property
 from shared.shadow import apply_card_shadow
 from shared.validation import MIN_PASSWORD_LENGTH, is_valid_password, password_strength
 
@@ -13,6 +14,11 @@ class ResetPasswordWindow(QDialog):
         self.account_manager = account_manager
         self._email = None
 
+        set_dynamic_property(self.next_btn, "variant", "primary")
+        set_dynamic_property(self.cancel_btn, "variant", "secondary")
+        set_dynamic_property(self.back_btn, "variant", "secondary")
+        set_dynamic_property(self.reset_btn, "variant", "primary")
+
         self.next_btn.clicked.connect(self.fetch_question)
         self.cancel_btn.clicked.connect(self.reject)
         self.back_btn.clicked.connect(lambda: self.steps_stack.setCurrentIndex(0))
@@ -20,7 +26,7 @@ class ResetPasswordWindow(QDialog):
         self.new_password_le.textChanged.connect(self._update_password_strength)
 
         self._password_toggle = self.new_password_le.addAction(
-            qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition
+            qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
         )
         self._password_toggle.setCheckable(True)
         self._password_toggle.setToolTip("Show password")
@@ -88,7 +94,7 @@ class ResetPasswordWindow(QDialog):
         mode = QLineEdit.Normal if checked else QLineEdit.Password
         self.new_password_le.setEchoMode(mode)
         self.confirm_password_le.setEchoMode(mode)
-        self._password_toggle.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B"))
+        self._password_toggle.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#6B6B76"))
         self._password_toggle.setToolTip("Hide password" if checked else "Show password")
 
     def _show_error(self, label, message):

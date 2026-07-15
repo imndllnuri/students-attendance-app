@@ -3,6 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog, QLineEdit, QMessageBox
 
 from models.accounts import Account
+from shared.qt_style import set_dynamic_property
 from shared.shadow import apply_card_shadow
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
@@ -19,9 +20,10 @@ class CreateAccountWindow(QDialog):
         uic.loadUi("ui/create_account_window.ui", self)
         self.account_manager = account_manager
 
+        set_dynamic_property(self.sign_up_btn, "variant", "primary")
         self.sign_up_btn.clicked.connect(self.create_account)
 
-        self.email_le.addAction(qta.icon("fa5s.envelope", color="#94A3B8"), QLineEdit.LeadingPosition)
+        self.email_le.addAction(qta.icon("fa5s.envelope", color="#C7C7D1"), QLineEdit.LeadingPosition)
         self._password_toggle = self._add_password_toggle(self.password_le)
         self._password_again_toggle = self._add_password_toggle(self.password_again_le)
 
@@ -40,7 +42,7 @@ class CreateAccountWindow(QDialog):
         self.show()
 
     def _add_password_toggle(self, line_edit):
-        action = line_edit.addAction(qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition)
+        action = line_edit.addAction(qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition)
         action.setCheckable(True)
         action.setToolTip("Show password")
         action.toggled.connect(lambda checked: self._toggle_echo(line_edit, action, checked))
@@ -48,7 +50,7 @@ class CreateAccountWindow(QDialog):
 
     def _toggle_echo(self, line_edit, action, checked):
         line_edit.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
-        action.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B"))
+        action.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#6B6B76"))
         action.setToolTip("Hide password" if checked else "Show password")
 
     def validate_email(self):

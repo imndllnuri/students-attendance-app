@@ -1,38 +1,44 @@
-"""Design tokens - the single source of truth for color values used across
-the app. Qt stylesheets have no variables, so resources/theme.qss embeds
-these same hex values directly (with a comment header listing the tokens
-for humans); any Python code that sets colors dynamically (e.g. per-cell
-pass/fail/attendance-status coloring in table widgets, which QSS can't
-express since it's driven by cell content, not a static widget state)
-must import from here rather than hardcoding a QColor/hex value, so both
-places stay in sync by construction.
+"""Design tokens - the single source of truth for color/spacing/radius
+values used across the app. Qt stylesheets have no variables, so
+resources/styles/theme.qss.tmpl references these tokens by name
+(`{{token_name}}`) and scripts/generate_theme.py renders it into the real
+theme.qss/theme_dark.qss files consumed at runtime - never hand-edit those
+generated files directly, edit the template instead and re-run the script.
 
-If theme.qss and this file drift apart, this file wins - update the QSS
-to match.
+Any Python code that sets colors dynamically (e.g. per-cell pass/fail/
+attendance-status coloring in table widgets, which QSS can't express since
+it's driven by cell content, not a static widget state) must import from
+here rather than hardcoding a QColor/hex value, so both places stay in sync
+by construction.
 """
 
 PALETTE = {
-    # Background layers
-    "bg_app": "#F8FAFC",
+    # Background layers - Kintsugi direction (see .claude/plans/wild-jingling-unicorn.md):
+    # mostly-white/black chrome with a sparing blue accent, replacing the
+    # earlier "Enterprise Dense" navy-sidebar look.
+    "bg_app": "#EEF0FA",
+    "bg_app_gradient_start": "#E7E9FA",
+    "bg_app_gradient_end": "#EFEFF7",
     "bg_card": "#FFFFFF",
     "bg_elevated": "#FFFFFF",
-    "bg_sidebar": "#1E293B",
-    "bg_hover": "#F1F5F9",
+    "bg_sidebar": "#FFFFFF",
+    "bg_hover": "#F4F4F8",
+    "bg_nav_active_pill": "#F1F1F5",
 
     # Text
-    "text_primary": "#0F172A",
-    "text_secondary": "#64748B",
-    "text_disabled": "#CBD5E1",
-    "text_on_dark": "#E2E8F0",
-    "text_on_dark_muted": "#94A3B8",
+    "text_primary": "#111114",
+    "text_secondary": "#6B6B76",
+    "text_disabled": "#C7C7D1",
 
     # Accent / brand
-    "accent": "#2563EB",
-    "accent_hover": "#1D4ED8",
-    "accent_pressed": "#1E40AF",
-    "accent_subtle": "#EFF6FF",
+    "accent": "#2F5CF0",
+    "accent_hover": "#254BC7",
+    "accent_pressed": "#1D3D9E",
+    "accent_subtle": "#EAF0FE",
 
-    # Semantic status colors (Present/Pass, Late, Absent/Fail)
+    # Semantic status colors (Present/Pass, Late, Absent/Fail) - kept in the
+    # same hue families as before; these are load-bearing for attendance
+    # status coding throughout roster tables and charts.
     "success": "#16A34A",
     "success_tint": "#DCFCE7",
     "success_border": "#86EFAC",
@@ -49,33 +55,33 @@ PALETTE = {
     "error_text": "#991B1B",
 
     # Borders
-    "border": "#E2E8F0",
-    "border_strong": "#CBD5E1",
+    "border": "#E7E7EE",
+    "border_strong": "#D6D6E0",
 }
 
 # Dark-mode counterpart to PALETTE, same keys - resources/styles/theme_dark.qss
-# is generated from theme.qss by substituting each PALETTE[key] hex for
-# DARK_PALETTE[key] (see scripts/generate_dark_theme.py). Dynamic per-cell
-# coloring (qcolor(), class_tag_color()) intentionally still uses the light
-# PALETTE in both themes - only the static QSS chrome is dark-mode aware for
-# now; see ROADMAP.md.
+# is generated from resources/styles/theme.qss.tmpl (see scripts/generate_theme.py).
+# Dynamic per-cell coloring (qcolor(), class_tag_color()) intentionally still
+# uses the light PALETTE in both themes - only the static QSS chrome and
+# matplotlib charts (via active_palette()) are dark-mode aware.
 DARK_PALETTE = {
-    "bg_app": "#0F172A",
-    "bg_card": "#1E293B",
-    "bg_elevated": "#1E293B",
-    "bg_sidebar": "#0B1120",
-    "bg_hover": "#334155",
+    "bg_app": "#14141B",
+    "bg_app_gradient_start": "#14141B",
+    "bg_app_gradient_end": "#1B1B24",
+    "bg_card": "#1E1E27",
+    "bg_elevated": "#1E1E27",
+    "bg_sidebar": "#17171F",
+    "bg_hover": "#24242E",
+    "bg_nav_active_pill": "#24242E",
 
-    "text_primary": "#F1F5F9",
-    "text_secondary": "#94A3B8",
-    "text_disabled": "#475569",
-    "text_on_dark": "#E2E8F0",
-    "text_on_dark_muted": "#94A3B8",
+    "text_primary": "#F1F1F5",
+    "text_secondary": "#A0A0AC",
+    "text_disabled": "#54545F",
 
-    "accent": "#3B82F6",
-    "accent_hover": "#60A5FA",
-    "accent_pressed": "#2563EB",
-    "accent_subtle": "#1E3A8A",
+    "accent": "#5B7FF5",
+    "accent_hover": "#7C99F7",
+    "accent_pressed": "#2F5CF0",
+    "accent_subtle": "#22315E",
 
     "success": "#22C55E",
     "success_tint": "#14532D",
@@ -92,8 +98,8 @@ DARK_PALETTE = {
     "error_border": "#DC2626",
     "error_text": "#FECACA",
 
-    "border": "#334155",
-    "border_strong": "#475569",
+    "border": "#2E2E38",
+    "border_strong": "#3D3D49",
 }
 
 # Class-card color tags: a small, hand-picked set of distinct hues (not an
@@ -105,8 +111,9 @@ CLASS_TAG_COLORS = [
 
 # Spacing scale (px) for the Kintsugi-direction redesign (see the plan at
 # .claude/plans/wild-jingling-unicorn.md) - wider than the Enterprise Dense
-# scale to match Kintsugi's generous whitespace. Not yet consumed anywhere;
-# lands ahead of the screens that will use it (Phase 1+).
+# scale to match Kintsugi's generous whitespace. Consumed by
+# resources/styles/theme.qss.tmpl (via scripts/generate_theme.py) and by
+# Python code that builds widgets programmatically.
 SPACING = {
     "xs": 4,
     "sm": 8,

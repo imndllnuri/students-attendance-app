@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QLineEdit, QWidget
 
 from models.accounts import AccountManager
 from shared.i18n import t
+from shared.qt_style import set_dynamic_property
 from shared.shadow import apply_card_shadow
 from views.create_account_window import CreateAccountWindow
 from views.main_window import MainWindow
@@ -23,21 +24,24 @@ class LoginWindow(QWidget):
 
         self.account_manager = AccountManager()
 
+        set_dynamic_property(self.login_btn, "variant", "primary")
+        set_dynamic_property(self.create_account_btn, "variant", "secondary")
+
         self.login_btn.clicked.connect(self.login)
         self.create_account_btn.clicked.connect(self.open_create_account_window)
         self.close_window_btn.clicked.connect(self.close)
         self.forgot_password_btn.clicked.connect(self.open_reset_password_window)
 
         self.close_window_btn.setText("")
-        self.close_window_btn.setIcon(qta.icon("fa5s.times", color="#64748B"))
+        self.close_window_btn.setIcon(qta.icon("fa5s.times", color="#6B6B76"))
         self.close_window_btn.setIconSize(QSize(14, 14))
 
         apply_card_shadow(self.card_frame, strength="lg")
 
-        self.email_le.addAction(qta.icon("fa5s.envelope", color="#94A3B8"), QLineEdit.LeadingPosition)
-        self.password_le.addAction(qta.icon("fa5s.lock", color="#94A3B8"), QLineEdit.LeadingPosition)
+        self.email_le.addAction(qta.icon("fa5s.envelope", color="#C7C7D1"), QLineEdit.LeadingPosition)
+        self.password_le.addAction(qta.icon("fa5s.lock", color="#C7C7D1"), QLineEdit.LeadingPosition)
         self._toggle_password_action = self.password_le.addAction(
-            qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition
+            qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
         )
         self._toggle_password_action.setCheckable(True)
         self._toggle_password_action.setToolTip("Show password")
@@ -60,7 +64,7 @@ class LoginWindow(QWidget):
     def _toggle_password_visibility(self, checked):
         self.password_le.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
         self._toggle_password_action.setIcon(
-            qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B")
+            qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#6B6B76")
         )
         self._toggle_password_action.setToolTip("Hide password" if checked else "Show password")
 

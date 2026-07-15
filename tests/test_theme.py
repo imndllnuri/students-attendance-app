@@ -1,6 +1,5 @@
 """Covers #27: dark mode preference persistence and the generated dark QSS."""
 
-import re
 from pathlib import Path
 
 import shared.theme as theme
@@ -30,25 +29,74 @@ def test_invalid_preference_file_content_falls_back_to_light(monkeypatch, tmp_pa
     assert theme.load_theme_preference() == "light"
 
 
-def test_generated_dark_qss_is_up_to_date_with_the_generator():
-    """Regression guard: theme_dark.qss must match what
-    scripts/generate_dark_theme.py produces from the current theme.qss and
-    palettes, catching both drift (forgot to re-run it) and substitution
-    bugs (e.g. two keys sharing a light hex clobbering each other)."""
-    from scripts.generate_dark_theme import DARK_QSS, LIGHT_QSS, generate_dark_qss
+def test_generated_qss_files_are_up_to_date_with_the_template():
+    """Regression guard: theme.qss and theme_dark.qss must match what
+    scripts/generate_theme.py produces from the current theme.qss.tmpl and
+    palettes - catches both drift (forgot to re-run it) and template
+    changes that reference a token shared/palette.py doesn't define."""
+    from scripts.generate_theme import DARK_QSS, LIGHT_QSS, TEMPLATE, render
+    from shared.palette import DARK_PALETTE, PALETTE
 
-    checked_in = DARK_QSS.read_text()
-    regenerated = generate_dark_qss(LIGHT_QSS.read_text())
+    template_text = TEMPLATE.read_text()
 
-    assert checked_in == regenerated
+    assert LIGHT_QSS.read_text() == render(template_text, PALETTE)
+    assert DARK_QSS.read_text() == render(template_text, DARK_PALETTE)
+
+
+def test_template_has_no_unresolved_placeholders_in_either_output():
+    repo_root = Path(__file__).parent.parent
+    light_qss = (repo_root / "resources" / "styles" / "theme.qss").read_text()
+    dark_qss = (repo_root / "resources" / "styles" / "theme_dark.qss").read_text()
+
+    assert "{{" not in light_qss
+    assert "{{" not in dark_qss
 
 
 def test_specific_known_substitutions_are_correct():
     """Spot-checks a few concrete rules rather than re-deriving the whole
     substitution map generically (see test above for the full-file check)."""
     repo_root = Path(__file__).parent.parent
+    light_qss = (repo_root / "resources" / "styles" / "theme.qss").read_text()
     dark_qss = (repo_root / "resources" / "styles" / "theme_dark.qss").read_text()
 
-    assert "background-color: #334155;\n    color: #CBD5E1;" in dark_qss  # header row
-    assert "QPushButton#delete_account_btn:hover {\n    background-color: #7F1D1D;" in dark_qss
-    assert "#1E3A8A" in dark_qss  # disabled-button background (was light blue #BFDBFE)
+    # "Always white text on a colored control" contexts must stay pure
+    # white in BOTH themes, not drift to a dark bg_card-ish value - this
+    # was a real, previously-unnoticed dark-mode bug the template-based
+    # (substitute-by-name, not by-hex-value) generator fixes.
+    assert "QLabel#notifications_badge_lbl {\n    background-color: #DC2626;\n    color: #FFFFFF;" in light_qss
+    assert "QLabel#notifications_badge_lbl {\n    background-color: #EF4444;\n    color: #FFFFFF;" in dark_qss
+
+    assert 'QPushButton[variant="primary"] {\n    background-color: #2F5CF0;\n    color: #FFFFFF;' in light_qss
+    assert 'QPushButton[variant="primary"] {\n    background-color: #5B7FF5;\n    color: #FFFFFF;' in dark_qss
+
+    # Sidebar flips from white (light) to dark (dark mode) - the biggest
+    # single token change in the Kintsugi redesign vs. the old dark-navy-
+    # always sidebar.
+    assert "QWidget#sidebar_widget {\n    background-color: #FFFFFF;" in light_qss
+    assert "QWidget#sidebar_widget {\n    background-color: #17171F;" in dark_qss
+
+    # Pill radius (999px) renders identically regardless of theme, since
+    # radius/spacing tokens aren't color tokens.
+    assert "border-radius: 999px;" in light_qss
+    assert "border-radius: 999px;" in dark_qss
+
+
+def test_render_raises_on_an_unknown_placeholder():
+    from scripts.generate_theme import render
+    from shared.palette import PALETTE
+
+    try:
+        render("QWidget { color: {{not_a_real_token}}; }", PALETTE)
+    except KeyError:
+        pass
+    else:
+        raise AssertionError("expected a KeyError for an unknown template token")
+
+
+def test_render_fills_radius_and_spacing_tokens():
+    from scripts.generate_theme import render
+    from shared.palette import PALETTE
+
+    result = render("border-radius: {{radius_pill}}px; margin: {{spacing_md}}px;", PALETTE)
+
+    assert result == "border-radius: 999px; margin: 16px;"

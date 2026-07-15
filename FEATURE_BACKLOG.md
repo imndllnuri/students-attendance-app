@@ -96,10 +96,11 @@ marked "not selected" were intentionally left out of this batch.
   persisted across restarts) - no email/SMTP is configured for this
   project, so the "weekly risk summary email" idea became an at-risk
   summary notification shown when a class's roster is loaded instead.
-- **#27 Dark mode**: `theme_dark.qss` is generated from `theme.qss` by
-  `scripts/generate_dark_theme.py` (hex-value substitution via
-  `shared/palette.py`'s `DARK_PALETTE`) rather than hand-authored - re-run
-  the script after editing either file. Preference persists to
+- **#27 Dark mode**: `theme.qss`/`theme_dark.qss` are both generated from
+  `resources/styles/theme.qss.tmpl` by `scripts/generate_theme.py`
+  (substitutes `{{token}}` placeholders by name from `shared/palette.py`'s
+  `PALETTE`/`DARK_PALETTE`) rather than hand-authored - edit the template
+  and re-run the script, never hand-edit the generated files. Preference persists to
   `.theme_preference` and applies live via `QApplication.setStyleSheet()`.
   Dynamic per-cell colors (`qcolor()`, `class_tag_color()`) intentionally
   still use the light `PALETTE` in both themes; the top search bar isn't
