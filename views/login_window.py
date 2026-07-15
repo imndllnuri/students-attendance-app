@@ -32,7 +32,7 @@ class LoginWindow(QWidget):
         self.close_window_btn.setIcon(qta.icon("fa5s.times", color="#64748B"))
         self.close_window_btn.setIconSize(QSize(14, 14))
 
-        apply_card_shadow(self.card_frame)
+        apply_card_shadow(self.card_frame, strength="lg")
 
         self.email_le.addAction(qta.icon("fa5s.envelope", color="#94A3B8"), QLineEdit.LeadingPosition)
         self.password_le.addAction(qta.icon("fa5s.lock", color="#94A3B8"), QLineEdit.LeadingPosition)

@@ -26,7 +26,7 @@ class ResetPasswordWindow(QDialog):
         self._password_toggle.setToolTip("Show password")
         self._password_toggle.toggled.connect(self.toggle_password_visibility)
 
-        apply_card_shadow(self.card_frame)
+        apply_card_shadow(self.card_frame, strength="lg")
 
     def fetch_question(self):
         email = self.email_le.text().strip()

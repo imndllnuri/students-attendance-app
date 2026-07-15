@@ -35,7 +35,7 @@ class CreateAccountWindow(QDialog):
         if len(SECURITY_QUESTIONS) > 1:
             self.security_question_2_ComboBox.setCurrentIndex(1)
 
-        apply_card_shadow(self.card_frame)
+        apply_card_shadow(self.card_frame, strength="lg")
 
         self.show()
 

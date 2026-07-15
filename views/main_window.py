@@ -38,7 +38,7 @@ from shared.class_order import load_class_order, save_class_order
 from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
-from shared.palette import PALETTE, class_tag_color
+from shared.palette import PALETTE, active_palette, class_tag_color
 from shared.shadow import apply_card_shadow
 from shared.session_timeout import (
     TIMEOUT_OPTIONS,
@@ -85,6 +85,7 @@ class MainWindow(QMainWindow):
         self.class_manager = ClassManager()
         self.account_manager = AccountManager()
         self.statistics_canvas = None
+        self._last_chart_builder = None
         self.notifications = []
         self.recently_viewed_class_ids = []
         self.selected_class_ids = set()
@@ -231,12 +232,13 @@ class MainWindow(QMainWindow):
         self.update_server_health_indicator()
 
     def update_server_health_indicator(self):
+        palette = active_palette()
         if self.class_manager.check_server_health():
             self.server_health_lbl.setText("● Connected")
-            self.server_health_lbl.setStyleSheet(f"color: {PALETTE['success']};")
+            self.server_health_lbl.setStyleSheet(f"color: {palette['success']};")
         else:
             self.server_health_lbl.setText("● Offline")
-            self.server_health_lbl.setStyleSheet(f"color: {PALETTE['error']};")
+            self.server_health_lbl.setStyleSheet(f"color: {palette['error']};")
 
     def export_settings(self):
         file_path, _ = QFileDialog.getSaveFileName(
@@ -379,7 +381,7 @@ class MainWindow(QMainWindow):
 
     def _apply_card_shadows(self):
         for frame in (self.profile_card_frame, self.settings_card_frame):
-            apply_card_shadow(frame)
+            apply_card_shadow(frame, strength="md")
 
     def _set_active_nav(self, active_btn):
         for btn in self._nav_buttons:
@@ -1079,6 +1081,8 @@ class MainWindow(QMainWindow):
         save_theme_preference(theme)
         with open(stylesheet_path(theme)) as f:
             QApplication.instance().setStyleSheet(f.read())
+        if self._last_chart_builder is not None:
+            self._last_chart_builder()
 
     def toggle_list_density(self, checked):
         save_list_density("compact" if checked else "comfortable")
@@ -1296,8 +1300,9 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Server Error", str(e))
             return
 
+        palette = active_palette()
         figure = Figure(figsize=(8, 4))
-        figure.patch.set_facecolor(PALETTE["bg_card"])
+        figure.patch.set_facecolor(palette["bg_card"])
         axes_pie = figure.add_subplot(121)
         axes_trend = figure.add_subplot(122)
         labels = ["Present", "Late", "Absent"]
@@ -1313,14 +1318,15 @@ class MainWindow(QMainWindow):
                 values,
                 labels=labels,
                 autopct="%1.1f%%",
-                colors=[PALETTE["success"], PALETTE["warning"], PALETTE["error"]],
-                textprops={"color": PALETTE["text_primary"]},
+                colors=[palette["success"], palette["warning"], palette["error"]],
+                textprops={"color": palette["text_primary"]},
             )
-            axes_pie.set_title(f"Attendance for {cls.class_code}", color=PALETTE["text_primary"])
+            axes_pie.set_title(f"Attendance for {cls.class_code}", color=palette["text_primary"])
             self._render_attendance_trend(axes_trend, cls)
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
+        self._last_chart_builder = self.render_statistics
 
     def show_class_comparison(self):
         """Bar chart comparing attendance rate across all of the
@@ -1354,17 +1360,19 @@ class MainWindow(QMainWindow):
             return
         self.statistics_empty_lbl.setVisible(False)
 
+        palette = active_palette()
         figure = Figure(figsize=(8, 4))
-        figure.patch.set_facecolor(PALETTE["bg_card"])
+        figure.patch.set_facecolor(palette["bg_card"])
         axes = figure.add_subplot(111)
-        axes.bar(labels, rates, color=PALETTE["accent"])
+        axes.bar(labels, rates, color=palette["accent"])
         axes.set_ylim(0, 100)
-        axes.set_ylabel("Attendance Rate (%)", color=PALETTE["text_primary"])
-        axes.set_title("Attendance Comparison Across Classes", color=PALETTE["text_primary"])
-        axes.tick_params(colors=PALETTE["text_primary"])
+        axes.set_ylabel("Attendance Rate (%)", color=palette["text_primary"])
+        axes.set_title("Attendance Comparison Across Classes", color=palette["text_primary"])
+        axes.tick_params(colors=palette["text_primary"])
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
+        self._last_chart_builder = self.show_class_comparison
 
     def show_attendance_heatmap(self):
         """Heatmap of attendance rate by day-of-week/time-slot for the
@@ -1419,19 +1427,21 @@ class MainWindow(QMainWindow):
         for (day, slot), (rate_sum, count) in cell_totals.items():
             grid[time_slots_present.index(slot), days_present.index(day)] = rate_sum / count
 
+        palette = active_palette()
         figure = Figure(figsize=(8, 4))
-        figure.patch.set_facecolor(PALETTE["bg_card"])
+        figure.patch.set_facecolor(palette["bg_card"])
         axes = figure.add_subplot(111)
         image = axes.imshow(grid, cmap="RdYlGn", vmin=0, vmax=100, aspect="auto")
         axes.set_xticks(range(len(days_present)))
-        axes.set_xticklabels(days_present, color=PALETTE["text_primary"])
+        axes.set_xticklabels(days_present, color=palette["text_primary"])
         axes.set_yticks(range(len(time_slots_present)))
-        axes.set_yticklabels(time_slots_present, color=PALETTE["text_primary"])
-        axes.set_title(f"Attendance Heatmap - {cls.class_code}", color=PALETTE["text_primary"])
+        axes.set_yticklabels(time_slots_present, color=palette["text_primary"])
+        axes.set_title(f"Attendance Heatmap - {cls.class_code}", color=palette["text_primary"])
         figure.colorbar(image, ax=axes, label="Attendance Rate (%)")
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
+        self._last_chart_builder = self.show_attendance_heatmap
 
     def export_statistics_pdf(self):
         """Combines class policy, present/late/absent rates, the
@@ -1479,7 +1489,7 @@ class MainWindow(QMainWindow):
             ax_pie.axis("off")
 
         ax_trend = figure.add_subplot(gs[1, 1])
-        self._render_attendance_trend(ax_trend, cls)
+        self._render_attendance_trend(ax_trend, cls, palette=PALETTE)
 
         ax_risk = figure.add_subplot(gs[2, :])
         ax_risk.axis("off")
@@ -1515,10 +1525,15 @@ class MainWindow(QMainWindow):
                 lines.append(f"{row[name_idx]} ({row[number_idx]}) - {not_attended:g} missed - {label}")
         return lines
 
-    def _render_attendance_trend(self, axes, cls):
+    def _render_attendance_trend(self, axes, cls, palette=None):
         """Plots the per-session attendance rate (% Present+Late) over
         time, reusing the same pivoted student table the roster page
-        already fetches rather than adding a parallel server aggregate."""
+        already fetches rather than adding a parallel server aggregate.
+
+        `palette` defaults to the active (theme-aware) palette for on-screen
+        rendering; export_statistics_pdf passes the light PALETTE explicitly
+        so exported reports stay print-friendly regardless of app theme."""
+        palette = palette or active_palette()
         try:
             table = self.class_manager.get_student_table(cls.class_id)
         except ApiError:
@@ -1539,12 +1554,12 @@ class MainWindow(QMainWindow):
             recorded = sum(1 for row in table["rows"] if str(row[col_index]).startswith("1 "))
             rates.append(recorded / num_students * 100)
 
-        axes.plot(range(1, len(rates) + 1), rates, marker="o", color=PALETTE["accent"])
+        axes.plot(range(1, len(rates) + 1), rates, marker="o", color=palette["accent"])
         axes.set_ylim(0, 100)
-        axes.set_xlabel("Session", color=PALETTE["text_primary"])
-        axes.set_ylabel("Attendance Rate (%)", color=PALETTE["text_primary"])
-        axes.set_title("Attendance Trend", color=PALETTE["text_primary"])
-        axes.tick_params(colors=PALETTE["text_primary"])
+        axes.set_xlabel("Session", color=palette["text_primary"])
+        axes.set_ylabel("Attendance Rate (%)", color=palette["text_primary"])
+        axes.set_title("Attendance Trend", color=palette["text_primary"])
+        axes.tick_params(colors=palette["text_primary"])
 
     def export_statistics_chart(self):
         if self.statistics_canvas is None:
