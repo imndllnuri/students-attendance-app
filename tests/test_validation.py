@@ -1,6 +1,6 @@
 import pytest
 
-from shared.validation import is_valid_email, is_valid_password
+from shared.validation import is_valid_email, is_valid_password, password_strength
 
 
 @pytest.mark.parametrize(
@@ -27,3 +27,18 @@ def test_is_valid_email(email, expected):
 )
 def test_is_valid_password(password, expected):
     assert is_valid_password(password) is expected
+
+
+@pytest.mark.parametrize(
+    "password,expected",
+    [
+        ("", ""),
+        ("short1", "weak"),
+        ("password123", "weak"),  # long enough but no upper/lower mix
+        ("Password123", "medium"),
+        ("Password1234", "strong"),  # 12+ chars and upper/lower mix and digit
+        ("Password123!", "strong"),
+    ],
+)
+def test_password_strength(password, expected):
+    assert password_strength(password) == expected

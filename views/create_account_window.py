@@ -4,7 +4,13 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDialog, QGraphicsDropShadowEffect, QLineEdit, QMessageBox
 
 from models.accounts import Account
-from shared.validation import MIN_PASSWORD_LENGTH, SECURITY_QUESTIONS, is_valid_email, is_valid_password
+from shared.validation import (
+    MIN_PASSWORD_LENGTH,
+    SECURITY_QUESTIONS,
+    is_valid_email,
+    is_valid_password,
+    password_strength,
+)
 
 
 class CreateAccountWindow(QDialog):
@@ -25,6 +31,7 @@ class CreateAccountWindow(QDialog):
 
         self.email_le.textChanged.connect(self.validate_email)
         self.password_le.textChanged.connect(self.validate_password)
+        self.password_le.textChanged.connect(self._update_password_strength)
         self.password_again_le.textChanged.connect(self.validate_password_match)
 
         self.security_question_ComboBox.addItems(SECURITY_QUESTIONS)
@@ -71,6 +78,13 @@ class CreateAccountWindow(QDialog):
         self._clear_error(self.password_le, self.password_error_lbl)
         self.validate_password_match()
         return True
+
+    def _update_password_strength(self):
+        strength = password_strength(self.password_le.text())
+        self.password_strength_lbl.setText(strength.capitalize() if strength else "")
+        self.password_strength_lbl.setProperty("strength", strength)
+        self.password_strength_lbl.style().unpolish(self.password_strength_lbl)
+        self.password_strength_lbl.style().polish(self.password_strength_lbl)
 
     def validate_password_match(self):
         if self.password_again_le.text() and self.password_again_le.text() != self.password_le.text():

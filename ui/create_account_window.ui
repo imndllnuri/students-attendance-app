@@ -82,6 +82,11 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="password_strength_lbl">
+             <property name="text"><string/></property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="show_password_row">
              <item>
               <spacer name="show_password_spacer">

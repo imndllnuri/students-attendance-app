@@ -26,3 +26,30 @@ def is_valid_password(password: str) -> bool:
         and any(c.isalpha() for c in password)
         and any(c.isdigit() for c in password)
     )
+
+
+def password_strength(password: str) -> str:
+    """Returns "", "weak", "medium", or "strong" - used to drive a live
+    strength indicator on password-creation fields. Independent of
+    is_valid_password()'s pass/fail rule: a password can be valid (meets
+    the minimum bar) while still rating as only "weak"."""
+    if not password:
+        return ""
+
+    score = 0
+    if len(password) >= MIN_PASSWORD_LENGTH:
+        score += 1
+    if len(password) >= 12:
+        score += 1
+    if any(c.islower() for c in password) and any(c.isupper() for c in password):
+        score += 1
+    if any(c.isdigit() for c in password):
+        score += 1
+    if any(not c.isalnum() for c in password):
+        score += 1
+
+    if score <= 2:
+        return "weak"
+    if score <= 3:
+        return "medium"
+    return "strong"

@@ -3,7 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDialog, QGraphicsDropShadowEffect, QLineEdit, QMessageBox
 
-from shared.validation import MIN_PASSWORD_LENGTH, is_valid_password
+from shared.validation import MIN_PASSWORD_LENGTH, is_valid_password, password_strength
 
 
 class ResetPasswordWindow(QDialog):
@@ -18,6 +18,7 @@ class ResetPasswordWindow(QDialog):
         self.back_btn.clicked.connect(lambda: self.steps_stack.setCurrentIndex(0))
         self.reset_btn.clicked.connect(self.submit_reset)
         self.show_password_btn.toggled.connect(self.toggle_password_visibility)
+        self.new_password_le.textChanged.connect(self._update_password_strength)
 
         self.show_password_btn.setText("")
         self.show_password_btn.setIcon(qta.icon("fa5s.eye", color="#64748B"))
@@ -77,6 +78,13 @@ class ResetPasswordWindow(QDialog):
             self, "Password Reset", "Your password has been reset successfully!"
         )
         self.accept()
+
+    def _update_password_strength(self):
+        strength = password_strength(self.new_password_le.text())
+        self.new_password_strength_lbl.setText(strength.capitalize() if strength else "")
+        self.new_password_strength_lbl.setProperty("strength", strength)
+        self.new_password_strength_lbl.style().unpolish(self.new_password_strength_lbl)
+        self.new_password_strength_lbl.style().polish(self.new_password_strength_lbl)
 
     def toggle_password_visibility(self, checked):
         mode = QLineEdit.Normal if checked else QLineEdit.Password

@@ -102,6 +102,33 @@ QLabel#class_row_caption_lbl {
     padding-bottom: 8px;
 }
 
+/* --- Password strength indicator --- */
+
+QLabel#password_strength_lbl,
+QLabel#new_password_strength_lbl,
+QLabel#settings_password_strength_lbl {
+    font-size: 9pt;
+    font-weight: 600;
+}
+
+QLabel#password_strength_lbl[strength="weak"],
+QLabel#new_password_strength_lbl[strength="weak"],
+QLabel#settings_password_strength_lbl[strength="weak"] {
+    color: #DC2626;
+}
+
+QLabel#password_strength_lbl[strength="medium"],
+QLabel#new_password_strength_lbl[strength="medium"],
+QLabel#settings_password_strength_lbl[strength="medium"] {
+    color: #D97706;
+}
+
+QLabel#password_strength_lbl[strength="strong"],
+QLabel#new_password_strength_lbl[strength="strong"],
+QLabel#settings_password_strength_lbl[strength="strong"] {
+    color: #16A34A;
+}
+
 QLabel#change_password_section_lbl,
 QLabel#security_question_section_lbl,
 QLabel#roster_section_title_lbl,

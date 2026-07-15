@@ -26,6 +26,7 @@ from shared.validation import (
     SECURITY_QUESTIONS,
     is_valid_email,
     is_valid_password,
+    password_strength,
 )
 from views.add_new_class_window import AddNewClassWindow
 from models.accounts import AccountManager
@@ -75,6 +76,7 @@ class MainWindow(QMainWindow):
         self.delete_account_btn.clicked.connect(self.confirm_delete_account)
         self.settings_show_password_btn.toggled.connect(self._toggle_settings_password_echo)
         self.new_password_le.textChanged.connect(self.validate_new_password)
+        self.new_password_le.textChanged.connect(self._update_settings_password_strength)
         self.confirm_new_password_le.textChanged.connect(self.validate_new_password_match)
 
         self._nav_buttons = (self.my_classes_btn, self.settings_btn, self.statistics_btn)
@@ -385,6 +387,7 @@ class MainWindow(QMainWindow):
         self._clear_error(self.confirm_new_password_le, self.confirm_new_password_error_lbl)
         self._clear_error(self.settings_answer_le, self.security_question_error_lbl)
         self.settings_security_question_combo.setCurrentIndex(0)
+        self._update_settings_password_strength()
 
     def validate_new_password(self):
         password = self.new_password_le.text()
@@ -400,6 +403,13 @@ class MainWindow(QMainWindow):
         self._clear_error(self.new_password_le, self.new_password_error_lbl)
         self.validate_new_password_match()
         return True
+
+    def _update_settings_password_strength(self):
+        strength = password_strength(self.new_password_le.text())
+        self.settings_password_strength_lbl.setText(strength.capitalize() if strength else "")
+        self.settings_password_strength_lbl.setProperty("strength", strength)
+        self.settings_password_strength_lbl.style().unpolish(self.settings_password_strength_lbl)
+        self.settings_password_strength_lbl.style().polish(self.settings_password_strength_lbl)
 
     def validate_new_password_match(self):
         if (self.confirm_new_password_le.text()

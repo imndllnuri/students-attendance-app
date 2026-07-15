@@ -227,6 +227,11 @@
                 </widget>
                </item>
                <item>
+                <widget class="QLabel" name="settings_password_strength_lbl">
+                 <property name="text"><string/></property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLabel" name="new_password_error_lbl">
                  <property name="visible"><bool>false</bool></property>
                  <property name="wordWrap"><bool>true</bool></property>

@@ -5,7 +5,7 @@ presented. Checked items are implemented (each as its own commit); items
 marked "not selected" were intentionally left out of this batch.
 
 ## Login & Account
-- [ ] 1. Password strength indicator on password-creation fields
+- [x] 1. Password strength indicator on password-creation fields
 - [ ] 2. Email verification step on signup (not selected)
 - [ ] 3. Session timeout / auto-logout after inactivity
 - [ ] 4. "Recent logins" log on the Profile page
