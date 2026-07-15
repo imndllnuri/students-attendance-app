@@ -117,6 +117,27 @@ class ClassWindow(QMainWindow):
         self.refresh_student_list_btn.clicked.connect(self.load_student_list)
         self.roster_retry_btn.clicked.connect(self.load_student_list)
         self.take_attendance_btn.clicked.connect(self.attendance_page_show)
+        self.class_settings_btn.clicked.connect(self.open_edit_class_window)
+
+    def open_edit_class_window(self):
+        from views.add_new_class_window import AddNewClassWindow
+        self.edit_class_window = AddNewClassWindow(
+            self.class_obj.instructor_id, existing_class=self.class_obj
+        )
+        self.edit_class_window.class_created.connect(self._reload_after_edit)
+        self.edit_class_window.show()
+
+    def _reload_after_edit(self):
+        classes = self.class_manager.load_classes_for_instructor(
+            self.class_obj.instructor_id, include_archived=True
+        )
+        updated = next((c for c in classes if c.class_id == self.class_obj.class_id), None)
+        if updated is not None:
+            self.class_obj = updated
+            self.failure = math.ceil(self.class_obj.total_hours * (100 - self.class_obj.attendance_policy) / 100)
+            self.safe = self.failure * 50 / 100
+            self.display_class_details()
+        self.main_window.load_classes()
 
     def attendance_page_show(self):
         from views.take_attendance_window import TakeAttendance

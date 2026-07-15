@@ -19,7 +19,7 @@ marked "not selected" were intentionally left out of this batch.
 - [ ] 10. Search by student name, not just class name/code
 
 ## Class Detail & Roster
-- [ ] 11. "Edit Class" (was previously create-only)
+- [x] 11. "Edit Class" (was previously create-only)
 - [ ] 12. Add/remove individual roster students after class creation
 - [ ] 13. "Export Report" button (wires the existing unused export button)
 - [ ] 14. Student photo/avatar in roster (not selected)

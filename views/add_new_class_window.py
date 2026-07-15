@@ -11,7 +11,7 @@ from services.api_client import ApiError
 class AddNewClassWindow(QWidget):
     class_created = pyqtSignal()
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, existing_class=None):
         super().__init__()
         uic.loadUi("ui/add_new_class.ui", self)
         for col, stretch in enumerate((0, 1, 0, 0, 1)):
@@ -19,6 +19,7 @@ class AddNewClassWindow(QWidget):
         self.user_id = user_id
         self.class_manager = ClassManager()
         self.students = []
+        self.existing_class = existing_class
 
         self.spreadsheet_file_btn.clicked.connect(self.load_spreadsheet)
         self.create_class_btn.clicked.connect(self.create_class)
@@ -36,6 +37,42 @@ class AddNewClassWindow(QWidget):
         self.create_class_btn.setIcon(qta.icon("fa5s.check", color="white"))
 
         self.time_slots = {day: [] for day in days}
+
+        if existing_class is not None:
+            self._prefill_for_edit(existing_class)
+
+    def _prefill_for_edit(self, cls):
+        self.setWindowTitle(f"Edit Class - {cls.class_code}")
+        self.create_class_btn.setText("Save Changes")
+        self.class_code_le.setText(cls.class_code)
+        self.class_code_le.setReadOnly(True)
+        self.class_name_le.setText(cls.class_name)
+        self.class_section_le.setText(cls.section)
+        self.attendance_policy_le.setText(str(cls.attendance_policy))
+        self.late_threshold_le.setText(str(cls.late_threshold))
+        self.number_of_weeks_le.setText(str(cls.total_weeks))
+        self.total_hours_le.setText(str(cls.total_hours))
+        self.weekly_hours_le.setText(str(cls.weekly_hours))
+
+        # Roster edits are handled separately (add/remove individual students);
+        # this dialog only edits schedule/policy fields when editing a class.
+        self.spreadsheet_lbl.setVisible(False)
+        self.spreadsheet_file_btn.setVisible(False)
+
+        for day, slots in cls.schedule.items():
+            if not any(slot.selected for slot in slots):
+                continue
+            checkbox = getattr(self, f"{day.lower()}_cb", None)
+            if checkbox is None:
+                continue
+            checkbox.setChecked(True)
+            for slot in slots:
+                if not slot.selected:
+                    continue
+                self.add_time_slot(day)
+                start_edit, end_edit = self.time_slots[day][-1]
+                start_edit.setTime(slot.start_time)
+                end_edit.setTime(slot.end_time)
 
     def add_time_slot(self, day):
         container = self.findChild(QWidget, f"{day.lower()}GroupBox")
@@ -74,10 +111,7 @@ class AddNewClassWindow(QWidget):
                         child.widget().deleteLater()
                 break
 
-    def create_class(self):
-        if not self.validate_inputs():
-            return
-
+    def _collect_schedule(self):
         schedule = {}
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         for day in days:
@@ -92,6 +126,17 @@ class AddNewClassWindow(QWidget):
                         selected=True
                     ))
                 schedule[day] = slots
+        return schedule
+
+    def create_class(self):
+        if not self.validate_inputs():
+            return
+
+        schedule = self._collect_schedule()
+
+        if self.existing_class is not None:
+            self._save_edits(schedule)
+            return
 
         new_class = Class(
             class_code=self.class_code_le.text(),
@@ -114,6 +159,38 @@ class AddNewClassWindow(QWidget):
             return
 
         QMessageBox.information(self, "Success", "Class created successfully!")
+        self.class_created.emit()
+        self.close()
+
+    def _save_edits(self, schedule):
+        fields = {
+            "class_name": self.class_name_le.text(),
+            "section": self.class_section_le.text(),
+            "attendance_policy": float(self.attendance_policy_le.text()),
+            "late_threshold": int(self.late_threshold_le.text()),
+            "total_weeks": int(self.number_of_weeks_le.text()),
+            "total_hours": float(self.total_hours_le.text()),
+            "weekly_hours": float(self.weekly_hours_le.text()),
+            "schedule": {
+                day: [
+                    {
+                        "start_time": slot.start_time.toString("HH:mm"),
+                        "end_time": slot.end_time.toString("HH:mm"),
+                        "selected": slot.selected,
+                    }
+                    for slot in slots
+                ]
+                for day, slots in schedule.items()
+            },
+        }
+
+        try:
+            self.class_manager.update_class(self.existing_class.class_id, fields)
+        except ApiError as e:
+            QMessageBox.warning(self, "Error", str(e))
+            return
+
+        QMessageBox.information(self, "Success", "Class updated successfully!")
         self.class_created.emit()
         self.close()
 

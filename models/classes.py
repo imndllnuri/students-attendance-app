@@ -111,16 +111,20 @@ class ClassManager:
         new_class.class_id = data["class_id"]
         self.classes.append(new_class)
 
+    def update_class(self, class_id: str, fields: dict) -> dict:
+        """Raises ApiError (e.g. class not found) on failure."""
+        return self.api_client.update_class(class_id, fields)
+
     def archive_class(self, class_id: str) -> bool:
         try:
-            self.api_client.update_class(class_id, {"archived": True})
+            self.update_class(class_id, {"archived": True})
         except ApiError:
             return False
         return True
 
     def unarchive_class(self, class_id: str) -> bool:
         try:
-            self.api_client.update_class(class_id, {"archived": False})
+            self.update_class(class_id, {"archived": False})
         except ApiError:
             return False
         return True
