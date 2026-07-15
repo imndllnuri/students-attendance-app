@@ -522,6 +522,11 @@
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
              </spacer>
             </item>
+            <item>
+             <widget class="QPushButton" name="export_chart_btn">
+              <property name="text"><string>Export Chart</string></property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>

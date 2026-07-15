@@ -38,7 +38,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 23. Per-student detail statistics
 - [x] 24. "At-Risk Students" list
 - [x] 25. Attendance trend over time (line chart)
-- [ ] 26. Export chart as PNG/PDF
+- [x] 26. Export chart as PNG/PDF
 
 ## Settings & Profile
 - [ ] 27. Dark mode

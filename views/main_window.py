@@ -6,6 +6,7 @@ from PyQt5.QtCore import QEvent, Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
+    QFileDialog,
     QFrame,
     QGraphicsDropShadowEffect,
     QHBoxLayout,
@@ -70,6 +71,7 @@ class MainWindow(QMainWindow):
         self.search_btn.clicked.connect(self.show_search)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
+        self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
 
@@ -768,3 +770,27 @@ class MainWindow(QMainWindow):
         axes.set_ylabel("Attendance Rate (%)", color=PALETTE["text_primary"])
         axes.set_title("Attendance Trend", color=PALETTE["text_primary"])
         axes.tick_params(colors=PALETTE["text_primary"])
+
+    def export_statistics_chart(self):
+        if self.statistics_canvas is None:
+            QMessageBox.information(
+                self, "Nothing to Export", "Select a class with attendance data first."
+            )
+            return
+
+        cls = self.statistics_class_combo.currentData()
+        default_name = f"{cls.class_code}_statistics.png" if cls else "statistics.png"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Chart", default_name, "PNG Image (*.png);;PDF Document (*.pdf)"
+        )
+        if not file_path:
+            return
+
+        figure = self.statistics_canvas.figure
+        try:
+            figure.savefig(file_path, facecolor=figure.get_facecolor())
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to export chart:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Chart exported to:\n{file_path}")
