@@ -16,5 +16,9 @@ def init_db():
     conn = get_connection()
     with open(SCHEMA_PATH) as f:
         conn.executescript(f.read())
+    try:
+        conn.execute("ALTER TABLE classes ADD COLUMN archived INTEGER NOT NULL DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass  # column already exists on a database created before this feature
     conn.commit()
     conn.close()

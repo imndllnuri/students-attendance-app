@@ -69,6 +69,54 @@ def test_create_class_then_duplicate_code_conflicts(client):
     assert dup.status_code == 409
 
 
+def test_archiving_a_class_hides_it_from_the_default_listing(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+
+    patched = client.patch(f"/classes/{class_id}", json={"archived": True})
+    assert patched.status_code == 200
+    assert patched.get_json()["archived"] is True
+
+    active = client.get("/classes", query_string={"instructor_id": instructor_id})
+    assert active.get_json() == []
+
+    everything = client.get(
+        "/classes", query_string={"instructor_id": instructor_id, "include_archived": "true"}
+    )
+    assert len(everything.get_json()) == 1
+    assert everything.get_json()[0]["archived"] is True
+
+    unarchived = client.patch(f"/classes/{class_id}", json={"archived": False})
+    assert unarchived.get_json()["archived"] is False
+    active_again = client.get("/classes", query_string={"instructor_id": instructor_id})
+    assert len(active_again.get_json()) == 1
+
+
+def test_update_class_edits_fields_and_schedule(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+
+    resp = client.patch(
+        f"/classes/{class_id}",
+        json={
+            "class_name": "Advanced Programming",
+            "late_threshold": 20,
+            "schedule": {"Friday": [{"start_time": "10:00", "end_time": "11:50", "selected": True}]},
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["class_name"] == "Advanced Programming"
+    assert body["late_threshold"] == 20
+    assert body["schedule"] == {
+        "Friday": [{"start_time": "10:00", "end_time": "11:50", "selected": True}]
+    }
+
+
 def test_roster_attend_and_statistics_flow(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

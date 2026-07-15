@@ -18,7 +18,8 @@ class Class:
     def __init__(self, class_code: str, class_name: str, instructor_id: str, section: str,
                  attendance_policy: float, late_threshold: int, total_weeks: int,
                  total_hours: float, weekly_hours: float, schedule: Dict[str, List[ScheduleSlot]],
-                 class_id: Optional[str] = None, students: Optional[List[dict]] = None):
+                 class_id: Optional[str] = None, students: Optional[List[dict]] = None,
+                 archived: bool = False):
         self.class_id = class_id
         self.class_code = class_code
         self.class_name = class_name
@@ -31,6 +32,7 @@ class Class:
         self.weekly_hours = weekly_hours
         self.schedule = schedule
         self.students = students or []
+        self.archived = archived
 
     def to_dict(self):
         return {
@@ -84,6 +86,7 @@ class Class:
             weekly_hours=data["weekly_hours"],
             schedule=schedule,
             class_id=data.get("class_id"),
+            archived=data.get("archived", False),
         )
 
 
@@ -94,9 +97,9 @@ class ClassManager:
         self.api_client = api_client or ApiClient()
         self.classes: List[Class] = []
 
-    def load_classes_for_instructor(self, instructor_id: str) -> List[Class]:
+    def load_classes_for_instructor(self, instructor_id: str, include_archived: bool = False) -> List[Class]:
         try:
-            data = self.api_client.list_classes(instructor_id)
+            data = self.api_client.list_classes(instructor_id, include_archived=include_archived)
         except ApiError:
             return []
         self.classes = [Class.from_dict(c) for c in data]
@@ -107,6 +110,20 @@ class ClassManager:
         data = self.api_client.create_class(new_class.to_dict())
         new_class.class_id = data["class_id"]
         self.classes.append(new_class)
+
+    def archive_class(self, class_id: str) -> bool:
+        try:
+            self.api_client.update_class(class_id, {"archived": True})
+        except ApiError:
+            return False
+        return True
+
+    def unarchive_class(self, class_id: str) -> bool:
+        try:
+            self.api_client.update_class(class_id, {"archived": False})
+        except ApiError:
+            return False
+        return True
 
     def delete_class(self, class_id: str) -> bool:
         try:

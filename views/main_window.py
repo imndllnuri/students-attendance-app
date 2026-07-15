@@ -71,6 +71,7 @@ class MainWindow(QMainWindow):
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
+        self.show_archived_cb.toggled.connect(self.load_classes)
 
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
@@ -187,11 +188,17 @@ class MainWindow(QMainWindow):
         self.stackedWidget.setCurrentIndex(SETTINGS_PAGE)
 
     def fetch_classes(self):
+        showing_archived = self.show_archived_cb.isChecked()
         try:
-            return self.class_manager.load_classes_for_instructor(self.user_id)
+            classes = self.class_manager.load_classes_for_instructor(
+                self.user_id, include_archived=showing_archived
+            )
         except ApiError as e:
             QMessageBox.critical(self, "Server Error", str(e))
             return []
+        if showing_archived:
+            return [cls for cls in classes if cls.archived]
+        return classes
 
     def _class_sort_key(self, cls):
         mode = self.class_sort_combo.currentText()
@@ -209,12 +216,25 @@ class MainWindow(QMainWindow):
             if item.widget():
                 item.widget().deleteLater()
 
-        classes = sorted(self.fetch_classes(), key=self._class_sort_key)
-        self.empty_state_lbl.setVisible(not classes)
-        for row, cls in enumerate(classes):
-            self.class_btns_layout.addWidget(self._make_class_row_widget(cls), row, 0)
+        showing_archived = self.show_archived_cb.isChecked()
+        self.create_new_class_btn.setVisible(not showing_archived)
 
-        self._populate_today_classes(classes)
+        classes = sorted(self.fetch_classes(), key=self._class_sort_key)
+        self.empty_state_lbl.setText(
+            "No archived classes." if showing_archived
+            else "You haven't created any classes yet. Use \"Create New Class\" below to get started."
+        )
+        self.empty_state_lbl.setVisible(not classes)
+        row_builder = self._make_archived_class_row_widget if showing_archived else self._make_class_row_widget
+        for row, cls in enumerate(classes):
+            self.class_btns_layout.addWidget(row_builder(cls), row, 0)
+
+        self.today_classes_title_lbl.setVisible(not showing_archived)
+        if showing_archived:
+            self._populate_today_classes([])
+            self.no_classes_today_lbl.setVisible(False)
+        else:
+            self._populate_today_classes(classes)
 
     def _classes_scheduled_today(self, classes):
         today = datetime.now().strftime("%A")
@@ -278,21 +298,67 @@ class MainWindow(QMainWindow):
         text_layout.addWidget(class_btn)
         text_layout.addWidget(caption_lbl)
 
-        delete_btn = QPushButton("X")
-        delete_btn.setObjectName("class_delete_btn")
-        delete_btn.setFixedSize(25, 25)
-        delete_btn.setCursor(Qt.PointingHandCursor)
-        delete_btn.clicked.connect(lambda _, c=cls: self.delete_class(c))
+        archive_btn = QPushButton("X")
+        archive_btn.setObjectName("class_delete_btn")
+        archive_btn.setFixedSize(25, 25)
+        archive_btn.setCursor(Qt.PointingHandCursor)
+        archive_btn.setToolTip("Archive class")
+        archive_btn.clicked.connect(lambda _, c=cls: self.archive_class(c))
 
         row_layout.addLayout(text_layout, 1)
-        row_layout.addWidget(delete_btn)
+        row_layout.addWidget(archive_btn)
         return class_widget
 
-    def delete_class(self, cls):
+    def _make_archived_class_row_widget(self, cls):
+        class_widget = QWidget()
+        class_widget.setObjectName("class_row_widget")
+        row_layout = QHBoxLayout(class_widget)
+        row_layout.setContentsMargins(4, 4, 4, 4)
+
+        label = QLabel(f"{cls.class_name} ({cls.class_code})")
+        row_layout.addWidget(label, 1)
+
+        unarchive_btn = QPushButton("Unarchive")
+        unarchive_btn.setCursor(Qt.PointingHandCursor)
+        unarchive_btn.clicked.connect(lambda _, c=cls: self.unarchive_class(c))
+        row_layout.addWidget(unarchive_btn)
+
+        delete_btn = QPushButton("Delete Permanently")
+        delete_btn.setObjectName("class_delete_btn")
+        delete_btn.setCursor(Qt.PointingHandCursor)
+        delete_btn.clicked.connect(lambda _, c=cls: self.permanently_delete_class(c))
+        row_layout.addWidget(delete_btn)
+
+        return class_widget
+
+    def archive_class(self, cls):
         reply = QMessageBox.question(
             self,
-            "Confirm Deletion",
-            f"Are you sure you want to delete the class '{cls.class_code}'?",
+            "Archive Class",
+            f"Archive '{cls.class_code}'? It will be hidden from My Classes but its data "
+            "is kept - you can restore it later from Show Archived.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        if self.class_manager.archive_class(cls.class_id):
+            self.load_classes()
+        else:
+            QMessageBox.critical(self, "Error", f"Could not archive {cls.class_code}.")
+
+    def unarchive_class(self, cls):
+        if self.class_manager.unarchive_class(cls.class_id):
+            self.load_classes()
+        else:
+            QMessageBox.critical(self, "Error", f"Could not unarchive {cls.class_code}.")
+
+    def permanently_delete_class(self, cls):
+        reply = QMessageBox.question(
+            self,
+            "Confirm Permanent Deletion",
+            f"Permanently delete '{cls.class_code}'? This cannot be undone.",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )

@@ -20,6 +20,10 @@ class FakeApiClient:
         self.calls.append(("create_class", class_data))
         return {"class_id": "c1"}
 
+    def update_class(self, class_id, fields):
+        self.calls.append(("update_class", class_id, fields))
+        return {"class_id": class_id, **fields}
+
     def delete_class(self, class_id):
         self.calls.append(("delete_class", class_id))
 
@@ -103,6 +107,18 @@ def test_class_manager_add_class_sets_id_and_tracks_it():
 def test_class_manager_delete_class_returns_false_on_api_error():
     manager = ClassManager(api_client=FailingApiClient())
     assert manager.delete_class("does-not-matter") is False
+
+
+def test_class_manager_archive_and_unarchive_class():
+    fake = FakeApiClient()
+    manager = ClassManager(api_client=fake)
+
+    assert manager.archive_class("c1") is True
+    assert manager.unarchive_class("c1") is True
+    assert fake.calls == [
+        ("update_class", "c1", {"archived": True}),
+        ("update_class", "c1", {"archived": False}),
+    ]
 
 
 def test_account_manager_get_login_history_returns_data():

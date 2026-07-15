@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS classes (
     late_threshold INTEGER NOT NULL,
     total_weeks INTEGER NOT NULL,
     total_hours REAL NOT NULL,
-    weekly_hours REAL NOT NULL
+    weekly_hours REAL NOT NULL,
+    archived INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS schedule_slots (

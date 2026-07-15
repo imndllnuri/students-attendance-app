@@ -81,11 +81,18 @@ class ApiClient:
         )
 
     # Classes
-    def list_classes(self, instructor_id):
-        return self._request("GET", "/classes", params={"instructor_id": instructor_id})
+    def list_classes(self, instructor_id, include_archived=False):
+        return self._request(
+            "GET",
+            "/classes",
+            params={"instructor_id": instructor_id, "include_archived": include_archived},
+        )
 
     def create_class(self, class_data):
         return self._request("POST", "/classes", json=class_data)
+
+    def update_class(self, class_id, fields):
+        return self._request("PATCH", f"/classes/{class_id}", json=fields)
 
     def delete_class(self, class_id):
         return self._request("DELETE", f"/classes/{class_id}")

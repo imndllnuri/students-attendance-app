@@ -35,6 +35,7 @@ def class_row_to_dict(conn, row):
         "total_weeks": row["total_weeks"],
         "total_hours": row["total_hours"],
         "weekly_hours": row["weekly_hours"],
+        "archived": bool(row["archived"]),
         "schedule": dict(schedule),
     }
 
@@ -258,10 +259,16 @@ def delete_account(user_id):
 @app.get("/classes")
 def list_classes():
     instructor_id = request.args.get("instructor_id")
+    include_archived = request.args.get("include_archived", "false").lower() == "true"
     conn = get_connection()
-    rows = conn.execute(
-        "SELECT * FROM classes WHERE instructor_id = ?", (instructor_id,)
-    ).fetchall()
+    if include_archived:
+        rows = conn.execute(
+            "SELECT * FROM classes WHERE instructor_id = ?", (instructor_id,)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM classes WHERE instructor_id = ? AND archived = 0", (instructor_id,)
+        ).fetchall()
     result = [class_row_to_dict(conn, row) for row in rows]
     conn.close()
     return jsonify(result)
@@ -317,6 +324,48 @@ def create_class():
     result = class_row_to_dict(conn, row)
     conn.close()
     return jsonify(result), 201
+
+
+_CLASS_UPDATABLE_FIELDS = (
+    "class_name", "section", "attendance_policy", "late_threshold",
+    "total_weeks", "total_hours", "weekly_hours",
+)
+
+
+@app.patch("/classes/<class_id>")
+def update_class(class_id):
+    data = request.get_json()
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM classes WHERE class_id = ?", (class_id,)).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({"error": "Class not found"}), 404
+
+    fields = {k: data[k] for k in _CLASS_UPDATABLE_FIELDS if k in data}
+    if "archived" in data:
+        fields["archived"] = int(bool(data["archived"]))
+    if fields:
+        assignments = ", ".join(f"{k} = ?" for k in fields)
+        conn.execute(
+            f"UPDATE classes SET {assignments} WHERE class_id = ?",
+            (*fields.values(), class_id),
+        )
+
+    if "schedule" in data:
+        conn.execute("DELETE FROM schedule_slots WHERE class_id = ?", (class_id,))
+        for day, slots in data["schedule"].items():
+            for slot in slots:
+                conn.execute(
+                    "INSERT INTO schedule_slots (class_id, day, start_time, end_time, "
+                    "selected) VALUES (?, ?, ?, ?, ?)",
+                    (class_id, day, slot["start_time"], slot["end_time"], int(slot["selected"])),
+                )
+
+    conn.commit()
+    row = conn.execute("SELECT * FROM classes WHERE class_id = ?", (class_id,)).fetchone()
+    result = class_row_to_dict(conn, row)
+    conn.close()
+    return jsonify(result)
 
 
 @app.delete("/classes/<class_id>")

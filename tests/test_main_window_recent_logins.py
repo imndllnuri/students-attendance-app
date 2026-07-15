@@ -6,7 +6,7 @@ import views.main_window as mw
 
 
 class FakeClassManager:
-    def load_classes_for_instructor(self, user_id):
+    def load_classes_for_instructor(self, user_id, include_archived=False):
         return []
 
 
