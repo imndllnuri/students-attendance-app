@@ -623,6 +623,11 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="attendance_heatmap_btn">
+              <property name="text"><string>Attendance Heatmap</string></property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="export_chart_btn">
               <property name="text"><string>Export Chart</string></property>
              </widget>

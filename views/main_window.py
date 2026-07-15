@@ -1,7 +1,9 @@
 import csv
 import json
+from collections import defaultdict
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 import qtawesome as qta
 from PyQt5 import uic
@@ -94,6 +96,7 @@ class MainWindow(QMainWindow):
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.compare_classes_btn.clicked.connect(self.show_class_comparison)
+        self.attendance_heatmap_btn.clicked.connect(self.show_attendance_heatmap)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
         self.compact_view_cb.blockSignals(True)
@@ -1217,6 +1220,73 @@ class MainWindow(QMainWindow):
         axes.set_ylabel("Attendance Rate (%)", color=PALETTE["text_primary"])
         axes.set_title("Attendance Comparison Across Classes", color=PALETTE["text_primary"])
         axes.tick_params(colors=PALETTE["text_primary"])
+
+        self.statistics_canvas = FigureCanvasQTAgg(figure)
+        self.statistics_chart_layout.addWidget(self.statistics_canvas)
+
+    def show_attendance_heatmap(self):
+        """Heatmap of attendance rate by day-of-week/time-slot for the
+        currently selected class, averaged across all sessions that share
+        the same day+slot combination."""
+        cls = self.statistics_class_combo.currentData()
+        if cls is None:
+            QMessageBox.information(self, "No Class Selected", "Select a class first.")
+            return
+
+        try:
+            table = self.class_manager.get_student_table(cls.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Server Error", str(e))
+            return
+
+        if self.statistics_canvas is not None:
+            self.statistics_chart_layout.removeWidget(self.statistics_canvas)
+            self.statistics_canvas.deleteLater()
+            self.statistics_canvas = None
+
+        fixed_columns = {"Student Number", "Student Name Surname", "Not Attended Hours", "Attended Hours"}
+        session_columns = [c for c in table["columns"] if c not in fixed_columns]
+        num_students = len(table["rows"])
+
+        cell_totals = defaultdict(lambda: [0.0, 0])  # (day, time_slot) -> [rate_sum, count]
+        if num_students:
+            for col in session_columns:
+                date_part, _, time_slot = col.partition(" - ")
+                try:
+                    day_name = datetime.strptime(date_part, "%d-%m-%Y").strftime("%A")
+                except ValueError:
+                    continue
+                col_index = table["columns"].index(col)
+                attended = sum(1 for row in table["rows"] if str(row[col_index]).startswith("1 "))
+                rate = attended / num_students * 100
+                totals = cell_totals[(day_name, time_slot)]
+                totals[0] += rate
+                totals[1] += 1
+
+        if not cell_totals:
+            self.statistics_empty_lbl.setText(f"No attendance recorded yet for {cls.class_code}.")
+            self.statistics_empty_lbl.setVisible(True)
+            return
+        self.statistics_empty_lbl.setVisible(False)
+
+        days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        days_present = sorted({day for day, _ in cell_totals}, key=days_order.index)
+        time_slots_present = sorted({slot for _, slot in cell_totals})
+
+        grid = np.full((len(time_slots_present), len(days_present)), np.nan)
+        for (day, slot), (rate_sum, count) in cell_totals.items():
+            grid[time_slots_present.index(slot), days_present.index(day)] = rate_sum / count
+
+        figure = Figure(figsize=(8, 4))
+        figure.patch.set_facecolor(PALETTE["bg_card"])
+        axes = figure.add_subplot(111)
+        image = axes.imshow(grid, cmap="RdYlGn", vmin=0, vmax=100, aspect="auto")
+        axes.set_xticks(range(len(days_present)))
+        axes.set_xticklabels(days_present, color=PALETTE["text_primary"])
+        axes.set_yticks(range(len(time_slots_present)))
+        axes.set_yticklabels(time_slots_present, color=PALETTE["text_primary"])
+        axes.set_title(f"Attendance Heatmap - {cls.class_code}", color=PALETTE["text_primary"])
+        figure.colorbar(image, ax=axes, label="Attendance Rate (%)")
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
