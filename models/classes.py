@@ -181,6 +181,26 @@ class ClassManager:
     def submit_attendance(self, class_id: str, records: list) -> None:
         self.api_client.submit_attendance(class_id, records)
 
+    def flush_offline_queue(self) -> int:
+        """Retries any attendance submissions queued while the server was
+        unreachable (#23). Returns how many were successfully flushed."""
+        from shared.offline_queue import load_queue, save_queue
+
+        queue = load_queue()
+        if not queue:
+            return 0
+
+        remaining = []
+        flushed = 0
+        for entry in queue:
+            try:
+                self.api_client.submit_attendance(entry["class_id"], entry["records"])
+                flushed += 1
+            except ApiError:
+                remaining.append(entry)
+        save_queue(remaining)
+        return flushed
+
     def get_statistics(self, class_id: str) -> dict:
         return self.api_client.get_statistics(class_id)
 

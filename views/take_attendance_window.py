@@ -23,6 +23,7 @@ import serial
 import serial.tools.list_ports
 
 from services.api_client import ApiError
+from shared.offline_queue import enqueue
 from shared.palette import qcolor
 from shared.session_templates import load_session_template, save_session_template
 
@@ -491,7 +492,16 @@ class TakeAttendance(QDialog):
         try:
             self.class_manager.submit_attendance(self.class_obj.class_id, self.staged_records)
         except ApiError as e:
-            QMessageBox.critical(self, "Error", f"Failed to submit attendance:\n{e}")
+            record_count = len(self.staged_records)
+            enqueue(self.class_obj.class_id, self.staged_records)
+            self.staged_records = []
+            QMessageBox.warning(
+                self, "Saved Offline",
+                f"Could not reach the server ({e}). Your {record_count} attendance record(s) "
+                "were saved locally and will be resubmitted automatically next time the app "
+                "can reach the server.",
+            )
+            self.close()
             return
 
         self.staged_records = []

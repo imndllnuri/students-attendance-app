@@ -75,6 +75,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 9. Bulk actions on the class list (multi-select archive)
 - [x] 14. Import multiple classes from one spreadsheet
 - [x] 22. Attendance session templates (time slot + late-threshold override)
+- [x] 23. Offline queueing for attendance submission
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

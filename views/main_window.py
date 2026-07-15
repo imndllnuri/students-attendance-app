@@ -135,6 +135,7 @@ class MainWindow(QMainWindow):
         self._setup_session_timeout_combo()
 
         self.load_classes()
+        self._flush_offline_queue_on_startup()
         self.show()
 
     # --- Session timeout ---
@@ -897,6 +898,13 @@ class MainWindow(QMainWindow):
     # --- Settings ---
 
     # --- Notifications ---
+
+    def _flush_offline_queue_on_startup(self):
+        flushed = self.class_manager.flush_offline_queue()
+        if flushed:
+            self.add_notification(
+                f"Resubmitted {flushed} attendance record batch(es) saved offline earlier."
+            )
 
     def add_notification(self, message):
         """Appends an in-app activity notification (e.g. a roster upload

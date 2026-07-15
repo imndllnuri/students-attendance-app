@@ -8,6 +8,9 @@ from shared.palette import class_tag_color
 
 
 class FakeClassManager:
+    def flush_offline_queue(self, *args, **kwargs):
+        return 0
+
     def load_classes_for_instructor(self, user_id, include_archived=False):
         return []
 

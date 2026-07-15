@@ -7,6 +7,9 @@ from models.classes import Class
 
 
 class FakeClassManager:
+    def flush_offline_queue(self, *args, **kwargs):
+        return 0
+
     def __init__(self, classes):
         self._classes = classes
 

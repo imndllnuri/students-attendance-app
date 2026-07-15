@@ -20,6 +20,7 @@ server/attendance.db
 .class_order_preference
 .list_density_preference
 .session_templates.json
+.offline_attendance_queue.json
 
 # Test/CI artifacts
 .pytest_cache/

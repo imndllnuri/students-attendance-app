@@ -9,6 +9,9 @@ from models.classes import Class
 
 
 class FakeClassManager:
+    def flush_offline_queue(self, *args, **kwargs):
+        return 0
+
     def __init__(self):
         self.archived_ids = []
         self.unarchived_ids = []

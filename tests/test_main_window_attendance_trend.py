@@ -8,6 +8,9 @@ import views.main_window as mw
 
 
 class FakeClassManager:
+    def flush_offline_queue(self, *args, **kwargs):
+        return 0
+
     def __init__(self, table):
         self._table = table
 
