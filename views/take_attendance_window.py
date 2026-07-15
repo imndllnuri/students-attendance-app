@@ -312,6 +312,17 @@ class TakeAttendance(QDialog):
         selected_student = combo.currentText()
         student = next(s for s in self.roster if s["name_surname"] == selected_student)
 
+        existing_card = student.get("card_id")
+        if existing_card and existing_card != card_id:
+            reply = QMessageBox.question(
+                self, "Card Already Registered",
+                f"{selected_student} already has a different card registered "
+                f"(ends in ...{existing_card[-4:]}). Overwrite it with this new card?",
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+            )
+            if reply != QMessageBox.Yes:
+                return
+
         try:
             self.class_manager.register_card(student["student_id"], card_id)
         except ApiError as e:

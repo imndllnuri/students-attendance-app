@@ -59,6 +59,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 38. Type-your-email confirmation before permanent account deletion
 - [x] 28. Confirm closing Take Attendance with unsubmitted records
 - [x] 26. Session countdown/timer display
+- [x] 25. Duplicate-card warning
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope
