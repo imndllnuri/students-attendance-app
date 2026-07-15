@@ -42,7 +42,7 @@ marked "not selected" were intentionally left out of this batch.
 
 ## Settings & Profile
 - [x] 27. Dark mode
-- [ ] 28. Language selector (English/Turkish) - infrastructure + partial
+- [x] 28. Language selector (English/Turkish) - infrastructure + partial
       string coverage; see note below
 
 ## Cross-cutting

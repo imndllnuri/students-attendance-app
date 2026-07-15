@@ -232,6 +232,18 @@
                 </widget>
                </item>
                <item>
+                <layout class="QHBoxLayout" name="language_row">
+                 <item>
+                  <widget class="QLabel" name="language_lbl">
+                   <property name="text"><string>Language:</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="language_combo"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <widget class="QLabel" name="change_password_section_lbl">
                  <property name="text"><string>Change Password</string></property>
                 </widget>

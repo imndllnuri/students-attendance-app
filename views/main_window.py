@@ -24,6 +24,7 @@ from matplotlib.figure import Figure
 
 from resources.images import qrc
 from services.api_client import ApiError
+from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.palette import PALETTE, class_tag_color
 from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.validation import (
@@ -84,6 +85,9 @@ class MainWindow(QMainWindow):
         self.dark_mode_cb.setChecked(load_theme_preference() == "dark")
         self.dark_mode_cb.blockSignals(False)
         self.dark_mode_cb.toggled.connect(self.toggle_dark_mode)
+
+        self._apply_translations()
+        self._setup_language_combo()
 
         self.settings_security_question_combo.addItems(SECURITY_QUESTIONS)
         self.change_password_btn.clicked.connect(self.change_password)
@@ -559,6 +563,33 @@ class MainWindow(QMainWindow):
         save_theme_preference(theme)
         with open(stylesheet_path(theme)) as f:
             QApplication.instance().setStyleSheet(f.read())
+
+    def _apply_translations(self):
+        self.my_classes_btn.setText(t("my_classes"))
+        self.settings_btn.setText(t("settings"))
+        self.statistics_btn.setText(t("statistics"))
+        self.log_out_btn.setText(t("log_out"))
+        self.create_new_class_btn.setText(t("create_new_class"))
+        self.profile_btn.setText(t("profile"))
+        self.my_classes_title_lbl.setText(t("my_classes"))
+        self.title_lbl_settings.setText(t("settings"))
+        self.statistics_title_lbl.setText(t("attendance_statistics"))
+
+    def _setup_language_combo(self):
+        self.language_combo.blockSignals(True)
+        self.language_combo.clear()
+        for code, label in LANGUAGES.items():
+            self.language_combo.addItem(label, code)
+        current = load_language_preference()
+        self.language_combo.setCurrentIndex(list(LANGUAGES).index(current))
+        self.language_combo.blockSignals(False)
+        self.language_combo.currentIndexChanged.connect(self.change_language)
+
+    def change_language(self):
+        save_language_preference(self.language_combo.currentData())
+        QMessageBox.information(
+            self, "Language Changed", "Restart the app for the new language to take full effect."
+        )
 
     def _clear_settings_form(self):
         for line_edit in (

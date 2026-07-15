@@ -7,6 +7,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QLineEdit, QMainWindow
 
 from models.accounts import AccountManager
+from shared.i18n import t
 from views.create_account_window import CreateAccountWindow
 from views.main_window import MainWindow
 from views.reset_password_window import ResetPasswordWindow
@@ -42,8 +43,15 @@ class LoginWindow(QMainWindow):
         self.password_le.textChanged.connect(self._clear_login_error)
         self.show_password_cb.toggled.connect(self._toggle_password_visibility)
 
+        self._apply_translations()
         self.load_remembered_email()
         self.show()
+
+    def _apply_translations(self):
+        self.title_lbl.setText(t("welcome_back"))
+        self.forgot_password_btn.setText(t("forgot_password"))
+        self.login_btn.setText(t("log_in"))
+        self.create_account_btn.setText(t("create_account"))
 
     def _toggle_password_visibility(self, checked):
         self.password_le.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)

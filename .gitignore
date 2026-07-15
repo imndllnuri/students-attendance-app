@@ -15,6 +15,7 @@ accounts.json
 server/attendance.db
 .remembered_email
 .theme_preference
+.language_preference
 
 # Test/CI artifacts
 .pytest_cache/
