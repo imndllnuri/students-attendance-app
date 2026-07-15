@@ -142,6 +142,20 @@
              <layout class="QVBoxLayout" name="today_classes_layout"/>
             </item>
             <item>
+             <widget class="QLabel" name="recently_viewed_title_lbl">
+              <property name="text"><string>Recently Viewed</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="no_recently_viewed_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="text"><string>Open a class to see it here.</string></property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="recently_viewed_layout"/>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="class_sort_row">
               <item>
                <widget class="QLabel" name="class_sort_lbl">

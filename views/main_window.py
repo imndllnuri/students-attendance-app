@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
         self.account_manager = AccountManager()
         self.statistics_canvas = None
         self.notifications = []
+        self.recently_viewed_class_ids = []
 
         self.user_info_lbl.setText(f"{user.name} {user.surname}")
 
@@ -334,11 +335,15 @@ class MainWindow(QMainWindow):
                 self.class_btns_layout.addWidget(row_builder(cls), row, 0)
 
         self.today_classes_title_lbl.setVisible(not showing_archived)
+        self.recently_viewed_title_lbl.setVisible(not showing_archived)
         if showing_archived:
             self._populate_today_classes([])
             self.no_classes_today_lbl.setVisible(False)
+            self._populate_recently_viewed([])
+            self.no_recently_viewed_lbl.setVisible(False)
         else:
             self._populate_today_classes(classes)
+            self._populate_recently_viewed(classes)
 
     def _populate_custom_order_list(self, classes):
         self.custom_order_listWidget.clear()
@@ -391,6 +396,43 @@ class MainWindow(QMainWindow):
         take_attendance_btn.setCursor(Qt.PointingHandCursor)
         take_attendance_btn.clicked.connect(lambda _, c=cls: self.open_take_attendance_for(c))
         layout.addWidget(take_attendance_btn)
+
+        return row
+
+    def _track_recently_viewed(self, cls):
+        self.recently_viewed_class_ids = [
+            class_id for class_id in self.recently_viewed_class_ids if class_id != cls.class_id
+        ]
+        self.recently_viewed_class_ids.insert(0, cls.class_id)
+        self.recently_viewed_class_ids = self.recently_viewed_class_ids[:5]
+
+    def _populate_recently_viewed(self, classes):
+        while self.recently_viewed_layout.count():
+            item = self.recently_viewed_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        by_id = {c.class_id: c for c in classes}
+        recent_classes = [
+            by_id[class_id] for class_id in self.recently_viewed_class_ids if class_id in by_id
+        ]
+        self.no_recently_viewed_lbl.setVisible(not recent_classes)
+        for cls in recent_classes:
+            self.recently_viewed_layout.addWidget(self._make_recently_viewed_row_widget(cls))
+
+    def _make_recently_viewed_row_widget(self, cls):
+        row = QWidget()
+        row.setObjectName("recently_viewed_row_widget")
+        layout = QHBoxLayout(row)
+        layout.setContentsMargins(4, 4, 4, 4)
+
+        label = QLabel(f"{cls.class_name} ({cls.class_code})")
+        layout.addWidget(label, 1)
+
+        open_btn = QPushButton("Open")
+        open_btn.setCursor(Qt.PointingHandCursor)
+        open_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
+        layout.addWidget(open_btn)
 
         return row
 
@@ -527,6 +569,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", f"Could not delete {cls.class_code}.")
 
     def open_class_window(self, class_obj):
+        self._track_recently_viewed(class_obj)
         existing_index = self.find_class_tab(class_obj.class_code)
 
         if existing_index is not None:
