@@ -30,6 +30,11 @@ from resources.images import qrc
 from services.api_client import ApiError
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.palette import PALETTE, class_tag_color
+from shared.session_timeout import (
+    TIMEOUT_OPTIONS,
+    load_session_timeout_minutes,
+    save_session_timeout_minutes,
+)
 from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
@@ -44,7 +49,6 @@ from models.classes import Class, ClassManager
 
 MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(5)
 
-SESSION_TIMEOUT_MINUTES = 15
 _ACTIVITY_EVENTS = (QEvent.MouseMove, QEvent.MouseButtonPress, QEvent.KeyPress, QEvent.Wheel)
 
 _WEEKDAY_ORDER = {
@@ -112,6 +116,7 @@ class MainWindow(QMainWindow):
         self._set_active_nav(self.my_classes_btn)
         self._setup_shortcuts()
         self._setup_session_timeout()
+        self._setup_session_timeout_combo()
 
         self.load_classes()
         self.show()
@@ -119,6 +124,7 @@ class MainWindow(QMainWindow):
     # --- Session timeout ---
 
     def _setup_session_timeout(self):
+        self.session_timeout_minutes = load_session_timeout_minutes()
         self._inactivity_timer = QTimer(self)
         self._inactivity_timer.setSingleShot(True)
         self._inactivity_timer.timeout.connect(self._handle_session_timeout)
@@ -131,16 +137,35 @@ class MainWindow(QMainWindow):
         return super().eventFilter(obj, event)
 
     def _reset_inactivity_timer(self):
-        self._inactivity_timer.start(SESSION_TIMEOUT_MINUTES * 60 * 1000)
+        if self.session_timeout_minutes <= 0:
+            self._inactivity_timer.stop()
+            return
+        self._inactivity_timer.start(self.session_timeout_minutes * 60 * 1000)
 
     def _handle_session_timeout(self):
         QApplication.instance().removeEventFilter(self)
         QMessageBox.information(
             self,
             "Session Expired",
-            f"You've been logged out after {SESSION_TIMEOUT_MINUTES} minutes of inactivity.",
+            f"You've been logged out after {self.session_timeout_minutes} minutes of inactivity.",
         )
         self.logout()
+
+    def change_session_timeout(self):
+        minutes = self.session_timeout_combo.currentData()
+        self.session_timeout_minutes = minutes
+        save_session_timeout_minutes(minutes)
+        self._reset_inactivity_timer()
+
+    def _setup_session_timeout_combo(self):
+        labels = {5: "5 minutes", 15: "15 minutes", 30: "30 minutes", 0: "Never"}
+        self.session_timeout_combo.blockSignals(True)
+        self.session_timeout_combo.clear()
+        for minutes in TIMEOUT_OPTIONS:
+            self.session_timeout_combo.addItem(labels[minutes], minutes)
+        self.session_timeout_combo.setCurrentIndex(TIMEOUT_OPTIONS.index(self.session_timeout_minutes))
+        self.session_timeout_combo.blockSignals(False)
+        self.session_timeout_combo.currentIndexChanged.connect(self.change_session_timeout)
 
     def _setup_icons(self):
         self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#94A3B8"))

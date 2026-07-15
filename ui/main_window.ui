@@ -265,6 +265,18 @@
                 </layout>
                </item>
                <item>
+                <layout class="QHBoxLayout" name="session_timeout_row">
+                 <item>
+                  <widget class="QLabel" name="session_timeout_lbl">
+                   <property name="text"><string>Auto Logout:</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="session_timeout_combo"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <widget class="QLabel" name="change_password_section_lbl">
                  <property name="text"><string>Change Password</string></property>
                 </widget>

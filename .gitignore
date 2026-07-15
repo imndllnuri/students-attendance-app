@@ -16,6 +16,7 @@ server/attendance.db
 .remembered_email
 .theme_preference
 .language_preference
+.session_timeout_preference
 
 # Test/CI artifacts
 .pytest_cache/

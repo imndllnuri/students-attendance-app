@@ -32,7 +32,7 @@ def window(qtbot, monkeypatch):
 
 def test_inactivity_timer_starts_on_init(window):
     assert window._inactivity_timer.isActive()
-    assert window._inactivity_timer.interval() == mw.SESSION_TIMEOUT_MINUTES * 60 * 1000
+    assert window._inactivity_timer.interval() == window.session_timeout_minutes * 60 * 1000
 
 
 def test_activity_event_resets_the_timer(window):
@@ -41,7 +41,7 @@ def test_activity_event_resets_the_timer(window):
 
     window.eventFilter(window, mw.QEvent(mw.QEvent.KeyPress))
     assert window._inactivity_timer.isActive()
-    assert window._inactivity_timer.interval() == mw.SESSION_TIMEOUT_MINUTES * 60 * 1000
+    assert window._inactivity_timer.interval() == window.session_timeout_minutes * 60 * 1000
 
 
 def test_session_timeout_logs_user_out(window, monkeypatch):
