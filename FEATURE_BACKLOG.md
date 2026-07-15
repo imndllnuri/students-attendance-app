@@ -55,6 +55,7 @@ marked "not selected" were intentionally left out of this batch.
 ## Batch 2 (from ideas.md)
 - [x] 13. CSV export of the class list
 - [x] 16. Roster CSV/Excel re-export
+- [x] 5. Export/download your own account data as JSON
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

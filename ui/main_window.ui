@@ -521,6 +521,11 @@
                  <property name="text"><string/></property>
                 </widget>
                </item>
+               <item>
+                <widget class="QPushButton" name="export_account_data_btn">
+                 <property name="text"><string>Download My Data</string></property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>

@@ -1,4 +1,5 @@
 import csv
+import json
 from datetime import datetime
 
 import qtawesome as qta
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow):
 
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
+        self.export_account_data_btn.clicked.connect(self.export_account_data)
         self.profile_email_le.textChanged.connect(self.validate_profile_email)
 
         self.dark_mode_cb.blockSignals(True)
@@ -563,6 +565,44 @@ class MainWindow(QMainWindow):
             except ValueError:
                 lines.append(raw)
         self.recent_logins_lbl.setText("\n".join(lines))
+
+    def export_account_data(self):
+        classes = self.fetch_classes()
+        data = {
+            "user_id": self.user_id,
+            "email": self.user.email,
+            "name": self.user.name,
+            "surname": self.user.surname,
+            "classes": [
+                {
+                    "class_code": cls.class_code,
+                    "class_name": cls.class_name,
+                    "section": cls.section,
+                    "attendance_policy": cls.attendance_policy,
+                    "late_threshold": cls.late_threshold,
+                    "total_weeks": cls.total_weeks,
+                    "total_hours": cls.total_hours,
+                    "weekly_hours": cls.weekly_hours,
+                }
+                for cls in classes
+            ],
+            "recent_logins": self.account_manager.get_login_history(self.user_id, limit=5),
+        }
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Download My Data", "my_account_data.json", "JSON Files (*.json)"
+        )
+        if not file_path:
+            return
+
+        try:
+            with open(file_path, "w") as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write file:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Account data exported to:\n{file_path}")
 
     def _set_profile_editing(self, editing):
         for line_edit in (self.profile_name_le, self.profile_surname_le, self.profile_email_le):
