@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
     QShortcut,
@@ -61,6 +62,7 @@ class MainWindow(QMainWindow):
         self.class_manager = ClassManager()
         self.account_manager = AccountManager()
         self.statistics_canvas = None
+        self.notifications = []
 
         self.user_info_lbl.setText(f"{user.name} {user.surname}")
 
@@ -72,6 +74,7 @@ class MainWindow(QMainWindow):
         self.create_new_class_btn.clicked.connect(self.open_add_new_class_window)
         self.search_btn.clicked.connect(self.show_search)
         self.search_bar_le.returnPressed.connect(self.show_search)
+        self.notifications_btn.clicked.connect(self.show_notifications_menu)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
@@ -144,8 +147,10 @@ class MainWindow(QMainWindow):
 
         self.profile_btn.setIcon(qta.icon("fa5s.user-circle", color="#4F46E5"))
         self.search_btn.setIcon(qta.icon("fa5s.search", color="#4F46E5"))
+        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#4F46E5"))
         self.profile_btn.setIconSize(QSize(18, 18))
         self.search_btn.setIconSize(QSize(16, 16))
+        self.notifications_btn.setIconSize(QSize(16, 16))
 
         self.my_classes_btn.setToolTip("My Classes (Ctrl+1)")
         self.settings_btn.setToolTip("Settings (Ctrl+2)")
@@ -330,6 +335,9 @@ class MainWindow(QMainWindow):
     def open_duplicate_class_window(self, cls):
         self.duplicate_class_window = AddNewClassWindow(user_id=self.user_id, duplicate_from=cls)
         self.duplicate_class_window.class_created.connect(self.load_classes)
+        self.duplicate_class_window.roster_load_failed.connect(
+            lambda msg: self.add_notification(f"Roster upload failed: {msg}")
+        )
         self.duplicate_class_window.show()
 
     def _make_archived_class_row_widget(self, cls):
@@ -423,6 +431,9 @@ class MainWindow(QMainWindow):
     def open_add_new_class_window(self):
         self.add_new_class_window = AddNewClassWindow(user_id=self.user_id)
         self.add_new_class_window.class_created.connect(self.load_classes)
+        self.add_new_class_window.roster_load_failed.connect(
+            lambda msg: self.add_notification(f"Roster upload failed: {msg}")
+        )
         self.add_new_class_window.show()
 
     def confirm_logout(self):
@@ -557,6 +568,39 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "Profile Updated", "Your profile has been updated successfully!")
 
     # --- Settings ---
+
+    # --- Notifications ---
+
+    def add_notification(self, message):
+        """Appends an in-app activity notification (e.g. a roster upload
+        failure, an at-risk student summary). No email/SMTP is configured
+        for this project, so this is an in-app feed rather than a real
+        email digest."""
+        if self.notifications and self.notifications[-1][1] == message:
+            return  # avoid spamming the same message on repeated refreshes
+        timestamp = datetime.now().strftime("%H:%M")
+        self.notifications.append((timestamp, message))
+        self._update_notifications_badge()
+
+    def clear_notifications(self):
+        self.notifications = []
+        self._update_notifications_badge()
+
+    def _update_notifications_badge(self):
+        count = len(self.notifications)
+        self.notifications_badge_lbl.setText(str(count) if count else "")
+        self.notifications_badge_lbl.setVisible(count > 0)
+
+    def show_notifications_menu(self):
+        menu = QMenu(self)
+        if not self.notifications:
+            menu.addAction("No notifications").setEnabled(False)
+        else:
+            for timestamp, message in reversed(self.notifications):
+                menu.addAction(f"[{timestamp}] {message}").setEnabled(False)
+            menu.addSeparator()
+            menu.addAction("Clear All").triggered.connect(self.clear_notifications)
+        menu.exec_(self.notifications_btn.mapToGlobal(self.notifications_btn.rect().bottomLeft()))
 
     def toggle_dark_mode(self, checked):
         theme = "dark" if checked else "light"

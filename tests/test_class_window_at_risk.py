@@ -33,7 +33,7 @@ def make_class():
 
 
 def build_window(qtbot, rows):
-    main_window = types.SimpleNamespace(load_classes=lambda: None)
+    main_window = types.SimpleNamespace(load_classes=lambda: None, add_notification=lambda msg: None)
     window = ClassWindow(make_class(), main_window, FakeClassManager(rows))
     qtbot.addWidget(window)
     window.show()
@@ -67,3 +67,19 @@ def test_students_over_safe_threshold_are_listed_worst_first(qtbot):
 def test_at_risk_widget_hidden_when_roster_empty(qtbot):
     window = build_window(qtbot, rows=[])
     assert window.at_risk_widget.isVisible() is False
+
+
+def test_at_risk_summary_notifies_main_window(qtbot):
+    notified = []
+    main_window = types.SimpleNamespace(
+        load_classes=lambda: None, add_notification=lambda msg: notified.append(msg)
+    )
+    rows = [
+        ["20230001", "Grace Hopper", 8, 5],
+        ["20230002", "Alan Turing", 15, 2],
+        ["20230003", "Katherine Johnson", 2, 11],
+    ]
+    window = ClassWindow(make_class(), main_window, FakeClassManager(rows))
+    qtbot.addWidget(window)
+
+    assert notified == ["2 student(s) at risk in COMP101"]

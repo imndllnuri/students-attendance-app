@@ -10,6 +10,7 @@ from services.api_client import ApiError
 
 class AddNewClassWindow(QWidget):
     class_created = pyqtSignal()
+    roster_load_failed = pyqtSignal(str)
 
     def __init__(self, user_id, existing_class=None, duplicate_from=None):
         super().__init__()
@@ -237,6 +238,7 @@ class AddNewClassWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Spreadsheet processing failed: {str(e)}")
+            self.roster_load_failed.emit(str(e))
 
     def validate_inputs(self):
         required_fields = [

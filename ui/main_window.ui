@@ -77,6 +77,22 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="notifications_btn">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="toolTip">
+           <string>Notifications</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="notifications_badge_lbl">
+          <property name="visible"><bool>false</bool></property>
+          <property name="text"><string/></property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="profile_btn">
           <property name="minimumSize">
            <size>

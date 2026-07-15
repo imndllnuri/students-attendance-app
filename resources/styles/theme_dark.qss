@@ -120,6 +120,21 @@ QLabel#schedule_slot_chip_lbl {
     margin: 2px;
 }
 
+/* --- Notifications badge --- */
+
+QLabel#notifications_badge_lbl {
+    background-color: #EF4444;
+    color: #1E293B;
+    font-size: 8pt;
+    font-weight: 600;
+    border-radius: 8px;
+    min-width: 16px;
+    max-width: 16px;
+    min-height: 16px;
+    max-height: 16px;
+    qproperty-alignment: AlignCenter;
+}
+
 /* --- Password strength indicator --- */
 
 QLabel#password_strength_lbl,

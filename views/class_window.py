@@ -140,6 +140,9 @@ class ClassWindow(QMainWindow):
 
         self.at_risk_students_lbl.setText("\n".join(lines))
         self.at_risk_widget.setVisible(True)
+        self.main_window.add_notification(
+            f"{len(at_risk)} student(s) at risk in {self.class_obj.class_code}"
+        )
 
     def display_class_details(self):
         """Displays class details in the UI."""
