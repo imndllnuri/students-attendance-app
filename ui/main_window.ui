@@ -48,6 +48,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="server_health_lbl">
+          <property name="text">
+           <string>● Checking server...</string>
+          </property>
+          <property name="toolTip">
+           <string>Server connectivity status</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

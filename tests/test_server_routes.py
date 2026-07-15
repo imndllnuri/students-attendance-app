@@ -7,6 +7,12 @@ def create_instructor(client):
     return resp.get_json()["user_id"]
 
 
+def test_health_check_endpoint(client):
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    assert resp.get_json() == {"status": "ok"}
+
+
 def test_create_account_then_duplicate_email_conflicts(client):
     resp = client.post("/accounts", json=SAMPLE_INSTRUCTOR)
     assert resp.status_code == 201

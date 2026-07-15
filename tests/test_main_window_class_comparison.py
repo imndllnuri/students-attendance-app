@@ -7,6 +7,9 @@ from models.classes import Class
 
 
 class FakeClassManager:
+    def check_server_health(self, *args, **kwargs):
+        return True
+
     def __init__(self, classes, stats_by_id):
         self._classes = classes
         self._stats_by_id = stats_by_id

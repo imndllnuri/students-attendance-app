@@ -43,6 +43,11 @@ def class_row_to_dict(conn, row):
     }
 
 
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok"})
+
+
 @app.post("/accounts")
 def create_account():
     data = request.get_json()

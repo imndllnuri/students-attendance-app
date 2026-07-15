@@ -82,6 +82,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 35. Font size / accessibility scaling
 - [x] 37. Export/import app settings as JSON
 - [x] 40. What's New changelog dialog
+- [x] 43. Server connectivity health indicator
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

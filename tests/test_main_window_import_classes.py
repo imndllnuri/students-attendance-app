@@ -10,6 +10,9 @@ from services.api_client import ApiError
 
 
 class FakeClassManager:
+    def check_server_health(self, *args, **kwargs):
+        return True
+
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 

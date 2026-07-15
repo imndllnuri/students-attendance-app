@@ -147,6 +147,7 @@ class MainWindow(QMainWindow):
         self._setup_session_timeout()
         self._setup_session_timeout_combo()
         self._setup_font_scale_combo()
+        self._setup_server_health_indicator()
 
         self.load_classes()
         self._flush_offline_queue_on_startup()
@@ -214,6 +215,20 @@ class MainWindow(QMainWindow):
         font = QApplication.instance().font()
         font.setPointSize(point_size_for_scale(scale))
         QApplication.instance().setFont(font)
+
+    def _setup_server_health_indicator(self):
+        self._health_check_timer = QTimer(self)
+        self._health_check_timer.timeout.connect(self.update_server_health_indicator)
+        self._health_check_timer.start(30000)  # recheck every 30s
+        self.update_server_health_indicator()
+
+    def update_server_health_indicator(self):
+        if self.class_manager.check_server_health():
+            self.server_health_lbl.setText("● Connected")
+            self.server_health_lbl.setStyleSheet(f"color: {PALETTE['success']};")
+        else:
+            self.server_health_lbl.setText("● Offline")
+            self.server_health_lbl.setStyleSheet(f"color: {PALETTE['error']};")
 
     def export_settings(self):
         file_path, _ = QFileDialog.getSaveFileName(

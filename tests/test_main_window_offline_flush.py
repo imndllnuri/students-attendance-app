@@ -6,6 +6,9 @@ import views.main_window as mw
 
 
 class FakeClassManager:
+    def check_server_health(self, *args, **kwargs):
+        return True
+
     def __init__(self, flushed_count):
         self._flushed_count = flushed_count
 

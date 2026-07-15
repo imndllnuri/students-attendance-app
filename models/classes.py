@@ -181,6 +181,13 @@ class ClassManager:
     def submit_attendance(self, class_id: str, records: list) -> None:
         self.api_client.submit_attendance(class_id, records)
 
+    def check_server_health(self) -> bool:
+        try:
+            self.api_client.check_health()
+        except ApiError:
+            return False
+        return True
+
     def flush_offline_queue(self) -> int:
         """Retries any attendance submissions queued while the server was
         unreachable (#23). Returns how many were successfully flushed."""

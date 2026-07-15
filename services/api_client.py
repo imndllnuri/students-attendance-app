@@ -30,6 +30,9 @@ class ApiClient:
             return response.json()
         return None
 
+    def check_health(self):
+        return self._request("GET", "/health")
+
     # Accounts
     def authenticate(self, email, password):
         return self._request("POST", "/authenticate", json={"email": email, "password": password})

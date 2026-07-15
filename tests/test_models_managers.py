@@ -228,6 +228,25 @@ def test_class_manager_merge_students_returns_false_on_api_error():
     assert manager.merge_students(1, 2) is False
 
 
+def test_class_manager_check_server_health_true_when_reachable():
+    fake = FakeApiClient()
+    fake.check_health = lambda: {"status": "ok"}
+    manager = ClassManager(api_client=fake)
+
+    assert manager.check_server_health() is True
+
+
+def test_class_manager_check_server_health_false_when_unreachable():
+    def raise_unreachable():
+        raise ApiError("boom")
+
+    fake = FailingApiClient()
+    fake.check_health = raise_unreachable
+    manager = ClassManager(api_client=fake)
+
+    assert manager.check_server_health() is False
+
+
 def test_class_manager_correct_attendance_wraps_api_client():
     fake = FakeApiClient()
     manager = ClassManager(api_client=fake)
