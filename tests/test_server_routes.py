@@ -376,6 +376,23 @@ def test_audit_log_defaults_to_all_users_and_respects_limit(client):
     assert log[0]["action"] == "class_unarchived"
 
 
+def test_trigger_backup_creates_a_backup_file(client, monkeypatch, tmp_path):
+    import server.app as app_module
+    from server.db import backup_database as real_backup_database
+
+    backup_dir = tmp_path / "backups"
+    monkeypatch.setattr(
+        app_module, "backup_database", lambda: real_backup_database(backup_dir=backup_dir)
+    )
+
+    create_instructor(client)  # ensures the sqlite_db fixture's file exists
+
+    resp = client.post("/admin/backup")
+    assert resp.status_code == 201
+    assert resp.get_json()["backup_file"].endswith(".db")
+    assert len(list(backup_dir.glob("*.db"))) == 1
+
+
 def test_roster_attend_and_statistics_flow(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

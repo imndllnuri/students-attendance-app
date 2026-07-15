@@ -86,6 +86,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 34. Per-student attendance CSV export
 - [x] 42. Admin audit log (account deletion, class archive/unarchive/delete,
       student merges, attendance corrections)
+- [x] 41. Scheduled automatic database backup (daily, retains last 10)
 
 ## Notes on scope
 - **#29 Notifications**: in-app bell-icon feed only (in-memory, not
@@ -115,3 +116,10 @@ marked "not selected" were intentionally left out of this batch.
   (class_id, student_id, date, time_slot) rather than exposing raw
   `attendance_records.id` to the client, since the existing pivoted
   student-table view doesn't carry record IDs.
+- **#41 Scheduled backup**: a `threading.Timer` loop started only when the
+  server is run directly (`server/app.py`'s `__main__` block), copying
+  `attendance.db` into `server/backups/` once a day and keeping the last
+  10 copies. A `POST /admin/backup` endpoint exposes the same logic
+  on-demand (used by the tests, since a real 24h timer isn't practical to
+  test). No restore tooling is included - this only covers taking the
+  backups, not a UI for restoring from one.

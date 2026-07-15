@@ -1,8 +1,12 @@
+import shutil
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "attendance.db"
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
+BACKUP_DIR = Path(__file__).parent / "backups"
+BACKUP_RETENTION = 10
 
 
 def get_connection():
@@ -28,3 +32,23 @@ def init_db():
             pass  # column already exists on a database created before this feature
     conn.commit()
     conn.close()
+
+
+def backup_database(backup_dir=None, retention=BACKUP_RETENTION):
+    """Copies the SQLite database file to a timestamped backup, pruning
+    older backups beyond `retention` (#41). Returns the backup path, or
+    None if there is no database file yet to back up."""
+    backup_dir = Path(backup_dir) if backup_dir else BACKUP_DIR
+    if not DB_PATH.exists():
+        return None
+
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    backup_path = backup_dir / f"{DB_PATH.stem}-{timestamp}.db"
+    shutil.copy2(DB_PATH, backup_path)
+
+    existing = sorted(backup_dir.glob(f"{DB_PATH.stem}-*.db"))
+    for stale in existing[:-retention]:
+        stale.unlink()
+
+    return backup_path

@@ -1,3 +1,4 @@
+import threading
 import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -5,7 +6,7 @@ from datetime import datetime, timezone
 from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from server.db import get_connection, init_db
+from server.db import backup_database, get_connection, init_db
 
 app = Flask(__name__)
 
@@ -673,6 +674,27 @@ def get_audit_log():
     return jsonify([dict(r) for r in rows])
 
 
+@app.post("/admin/backup")
+def trigger_backup():
+    backup_path = backup_database()
+    if backup_path is None:
+        return jsonify({"error": "No database file to back up yet."}), 404
+    return jsonify({"backup_file": backup_path.name}), 201
+
+
+BACKUP_INTERVAL_SECONDS = 24 * 60 * 60
+
+
+def _schedule_periodic_backups(interval_seconds=BACKUP_INTERVAL_SECONDS):
+    """Runs backup_database() on a recurring timer for as long as the
+    server process is alive (#41)."""
+    backup_database()
+    timer = threading.Timer(interval_seconds, _schedule_periodic_backups, args=(interval_seconds,))
+    timer.daemon = True
+    timer.start()
+
+
 if __name__ == "__main__":
     init_db()
+    _schedule_periodic_backups()
     app.run(debug=True)

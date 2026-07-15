@@ -13,6 +13,7 @@ accounts.json
 
 # Server database and remembered-login marker
 server/attendance.db
+server/backups/
 .remembered_email
 .theme_preference
 .language_preference
