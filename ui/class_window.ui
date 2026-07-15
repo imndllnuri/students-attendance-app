@@ -205,6 +205,24 @@
           </layout>
          </item>
          <item>
+          <widget class="QWidget" name="at_risk_widget" native="true">
+           <property name="visible"><bool>false</bool></property>
+           <layout class="QVBoxLayout" name="at_risk_layout">
+            <item>
+             <widget class="QLabel" name="at_risk_title_lbl">
+              <property name="text"><string>At-Risk Students</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="at_risk_students_lbl">
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QWidget" name="roster_status_widget" native="true">
            <property name="visible">
             <bool>false</bool>

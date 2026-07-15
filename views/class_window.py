@@ -64,7 +64,10 @@ class ClassWindow(QMainWindow):
 
         if df.shape[0] == 0:
             self._show_roster_status("No students in this class's roster yet.", show_retry=False)
+            self.at_risk_widget.setVisible(False)
             return
+
+        self._render_at_risk_list(df)
 
         self.roster_status_widget.setVisible(False)
         self.student_list_tableWidget.setVisible(True)
@@ -107,6 +110,36 @@ class ClassWindow(QMainWindow):
         else:
             self.student_list_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
             self.student_list_tableWidget.setHorizontalScrollMode(QHeaderView.ScrollPerPixel)
+
+    def _render_at_risk_list(self, df):
+        """Surfaces students whose absence count has reached the "safe"
+        threshold used elsewhere for the roster table's color coding, so
+        the instructor doesn't have to scan the whole table to spot them."""
+        if "Not Attended Hours" not in df.columns:
+            self.at_risk_widget.setVisible(False)
+            return
+
+        at_risk = []
+        for _, row in df.iterrows():
+            try:
+                not_attended = float(row["Not Attended Hours"])
+            except (ValueError, TypeError):
+                continue
+            if not_attended >= self.safe:
+                at_risk.append((not_attended, row["Student Name Surname"], row["Student Number"]))
+
+        if not at_risk:
+            self.at_risk_widget.setVisible(False)
+            return
+
+        at_risk.sort(key=lambda item: item[0], reverse=True)
+        lines = []
+        for not_attended, name, number in at_risk:
+            label = "FAILING RISK" if not_attended >= self.failure else "at risk"
+            lines.append(f"{name} ({number}) - {not_attended:g} missed - {label}")
+
+        self.at_risk_students_lbl.setText("\n".join(lines))
+        self.at_risk_widget.setVisible(True)
 
     def display_class_details(self):
         """Displays class details in the UI."""
