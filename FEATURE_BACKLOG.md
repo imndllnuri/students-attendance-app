@@ -80,6 +80,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 32. Attendance heatmap by day/time-slot
 - [x] 31. Downloadable PDF statistics report
 - [x] 35. Font size / accessibility scaling
+- [x] 37. Export/import app settings as JSON
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

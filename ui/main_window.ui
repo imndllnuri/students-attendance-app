@@ -329,6 +329,20 @@
                 </layout>
                </item>
                <item>
+                <layout class="QHBoxLayout" name="settings_export_import_row">
+                 <item>
+                  <widget class="QPushButton" name="export_settings_btn">
+                   <property name="text"><string>Export Settings</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="import_settings_btn">
+                   <property name="text"><string>Import Settings</string></property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <widget class="QLabel" name="change_password_section_lbl">
                  <property name="text"><string>Change Password</string></property>
                 </widget>

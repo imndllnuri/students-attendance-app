@@ -209,6 +209,91 @@ class MainWindow(QMainWindow):
         font.setPointSize(point_size_for_scale(scale))
         QApplication.instance().setFont(font)
 
+    def export_settings(self):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Settings", "app_settings.json", "JSON Files (*.json)"
+        )
+        if not file_path:
+            return
+
+        settings = {
+            "theme": load_theme_preference(),
+            "language": load_language_preference(),
+            "session_timeout_minutes": self.session_timeout_minutes,
+            "list_density": load_list_density(),
+            "font_scale": load_font_scale(),
+        }
+        try:
+            with open(file_path, "w") as f:
+                json.dump(settings, f, indent=2)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write file:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Settings exported to:\n{file_path}")
+
+    def import_settings(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Import Settings", "", "JSON Files (*.json)"
+        )
+        if not file_path:
+            return
+
+        try:
+            with open(file_path) as f:
+                settings = json.load(f)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to read file:\n{e}")
+            return
+
+        if settings.get("theme") in ("light", "dark"):
+            theme = settings["theme"]
+            save_theme_preference(theme)
+            with open(stylesheet_path(theme)) as f:
+                QApplication.instance().setStyleSheet(f.read())
+            self.dark_mode_cb.blockSignals(True)
+            self.dark_mode_cb.setChecked(theme == "dark")
+            self.dark_mode_cb.blockSignals(False)
+
+        if settings.get("language") in LANGUAGES:
+            save_language_preference(settings["language"])
+            index = list(LANGUAGES).index(settings["language"])
+            self.language_combo.blockSignals(True)
+            self.language_combo.setCurrentIndex(index)
+            self.language_combo.blockSignals(False)
+
+        minutes = settings.get("session_timeout_minutes")
+        if minutes in TIMEOUT_OPTIONS:
+            save_session_timeout_minutes(minutes)
+            self.session_timeout_minutes = minutes
+            self._reset_inactivity_timer()
+            self.session_timeout_combo.blockSignals(True)
+            self.session_timeout_combo.setCurrentIndex(TIMEOUT_OPTIONS.index(minutes))
+            self.session_timeout_combo.blockSignals(False)
+
+        if settings.get("list_density") in ("comfortable", "compact"):
+            density = settings["list_density"]
+            save_list_density(density)
+            self.compact_view_cb.blockSignals(True)
+            self.compact_view_cb.setChecked(density == "compact")
+            self.compact_view_cb.blockSignals(False)
+            self.load_classes()
+
+        if settings.get("font_scale") in SCALE_LABELS:
+            scale = settings["font_scale"]
+            save_font_scale(scale)
+            font = QApplication.instance().font()
+            font.setPointSize(point_size_for_scale(scale))
+            QApplication.instance().setFont(font)
+            self.font_scale_combo.blockSignals(True)
+            self.font_scale_combo.setCurrentIndex(list(SCALE_LABELS).index(scale))
+            self.font_scale_combo.blockSignals(False)
+
+        QMessageBox.information(
+            self, "Success",
+            "Settings imported. The language change (if any) applies on next launch.",
+        )
+
     def _setup_icons(self):
         self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#94A3B8"))
         self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#94A3B8"))
