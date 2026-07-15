@@ -168,3 +168,6 @@ class ClassManager:
 
     def get_statistics(self, class_id: str) -> dict:
         return self.api_client.get_statistics(class_id)
+
+    def get_attendance_sheet(self, class_id: str, date: str) -> list:
+        return self.api_client.get_attendance_sheet(class_id, date)

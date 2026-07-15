@@ -1,9 +1,11 @@
 import logging
 
+import pandas as pd
 import qtawesome as qta
 from PyQt5.QtWidgets import (
     QComboBox,
     QDialog,
+    QFileDialog,
     QGraphicsOpacityEffect,
     QHeaderView,
     QInputDialog,
@@ -60,6 +62,7 @@ class TakeAttendance(QDialog):
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
 
         self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#4F46E5"))
+        self.export_to_excel_btn.clicked.connect(self.export_attendance_sheet)
         self.start_attendance_btn.setIcon(qta.icon("fa5s.play", color="white"))
         self.submit_attendance_btn.setIcon(qta.icon("fa5s.check-circle", color="white"))
 
@@ -348,6 +351,43 @@ class TakeAttendance(QDialog):
         self.class_window.load_student_list()
         QMessageBox.information(self, "Success", "Attendance submitted successfully!")
         self.close()
+
+    def export_attendance_sheet(self):
+        """Export the already-submitted attendance sheet for the selected date."""
+        selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
+
+        try:
+            rows = self.class_manager.get_attendance_sheet(self.class_obj.class_id, selected_date)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Failed to fetch attendance sheet:\n{e}")
+            return
+
+        if not rows:
+            QMessageBox.information(
+                self, "Nothing to Export",
+                f"No submitted attendance found for {selected_date}."
+            )
+            return
+
+        default_name = f"{self.class_obj.class_code}_{selected_date}_attendance.xlsx"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Attendance Report", default_name,
+            "Excel Files (*.xlsx);;CSV Files (*.csv)"
+        )
+        if not file_path:
+            return
+
+        df = pd.DataFrame(rows)
+        try:
+            if file_path.endswith(".csv"):
+                df.to_csv(file_path, index=False)
+            else:
+                df.to_excel(file_path, index=False)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write file:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Attendance report exported to:\n{file_path}")
 
     def update_date_info(self):
         """Update date-related information when calendar changes"""
