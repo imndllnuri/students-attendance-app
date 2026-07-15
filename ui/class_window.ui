@@ -144,13 +144,15 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="schedule_lbl">
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
+          <widget class="QLabel" name="schedule_title_lbl">
            <property name="text">
-            <string>Schedule:</string>
+            <string>Schedule</string>
            </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="schedule_grid_widget" native="true">
+           <layout class="QGridLayout" name="schedule_grid_layout"/>
           </widget>
          </item>
         </layout>

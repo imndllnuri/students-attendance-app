@@ -24,7 +24,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 13. "Export Report" button (wires the existing unused export button)
 - [ ] 14. Student photo/avatar in roster (not selected)
 - [x] 15. Correct/edit a past attendance record
-- [ ] 16. Visual weekly schedule grid (replacing plain text)
+- [x] 16. Visual weekly schedule grid (replacing plain text)
 
 ## Take Attendance
 - [ ] 17. Manual attendance mode (mark by clicking, no RFID needed)

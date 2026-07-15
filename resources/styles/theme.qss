@@ -102,6 +102,21 @@ QLabel#class_row_caption_lbl {
     padding-bottom: 8px;
 }
 
+/* --- Weekly schedule grid --- */
+
+QLabel#schedule_day_header_lbl {
+    font-weight: 600;
+    padding: 4px 8px;
+}
+
+QLabel#schedule_slot_chip_lbl {
+    background-color: #EEF2FF;
+    color: #4F46E5;
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin: 2px;
+}
+
 /* --- Password strength indicator --- */
 
 QLabel#password_strength_lbl,

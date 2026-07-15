@@ -4,7 +4,15 @@ import math
 import pandas as pd
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtWidgets import QHeaderView, QInputDialog, QMainWindow, QMessageBox, QTableWidgetItem
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QHeaderView,
+    QInputDialog,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
+)
 
 from services.api_client import ApiError
 from shared.palette import qcolor
@@ -109,8 +117,7 @@ class ClassWindow(QMainWindow):
         self.number_of_weeks_lbl.setText(f"Weeks: {self.class_obj.total_weeks}")
         self.total_hours_lbl.setText(f"Total Hours: {self.class_obj.total_hours}")
         self.weekly_hours_lbl.setText(f"Weekly Hours: {self.class_obj.weekly_hours}")
-        formatted_schedule = self.format_schedule(self.class_obj.schedule)
-        self.schedule_lbl.setText(f"Schedule:\n{formatted_schedule}")
+        self.render_schedule_grid(self.class_obj.schedule)
 
     def setup_connections(self):
         self.back_to_my_classes_btn.clicked.connect(self.return_to_main_window)
@@ -252,17 +259,35 @@ class ClassWindow(QMainWindow):
         self.take_attendance_page = TakeAttendance(self.class_obj, self, self.class_manager)
         self.take_attendance_page.show()
 
-    def format_schedule(self, schedule):
-        """Formats the schedule dictionary into a readable string."""
-        schedule_str = []
-        for day, slots in schedule.items():
-            slot_strs = [
-                f"{slot.start_time.toString('HH:mm')} - {slot.end_time.toString('HH:mm')}"
-                for slot in slots if slot.selected
-            ]
-            if slot_strs:
-                schedule_str.append(f"{day}: {', '.join(slot_strs)}")
-        return "\n".join(schedule_str) if schedule_str else "No schedule set"
+    _WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    def render_schedule_grid(self, schedule):
+        """Renders the weekly schedule as a real day-by-day grid instead of
+        a plain 'Day: HH:mm-HH:mm' text block."""
+        layout = self.schedule_grid_widget.layout()
+        while layout.count():
+            item = layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        days_with_slots = [day for day in self._WEEK_DAYS if any(s.selected for s in schedule.get(day, []))]
+        if not days_with_slots:
+            no_schedule_lbl = QLabel("No schedule set")
+            layout.addWidget(no_schedule_lbl, 0, 0)
+            return
+
+        for col, day in enumerate(days_with_slots):
+            day_lbl = QLabel(day)
+            day_lbl.setObjectName("schedule_day_header_lbl")
+            day_lbl.setAlignment(Qt.AlignCenter)
+            layout.addWidget(day_lbl, 0, col)
+
+            slots = [s for s in schedule[day] if s.selected]
+            for row, slot in enumerate(slots, start=1):
+                slot_lbl = QLabel(f"{slot.start_time.toString('HH:mm')} - {slot.end_time.toString('HH:mm')}")
+                slot_lbl.setObjectName("schedule_slot_chip_lbl")
+                slot_lbl.setAlignment(Qt.AlignCenter)
+                layout.addWidget(slot_lbl, row, col)
 
     def return_to_main_window(self):
         """Returns to 'My Classes' view in the main window."""
