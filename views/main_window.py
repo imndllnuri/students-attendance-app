@@ -9,6 +9,7 @@ from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
+    QCheckBox,
     QFileDialog,
     QFrame,
     QGraphicsDropShadowEffect,
@@ -75,6 +76,7 @@ class MainWindow(QMainWindow):
         self.statistics_canvas = None
         self.notifications = []
         self.recently_viewed_class_ids = []
+        self.selected_class_ids = set()
 
         self.user_info_lbl.setText(f"{user.name} {user.surname}")
 
@@ -96,6 +98,7 @@ class MainWindow(QMainWindow):
         self.compact_view_cb.blockSignals(False)
         self.compact_view_cb.toggled.connect(self.toggle_list_density)
         self.export_class_list_btn.clicked.connect(self.export_class_list)
+        self.bulk_archive_btn.clicked.connect(self.bulk_archive_selected)
         self.custom_order_listWidget.setDragDropMode(QAbstractItemView.InternalMove)
         self.custom_order_listWidget.model().rowsMoved.connect(self._save_custom_order)
 
@@ -334,6 +337,7 @@ class MainWindow(QMainWindow):
             if item.widget():
                 item.widget().deleteLater()
 
+        self.selected_class_ids = set()
         showing_archived = self.show_archived_cb.isChecked()
         self.create_new_class_btn.setVisible(not showing_archived)
         custom_order_mode = self.class_sort_combo.currentText() == "Custom Order" and not showing_archived
@@ -463,6 +467,12 @@ class MainWindow(QMainWindow):
         row_layout = QHBoxLayout(class_widget)
         row_layout.setContentsMargins(*((4, 2, 4, 2) if compact else (4, 4, 4, 4)))
 
+        select_cb = QCheckBox()
+        select_cb.setToolTip("Select for bulk actions")
+        select_cb.setChecked(cls.class_id in self.selected_class_ids)
+        select_cb.toggled.connect(lambda checked, c=cls: self.toggle_class_selection(c, checked))
+        row_layout.addWidget(select_cb)
+
         color_chip = QFrame()
         color_chip.setFixedWidth(4)
         color_chip.setMinimumHeight(40)
@@ -547,6 +557,34 @@ class MainWindow(QMainWindow):
         row_layout.addWidget(delete_btn)
 
         return class_widget
+
+    def toggle_class_selection(self, cls, checked):
+        if checked:
+            self.selected_class_ids.add(cls.class_id)
+        else:
+            self.selected_class_ids.discard(cls.class_id)
+
+    def bulk_archive_selected(self):
+        if not self.selected_class_ids:
+            QMessageBox.information(self, "Nothing Selected", "Select one or more classes first.")
+            return
+
+        reply = QMessageBox.question(
+            self, "Archive Selected Classes",
+            f"Archive {len(self.selected_class_ids)} selected class(es)? They will be hidden "
+            "from My Classes but their data is kept.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        failures = [
+            class_id for class_id in self.selected_class_ids
+            if not self.class_manager.archive_class(class_id)
+        ]
+        self.load_classes()
+        if failures:
+            QMessageBox.warning(self, "Partially Completed", f"Could not archive {len(failures)} class(es).")
 
     def archive_class(self, cls):
         reply = QMessageBox.question(

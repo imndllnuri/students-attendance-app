@@ -72,6 +72,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 11. Class list density toggle (comfortable vs compact)
 - [x] 10. "Recently Viewed Classes" quick-access list
 - [x] 12. "Jump to Class" command-palette shortcut (Ctrl+K)
+- [x] 9. Bulk actions on the class list (multi-select archive)
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope
