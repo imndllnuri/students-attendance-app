@@ -210,11 +210,31 @@ class MainWindow(QMainWindow):
         QShortcut(QKeySequence("Ctrl+1"), self, self.show_my_classes)
         QShortcut(QKeySequence("Ctrl+2"), self, self.show_settings)
         QShortcut(QKeySequence("Ctrl+3"), self, self.show_statistics)
+        QShortcut(QKeySequence("Ctrl+K"), self, self.jump_to_class)
 
     def _focus_search(self):
         self.show_search()
         self.search_bar_le.setFocus()
         self.search_bar_le.selectAll()
+
+    def jump_to_class(self):
+        """Ctrl+K command palette: type or pick a class by name/code and
+        jump straight to its detail page."""
+        classes = self.fetch_classes()
+        if not classes:
+            QMessageBox.information(self, "No Classes", "You have no classes to jump to.")
+            return
+
+        labels = [f"{c.class_name} ({c.class_code})" for c in classes]
+        selected_label, ok = QInputDialog.getItem(
+            self, "Jump to Class", "Type or select a class:", labels, 0, True
+        )
+        if not ok or selected_label not in labels:
+            return
+
+        cls = classes[labels.index(selected_label)]
+        self.show_my_classes()
+        self.open_class_window(cls)
 
     def _apply_card_shadows(self):
         for frame in (self.profile_card_frame, self.settings_card_frame):
