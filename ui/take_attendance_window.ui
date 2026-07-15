@@ -47,6 +47,12 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="manual_attendance_btn">
+          <property name="text"><string>Manual Attendance</string></property>
+          <property name="toolTip"><string>Mark a student's attendance without an RFID scan</string></property>
+         </widget>
+        </item>
+        <item>
          <spacer name="attendance_actions_spacer">
           <property name="orientation"><enum>Qt::Horizontal</enum></property>
          </spacer>

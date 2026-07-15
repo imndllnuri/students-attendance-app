@@ -59,6 +59,7 @@ class TakeAttendance(QDialog):
         self.submit_attendance_btn.clicked.connect(self.submit_attendance)
         self.mark_all_present_btn.clicked.connect(self.mark_all_present)
         self.undo_last_scan_btn.clicked.connect(self.undo_last_scan)
+        self.manual_attendance_btn.clicked.connect(self.manual_attendance_entry)
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
 
         self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#4F46E5"))
@@ -238,6 +239,40 @@ class TakeAttendance(QDialog):
         self._set_scan_status(
             "success", f"✓ Marked {len(remaining)} student(s) Present.", revert_after_ms=1500
         )
+
+    def manual_attendance_entry(self):
+        """Mark a student's attendance by picking them from a list, for
+        when the RFID reader is unavailable or malfunctioning."""
+        remaining = [s for s in self.roster if s["student_id"] not in self.staged_student_ids]
+        if not remaining:
+            QMessageBox.information(self, "Nothing to Add", "Everyone has already been recorded.")
+            return
+
+        names = [s["name_surname"] for s in remaining]
+        selected_name, ok = QInputDialog.getItem(
+            self, "Manual Attendance", "Select student:", names, 0, False
+        )
+        if not ok:
+            return
+        student = next(s for s in remaining if s["name_surname"] == selected_name)
+
+        statuses = ["Present", "Late", "Absent"]
+        status, ok = QInputDialog.getItem(
+            self, "Manual Attendance", f"Mark {selected_name} as:", statuses, 0, False
+        )
+        if not ok:
+            return
+
+        if status == "Absent":
+            self._set_scan_status(
+                "idle", f"{selected_name} left unmarked (Absent).", revert_after_ms=1500
+            )
+            return
+
+        selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
+        time_slot = self.hours_comboBox.currentText()
+        now_str = QDateTime.currentDateTime().toString("HH:mm")
+        self.record_attendance(student, selected_date, time_slot, now_str, status)
 
     def undo_last_scan(self):
         """Remove the most recently staged attendance row (the table and
