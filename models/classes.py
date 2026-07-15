@@ -19,7 +19,8 @@ class Class:
                  attendance_policy: float, late_threshold: int, total_weeks: int,
                  total_hours: float, weekly_hours: float, schedule: Dict[str, List[ScheduleSlot]],
                  class_id: Optional[str] = None, students: Optional[List[dict]] = None,
-                 archived: bool = False, notes: str = "", color: Optional[str] = None):
+                 archived: bool = False, notes: str = "", color: Optional[str] = None,
+                 pinned: bool = False):
         self.class_id = class_id
         self.class_code = class_code
         self.class_name = class_name
@@ -35,6 +36,7 @@ class Class:
         self.archived = archived
         self.notes = notes
         self.color = color
+        self.pinned = pinned
 
     def to_dict(self):
         return {
@@ -92,6 +94,7 @@ class Class:
             archived=data.get("archived", False),
             notes=data.get("notes", ""),
             color=data.get("color"),
+            pinned=data.get("pinned", False),
         )
 
 

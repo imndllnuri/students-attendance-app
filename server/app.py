@@ -38,6 +38,7 @@ def class_row_to_dict(conn, row):
         "archived": bool(row["archived"]),
         "notes": row["notes"],
         "color": row["color"],
+        "pinned": bool(row["pinned"]),
         "schedule": dict(schedule),
     }
 
@@ -347,6 +348,8 @@ def update_class(class_id):
     fields = {k: data[k] for k in _CLASS_UPDATABLE_FIELDS if k in data}
     if "archived" in data:
         fields["archived"] = int(bool(data["archived"]))
+    if "pinned" in data:
+        fields["pinned"] = int(bool(data["pinned"]))
     if fields:
         assignments = ", ".join(f"{k} = ?" for k in fields)
         conn.execute(

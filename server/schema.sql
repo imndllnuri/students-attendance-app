@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS classes (
     weekly_hours REAL NOT NULL,
     archived INTEGER NOT NULL DEFAULT 0,
     notes TEXT NOT NULL DEFAULT '',
-    color TEXT
+    color TEXT,
+    pinned INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS schedule_slots (

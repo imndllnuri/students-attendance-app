@@ -20,6 +20,7 @@ def init_db():
         "ALTER TABLE classes ADD COLUMN archived INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE classes ADD COLUMN notes TEXT NOT NULL DEFAULT ''",
         "ALTER TABLE classes ADD COLUMN color TEXT",
+        "ALTER TABLE classes ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0",
     ):
         try:
             conn.execute(statement)

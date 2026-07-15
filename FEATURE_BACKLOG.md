@@ -68,6 +68,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 21. Copy roster from another class
 - [x] 18. Merge student tool
 - [x] 7. Drag-and-drop reordering of class cards (Custom Order sort mode)
+- [x] 8. Pin/favorite classes
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

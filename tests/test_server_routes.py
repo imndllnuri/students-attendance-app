@@ -217,6 +217,19 @@ def test_merge_students_moves_attendance_and_deletes_duplicate(client):
     assert sheet[0]["student_number"] == roster[0]["student_number"]
 
 
+def test_class_pinned_defaults_to_false_and_can_be_toggled(client):
+    instructor_id = create_instructor(client)
+    created = client.post("/classes", json=sample_class_payload(instructor_id)).get_json()
+    assert created["pinned"] is False
+
+    resp = client.patch(f"/classes/{created['class_id']}", json={"pinned": True})
+    assert resp.status_code == 200
+    assert resp.get_json()["pinned"] is True
+
+    resp2 = client.patch(f"/classes/{created['class_id']}", json={"pinned": False})
+    assert resp2.get_json()["pinned"] is False
+
+
 def test_correct_attendance_upserts_and_deletes_by_natural_key(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

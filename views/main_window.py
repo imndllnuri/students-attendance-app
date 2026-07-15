@@ -253,13 +253,14 @@ class MainWindow(QMainWindow):
         return classes
 
     def _class_sort_key(self, cls):
+        pin_key = 0 if cls.pinned else 1
         mode = self.class_sort_combo.currentText()
         if mode == "Class Name":
-            return (cls.class_name.lower(), cls.class_code.lower())
+            return (pin_key, cls.class_name.lower(), cls.class_code.lower())
         if mode == "Day":
             days = [_WEEKDAY_ORDER.get(day, 99) for day, slots in cls.schedule.items() if slots]
-            return (min(days) if days else 99, cls.class_code.lower())
-        return (cls.class_code.lower(),)
+            return (pin_key, min(days) if days else 99, cls.class_code.lower())
+        return (pin_key, cls.class_code.lower())
 
     def _format_schedule_for_export(self, schedule):
         parts = []
@@ -338,9 +339,12 @@ class MainWindow(QMainWindow):
         self.custom_order_listWidget.clear()
         saved_order = load_class_order()
         order_index = {class_id: i for i, class_id in enumerate(saved_order)}
-        ordered = sorted(classes, key=lambda c: order_index.get(c.class_id, len(saved_order)))
+        ordered = sorted(
+            classes,
+            key=lambda c: (0 if c.pinned else 1, order_index.get(c.class_id, len(saved_order))),
+        )
         for cls in ordered:
-            item = QListWidgetItem(f"{cls.class_name} ({cls.class_code})")
+            item = QListWidgetItem(f"{'★ ' if cls.pinned else ''}{cls.class_name} ({cls.class_code})")
             item.setData(Qt.UserRole, cls.class_id)
             self.custom_order_listWidget.addItem(item)
 
@@ -413,6 +417,12 @@ class MainWindow(QMainWindow):
         text_layout.addWidget(class_btn)
         text_layout.addWidget(caption_lbl)
 
+        pin_btn = QPushButton("★" if cls.pinned else "☆")
+        pin_btn.setFixedSize(28, 28)
+        pin_btn.setCursor(Qt.PointingHandCursor)
+        pin_btn.setToolTip("Unpin class" if cls.pinned else "Pin class to the top")
+        pin_btn.clicked.connect(lambda _, c=cls: self.toggle_pin_class(c))
+
         duplicate_btn = QPushButton("Duplicate")
         duplicate_btn.setCursor(Qt.PointingHandCursor)
         duplicate_btn.setToolTip("Create a new class with the same schedule and policy")
@@ -426,9 +436,18 @@ class MainWindow(QMainWindow):
         archive_btn.clicked.connect(lambda _, c=cls: self.archive_class(c))
 
         row_layout.addLayout(text_layout, 1)
+        row_layout.addWidget(pin_btn)
         row_layout.addWidget(duplicate_btn)
         row_layout.addWidget(archive_btn)
         return class_widget
+
+    def toggle_pin_class(self, cls):
+        try:
+            self.class_manager.update_class(cls.class_id, {"pinned": not cls.pinned})
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not update {cls.class_code}:\n{e}")
+            return
+        self.load_classes()
 
     def open_duplicate_class_window(self, cls):
         self.duplicate_class_window = AddNewClassWindow(user_id=self.user_id, duplicate_from=cls)

@@ -136,6 +136,20 @@ def test_class_color_defaults_to_none():
     assert make_class().color is None
 
 
+def test_class_pinned_defaults_to_false():
+    assert make_class().pinned is False
+
+
+def test_class_from_dict_parses_pinned_field():
+    data = make_class().to_dict()
+    data["class_id"] = "c1"
+    data["pinned"] = True
+
+    restored = Class.from_dict(data)
+
+    assert restored.pinned is True
+
+
 def test_account_manager_add_account_wraps_api_client():
     fake = FakeApiClient()
     manager = AccountManager(api_client=fake)
