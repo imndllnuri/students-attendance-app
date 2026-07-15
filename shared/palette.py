@@ -53,6 +53,49 @@ PALETTE = {
     "border_strong": "#CBD5E1",
 }
 
+# Dark-mode counterpart to PALETTE, same keys - resources/styles/theme_dark.qss
+# is generated from theme.qss by substituting each PALETTE[key] hex for
+# DARK_PALETTE[key] (see scripts/generate_dark_theme.py). Dynamic per-cell
+# coloring (qcolor(), class_tag_color()) intentionally still uses the light
+# PALETTE in both themes - only the static QSS chrome is dark-mode aware for
+# now; see ROADMAP.md.
+DARK_PALETTE = {
+    "bg_app": "#0F172A",
+    "bg_card": "#1E293B",
+    "bg_elevated": "#1E293B",
+    "bg_sidebar": "#0B1120",
+    "bg_hover": "#334155",
+
+    "text_primary": "#F1F5F9",
+    "text_secondary": "#94A3B8",
+    "text_disabled": "#475569",
+    "text_on_dark": "#E2E8F0",
+    "text_on_dark_muted": "#94A3B8",
+
+    "accent": "#6366F1",
+    "accent_hover": "#818CF8",
+    "accent_pressed": "#4F46E5",
+    "accent_subtle": "#312E81",
+
+    "success": "#22C55E",
+    "success_tint": "#14532D",
+    "success_border": "#16A34A",
+    "success_text": "#BBF7D0",
+
+    "warning": "#F59E0B",
+    "warning_tint": "#78350F",
+    "warning_border": "#D97706",
+    "warning_text": "#FDE68A",
+
+    "error": "#EF4444",
+    "error_tint": "#7F1D1D",
+    "error_border": "#DC2626",
+    "error_text": "#FECACA",
+
+    "border": "#334155",
+    "border_strong": "#475569",
+}
+
 # Class-card color tags: a small, hand-picked set of distinct hues (not an
 # arbitrary hash-to-RGB, which tends to produce muddy colors).
 CLASS_TAG_COLORS = [

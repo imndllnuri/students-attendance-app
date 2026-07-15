@@ -227,6 +227,11 @@
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="dark_mode_cb">
+                 <property name="text"><string>Dark Mode</string></property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLabel" name="change_password_section_lbl">
                  <property name="text"><string>Change Password</string></property>
                 </widget>

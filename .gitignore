@@ -14,6 +14,7 @@ accounts.json
 # Server database and remembered-login marker
 server/attendance.db
 .remembered_email
+.theme_preference
 
 # Test/CI artifacts
 .pytest_cache/

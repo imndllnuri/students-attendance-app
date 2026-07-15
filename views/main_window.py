@@ -25,6 +25,7 @@ from matplotlib.figure import Figure
 from resources.images import qrc
 from services.api_client import ApiError
 from shared.palette import PALETTE, class_tag_color
+from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -78,6 +79,11 @@ class MainWindow(QMainWindow):
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
         self.profile_email_le.textChanged.connect(self.validate_profile_email)
+
+        self.dark_mode_cb.blockSignals(True)
+        self.dark_mode_cb.setChecked(load_theme_preference() == "dark")
+        self.dark_mode_cb.blockSignals(False)
+        self.dark_mode_cb.toggled.connect(self.toggle_dark_mode)
 
         self.settings_security_question_combo.addItems(SECURITY_QUESTIONS)
         self.change_password_btn.clicked.connect(self.change_password)
@@ -547,6 +553,12 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "Profile Updated", "Your profile has been updated successfully!")
 
     # --- Settings ---
+
+    def toggle_dark_mode(self, checked):
+        theme = "dark" if checked else "light"
+        save_theme_preference(theme)
+        with open(stylesheet_path(theme)) as f:
+            QApplication.instance().setStyleSheet(f.read())
 
     def _clear_settings_form(self):
         for line_edit in (

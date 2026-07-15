@@ -41,7 +41,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 26. Export chart as PNG/PDF
 
 ## Settings & Profile
-- [ ] 27. Dark mode
+- [x] 27. Dark mode
 - [ ] 28. Language selector (English/Turkish) - infrastructure + partial
       string coverage; see note below
 
@@ -53,6 +53,14 @@ marked "not selected" were intentionally left out of this batch.
 - [x] Show-password checkbox on the login screen
 
 ## Notes on scope
+- **#27 Dark mode**: `theme_dark.qss` is generated from `theme.qss` by
+  `scripts/generate_dark_theme.py` (hex-value substitution via
+  `shared/palette.py`'s `DARK_PALETTE`) rather than hand-authored - re-run
+  the script after editing either file. Preference persists to
+  `.theme_preference` and applies live via `QApplication.setStyleSheet()`.
+  Dynamic per-cell colors (`qcolor()`, `class_tag_color()`) intentionally
+  still use the light `PALETTE` in both themes; the top search bar isn't
+  covered either since it has no explicit background rule in either theme.
 - **#28 Language selector**: implements the lightweight dict-based
   approach (`shared/i18n.py`) discussed earlier - not Qt's full
   `QTranslator`/`.ts`/`.qm` workflow. Covers navigation, page titles, and
