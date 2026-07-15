@@ -24,6 +24,7 @@ import serial.tools.list_ports
 
 from services.api_client import ApiError
 from shared.palette import qcolor
+from shared.session_templates import load_session_template, save_session_template
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,9 @@ class TakeAttendance(QDialog):
         ])
         self.take_attendance_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.update_date_info()
+        self._apply_session_template()
 
+        self.save_session_template_btn.clicked.connect(self.save_current_as_template)
         self.hours_comboBox.currentIndexChanged.connect(self.update_session_countdown)
         self._countdown_timer = QTimer(self)
         self._countdown_timer.timeout.connect(self.update_session_countdown)
@@ -219,8 +222,43 @@ class TakeAttendance(QDialog):
         start_time_str = time_slot.split('-')[0].strip()
         start_time = QTime.fromString(start_time_str, "HH:mm")
         time_diff = start_time.secsTo(now.time()) / 60  # minutes
-        status = "Late" if time_diff > self.class_obj.late_threshold else "Present"
+        status = "Late" if time_diff > self._effective_late_threshold() else "Present"
         return status, now.toString("HH:mm")
+
+    def _effective_late_threshold(self):
+        """A saved template's late-threshold override, if set, takes
+        precedence over the class's default late threshold for this
+        session only."""
+        text = self.late_threshold_override_le.text().strip()
+        if text:
+            try:
+                return int(text)
+            except ValueError:
+                pass
+        return self.class_obj.late_threshold
+
+    def _apply_session_template(self):
+        template = load_session_template(self.class_obj.class_id)
+        time_slot = template.get("time_slot")
+        if time_slot:
+            index = self.hours_comboBox.findText(time_slot)
+            if index >= 0:
+                self.hours_comboBox.setCurrentIndex(index)
+        override = template.get("late_threshold_override")
+        if override is not None:
+            self.late_threshold_override_le.setText(str(override))
+
+    def save_current_as_template(self):
+        time_slot = self.hours_comboBox.currentText()
+        if not time_slot:
+            QMessageBox.information(self, "Nothing to Save", "Select a time slot first.")
+            return
+
+        override_text = self.late_threshold_override_le.text().strip()
+        override = int(override_text) if override_text.lstrip("-").isdigit() else None
+
+        save_session_template(self.class_obj.class_id, time_slot, override)
+        QMessageBox.information(self, "Saved", "Session template saved for this class.")
 
     def mark_attendance(self, student):
         selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")

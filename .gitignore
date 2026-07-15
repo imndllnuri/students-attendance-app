@@ -19,6 +19,7 @@ server/attendance.db
 .session_timeout_preference
 .class_order_preference
 .list_density_preference
+.session_templates.json
 
 # Test/CI artifacts
 .pytest_cache/
