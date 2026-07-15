@@ -659,7 +659,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="statistics_class_combo"/>
+             <widget class="QComboBox" name="statistics_class_combo">
+              <property name="minimumWidth"><number>220</number></property>
+             </widget>
             </item>
             <item>
              <spacer name="statistics_filter_spacer">

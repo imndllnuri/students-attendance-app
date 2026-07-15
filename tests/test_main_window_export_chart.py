@@ -60,7 +60,10 @@ def test_export_saves_the_current_figure(qtbot, monkeypatch, tmp_path):
     window = build_window(qtbot, monkeypatch)
 
     import types as t
-    cls = t.SimpleNamespace(class_id="c1", class_code="COMP101", class_name="Intro")
+    cls = t.SimpleNamespace(
+        class_id="c1", class_code="COMP101", class_name="Intro",
+        section="1", total_weeks=14, weekly_hours=3, archived=False,
+    )
     window.statistics_class_combo.addItem("Intro (COMP101)", cls)
     window.render_statistics()
     assert window.statistics_canvas is not None
@@ -81,7 +84,10 @@ def test_export_cancelled_dialog_does_not_write_file(qtbot, monkeypatch, tmp_pat
     window = build_window(qtbot, monkeypatch)
 
     import types as t
-    cls = t.SimpleNamespace(class_id="c1", class_code="COMP101", class_name="Intro")
+    cls = t.SimpleNamespace(
+        class_id="c1", class_code="COMP101", class_name="Intro",
+        section="1", total_weeks=14, weekly_hours=3, archived=False,
+    )
     window.statistics_class_combo.addItem("Intro (COMP101)", cls)
     window.render_statistics()
 

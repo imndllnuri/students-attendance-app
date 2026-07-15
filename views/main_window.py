@@ -38,7 +38,7 @@ from shared.class_order import load_class_order, save_class_order
 from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
-from shared.palette import PALETTE, RADIUS, active_palette, class_tag_color
+from shared.palette import PALETTE, RADIUS, active_palette, class_tag_color, class_tag_color_key
 from shared.qt_style import set_dynamic_property
 from shared.shadow import apply_card_shadow
 from shared.session_timeout import (
@@ -113,6 +113,11 @@ class MainWindow(QMainWindow):
         self.compare_classes_btn.clicked.connect(self.show_class_comparison)
         self.attendance_heatmap_btn.clicked.connect(self.show_attendance_heatmap)
         self.export_pdf_report_btn.clicked.connect(self.export_statistics_pdf)
+        for btn in (
+            self.compare_classes_btn, self.attendance_heatmap_btn,
+            self.export_chart_btn, self.export_pdf_report_btn,
+        ):
+            set_dynamic_property(btn, "variant", "ghost")
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
         self.compact_view_cb.blockSignals(True)
@@ -425,15 +430,17 @@ class MainWindow(QMainWindow):
         )
 
     def _sync_info_panel_visibility(self):
-        """The Info panel only applies to My Classes and Class Detail
-        (and, once its content is wired in a later phase, Statistics) -
-        Settings/Profile/Search keep the 3rd grid column hidden entirely,
-        per the redesign's scope decision that the panel is not a global
-        chrome element."""
+        """The Info panel only applies to My Classes, Class Detail, and
+        Statistics - Settings/Profile/Search keep the 3rd grid column
+        hidden entirely, per the redesign's scope decision that the panel
+        is not a global chrome element."""
         from views.class_window import ClassWindow
 
         current = self.stackedWidget.currentWidget()
-        applicable = self.stackedWidget.currentIndex() == MY_CLASSES_PAGE or isinstance(current, ClassWindow)
+        applicable = (
+            self.stackedWidget.currentIndex() in (MY_CLASSES_PAGE, STATISTICS_PAGE)
+            or isinstance(current, ClassWindow)
+        )
         self.info_panel_widget.setVisible(applicable and self._info_panel_expanded)
 
     def set_info_panel_content(self, stats=(), properties=(), tags=(), footer_actions=()):
@@ -1490,6 +1497,7 @@ class MainWindow(QMainWindow):
         if cls is None:
             self.statistics_empty_lbl.setText("Select a class to view its statistics.")
             self.statistics_empty_lbl.setVisible(True)
+            self._update_info_panel_for_statistics(None)
             return
 
         try:
@@ -1497,6 +1505,8 @@ class MainWindow(QMainWindow):
         except ApiError as e:
             QMessageBox.critical(self, "Server Error", str(e))
             return
+
+        self._update_info_panel_for_statistics(cls, stats)
 
         palette = active_palette()
         figure = Figure(figsize=(8, 4))
@@ -1525,6 +1535,44 @@ class MainWindow(QMainWindow):
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
         self._last_chart_builder = self.render_statistics
+
+    def _update_info_panel_for_statistics(self, cls, stats=None):
+        """Statistics' Info panel shows the currently-selected class's
+        attendance rate/record count plus its identifying properties and
+        tags - mirrors the pattern already used for My Classes (aggregate)
+        and Class Window (per-class) in earlier phases."""
+        if cls is None:
+            self.set_info_panel_content(stats=[], properties=[], tags=[], footer_actions=[])
+            return
+
+        if stats is None:
+            total_records = 0
+            rate = 0
+        else:
+            total_records = stats["present"] + stats["late"] + stats["absent"]
+            rate = int(stats["present"] / total_records * 100) if total_records else 0
+
+        info_stats = [
+            ("Attendance Rate", f"{rate}%", rate, None),
+            ("Attendance Records", str(total_records), min(100, total_records * 5), None),
+        ]
+        properties = [
+            ("Class Code", cls.class_code),
+            ("Section", cls.section),
+            ("Total Weeks", str(cls.total_weeks)),
+            ("Weekly Hours", str(cls.weekly_hours)),
+        ]
+        tags = [(cls.class_code, class_tag_color_key(cls.class_code))]
+        if cls.archived:
+            tags.append(("Archived", "slate"))
+
+        self.set_info_panel_content(
+            stats=info_stats, properties=properties, tags=tags,
+            footer_actions=[
+                ("📄  Export PDF Report", self.export_statistics_pdf),
+                ("📂  View Full Class", lambda: self.open_class_window(cls)),
+            ],
+        )
 
     def show_class_comparison(self):
         """Bar chart comparing attendance rate across all of the
