@@ -60,3 +60,14 @@ CREATE TABLE IF NOT EXISTS login_history (
     user_id TEXT NOT NULL REFERENCES accounts(user_id) ON DELETE CASCADE,
     logged_in_at TEXT NOT NULL
 );
+
+-- Accountability log for administrative actions (account deletion, class
+-- archiving, attendance corrections, student merges) - separate from the
+-- instructor-facing in-app notification feed.
+CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT,
+    action TEXT NOT NULL,
+    details TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+);

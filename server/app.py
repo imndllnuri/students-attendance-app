@@ -10,6 +10,15 @@ from server.db import get_connection, init_db
 app = Flask(__name__)
 
 
+def log_audit(conn, user_id, action, details=""):
+    """Records an administrative action for accountability (#42) -
+    separate from the instructor-facing in-app notification feed."""
+    conn.execute(
+        "INSERT INTO audit_log (user_id, action, details, created_at) VALUES (?, ?, ?, ?)",
+        (user_id, action, details, datetime.now(timezone.utc).isoformat()),
+    )
+
+
 def class_row_to_dict(conn, row):
     slots = conn.execute(
         "SELECT day, start_time, end_time, selected FROM schedule_slots WHERE class_id = ?",
@@ -259,6 +268,7 @@ def delete_account(user_id):
         ), 409
 
     conn.execute("DELETE FROM accounts WHERE user_id = ?", (user_id,))
+    log_audit(conn, user_id, "account_deleted", account["email"])
     conn.commit()
     conn.close()
     return "", 204
@@ -372,6 +382,10 @@ def update_class(class_id):
                     (class_id, day, slot["start_time"], slot["end_time"], int(slot["selected"])),
                 )
 
+    if "archived" in data:
+        action = "class_archived" if bool(data["archived"]) else "class_unarchived"
+        log_audit(conn, row["instructor_id"], action, row["class_code"])
+
     conn.commit()
     row = conn.execute("SELECT * FROM classes WHERE class_id = ?", (class_id,)).fetchone()
     result = class_row_to_dict(conn, row)
@@ -382,6 +396,9 @@ def update_class(class_id):
 @app.delete("/classes/<class_id>")
 def delete_class(class_id):
     conn = get_connection()
+    row = conn.execute("SELECT * FROM classes WHERE class_id = ?", (class_id,)).fetchone()
+    if row:
+        log_audit(conn, row["instructor_id"], "class_deleted", row["class_code"])
     conn.execute("DELETE FROM classes WHERE class_id = ?", (class_id,))
     conn.commit()
     conn.close()
@@ -438,11 +455,24 @@ def merge_students():
     keep_id = data["keep_student_id"]
     remove_id = data["remove_student_id"]
     conn = get_connection()
+
+    student_row = conn.execute(
+        "SELECT s.class_id, s.name_surname, c.instructor_id FROM students s "
+        "JOIN classes c ON c.class_id = s.class_id WHERE s.student_id = ?",
+        (keep_id,),
+    ).fetchone()
+
     conn.execute(
         "UPDATE attendance_records SET student_id = ? WHERE student_id = ?",
         (keep_id, remove_id),
     )
     conn.execute("DELETE FROM students WHERE student_id = ?", (remove_id,))
+    if student_row:
+        log_audit(
+            conn, student_row["instructor_id"], "students_merged",
+            f"kept {student_row['name_surname']} (student_id={keep_id}), "
+            f"removed student_id={remove_id}",
+        )
     conn.commit()
     conn.close()
     return "", 204
@@ -559,6 +589,17 @@ def correct_attendance():
                 data.get("time", ""), data["status"],
             ),
         )
+
+    class_row = conn.execute(
+        "SELECT instructor_id FROM classes WHERE class_id = ?", (data["class_id"],)
+    ).fetchone()
+    if class_row:
+        log_audit(
+            conn, class_row["instructor_id"], "attendance_corrected",
+            f"class_id={data['class_id']} student_id={data['student_id']} "
+            f"date={data['date']} time_slot={data['time_slot']} -> {data['status']}",
+        )
+
     conn.commit()
     conn.close()
     return jsonify({"deleted": False})
@@ -612,6 +653,24 @@ def statistics():
             "absent": absent,
         }
     )
+
+
+@app.get("/audit-log")
+def get_audit_log():
+    user_id = request.args.get("user_id")
+    limit = request.args.get("limit", default=50, type=int)
+    conn = get_connection()
+    if user_id:
+        rows = conn.execute(
+            "SELECT * FROM audit_log WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+            (user_id, limit),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM audit_log ORDER BY created_at DESC LIMIT ?", (limit,)
+        ).fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
 
 
 if __name__ == "__main__":

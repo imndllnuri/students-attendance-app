@@ -84,6 +84,8 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 40. What's New changelog dialog
 - [x] 43. Server connectivity health indicator
 - [x] 34. Per-student attendance CSV export
+- [x] 42. Admin audit log (account deletion, class archive/unarchive/delete,
+      student merges, attendance corrections)
 
 ## Notes on scope
 - **#29 Notifications**: in-app bell-icon feed only (in-memory, not

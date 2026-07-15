@@ -288,6 +288,94 @@ def test_correct_attendance_upserts_and_deletes_by_natural_key(client):
     assert sheet_after_absent == []
 
 
+def test_audit_log_records_class_archive_and_unarchive(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+
+    client.patch(f"/classes/{class_id}", json={"archived": True})
+    client.patch(f"/classes/{class_id}", json={"archived": False})
+
+    log = client.get("/audit-log", query_string={"user_id": instructor_id}).get_json()
+    actions = [entry["action"] for entry in log]
+    assert actions[:2] == ["class_unarchived", "class_archived"]  # newest first
+
+
+def test_audit_log_records_class_deletion(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+
+    client.delete(f"/classes/{class_id}")
+
+    log = client.get("/audit-log", query_string={"user_id": instructor_id}).get_json()
+    assert log[0]["action"] == "class_deleted"
+
+
+def test_audit_log_records_student_merge(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+    roster = client.get("/roster", query_string={"class_id": class_id}).get_json()
+
+    client.post(
+        "/roster/merge",
+        json={"keep_student_id": roster[0]["student_id"], "remove_student_id": roster[1]["student_id"]},
+    )
+
+    log = client.get("/audit-log", query_string={"user_id": instructor_id}).get_json()
+    assert log[0]["action"] == "students_merged"
+
+
+def test_audit_log_records_attendance_correction(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+    student_id = client.get(
+        "/roster", query_string={"class_id": class_id}
+    ).get_json()[0]["student_id"]
+
+    client.post(
+        "/attend/correct",
+        json={
+            "class_id": class_id, "student_id": student_id,
+            "date": "01-09-2025", "time_slot": "09:00-10:50", "status": "Present",
+        },
+    )
+
+    log = client.get("/audit-log", query_string={"user_id": instructor_id}).get_json()
+    assert log[0]["action"] == "attendance_corrected"
+
+
+def test_audit_log_records_account_deletion(client):
+    instructor_id = create_instructor(client)
+
+    resp = client.delete(f"/accounts/{instructor_id}")
+    assert resp.status_code == 204
+
+    log = client.get("/audit-log", query_string={"user_id": instructor_id}).get_json()
+    assert log[0]["action"] == "account_deleted"
+    assert log[0]["details"] == SAMPLE_INSTRUCTOR["email"]
+
+
+def test_audit_log_defaults_to_all_users_and_respects_limit(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+
+    client.patch(f"/classes/{class_id}", json={"archived": True})
+    client.patch(f"/classes/{class_id}", json={"archived": False})
+
+    log = client.get("/audit-log", query_string={"limit": 1}).get_json()
+    assert len(log) == 1
+    assert log[0]["action"] == "class_unarchived"
+
+
 def test_roster_attend_and_statistics_flow(client):
     instructor_id = create_instructor(client)
     class_id = client.post(
