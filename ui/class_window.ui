@@ -211,6 +211,13 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="copy_roster_btn">
+             <property name="text">
+              <string>Copy Roster From Class</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="export_roster_btn">
              <property name="text">
               <string>Export Roster</string>

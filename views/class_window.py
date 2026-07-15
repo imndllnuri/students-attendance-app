@@ -178,6 +178,7 @@ class ClassWindow(QMainWindow):
         self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
         self.student_list_tableWidget.cellDoubleClicked.connect(self.handle_roster_cell_double_click)
         self.export_roster_btn.clicked.connect(self.export_roster)
+        self.copy_roster_btn.clicked.connect(self.copy_roster_from_class)
 
     _FIRST_SESSION_COLUMN = 4  # Student Number, Name Surname, Not Attended, Attended
 
@@ -304,6 +305,72 @@ class ClassWindow(QMainWindow):
             return
 
         self.load_student_list()
+
+    def copy_roster_from_class(self):
+        """Adds every student from a chosen other class into this class's
+        roster, as a lighter alternative to full class duplication when
+        only the roster should carry over."""
+        try:
+            classes = self.class_manager.load_classes_for_instructor(
+                self.class_obj.instructor_id, include_archived=True
+            )
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load classes:\n{e}")
+            return
+
+        other_classes = [c for c in classes if c.class_id != self.class_obj.class_id]
+        if not other_classes:
+            QMessageBox.information(self, "Nothing to Copy", "You have no other classes to copy a roster from.")
+            return
+
+        labels = [f"{c.class_name} ({c.class_code})" for c in other_classes]
+        selected_label, ok = QInputDialog.getItem(
+            self, "Copy Roster", "Copy roster from:", labels, 0, False
+        )
+        if not ok:
+            return
+        source_class = other_classes[labels.index(selected_label)]
+
+        try:
+            source_roster = self.class_manager.get_roster(source_class.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load source roster:\n{e}")
+            return
+
+        if not source_roster:
+            QMessageBox.information(self, "Nothing to Copy", f"{source_class.class_code} has no students.")
+            return
+
+        reply = QMessageBox.question(
+            self, "Confirm Copy",
+            f"Copy {len(source_roster)} student(s) from {source_class.class_code} into "
+            f"{self.class_obj.class_code}?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        added = 0
+        errors = []
+        for student in source_roster:
+            try:
+                self.class_manager.add_student(
+                    self.class_obj.class_id, student["student_number"], student["name_surname"]
+                )
+                added += 1
+            except ApiError as e:
+                errors.append(f"{student['name_surname']}: {e}")
+
+        self.load_student_list()
+        if errors:
+            QMessageBox.warning(
+                self, "Partially Completed",
+                f"Copied {added} student(s). Errors:\n" + "\n".join(errors),
+            )
+        else:
+            QMessageBox.information(
+                self, "Success", f"Copied {added} student(s) from {source_class.class_code}."
+            )
 
     def export_roster(self):
         try:
