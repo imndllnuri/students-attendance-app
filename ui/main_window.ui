@@ -153,6 +153,7 @@
                 <item><property name="text"><string>Class Code</string></property></item>
                 <item><property name="text"><string>Class Name</string></property></item>
                 <item><property name="text"><string>Day</string></property></item>
+                <item><property name="text"><string>Custom Order</string></property></item>
                </widget>
               </item>
               <item>
@@ -179,7 +180,15 @@
              </widget>
             </item>
             <item>
-             <layout class="QGridLayout" name="class_btns_layout"/>
+             <widget class="QWidget" name="class_grid_widget" native="true">
+              <layout class="QGridLayout" name="class_btns_layout"/>
+             </widget>
+            </item>
+            <item>
+             <widget class="QListWidget" name="custom_order_listWidget">
+              <property name="visible"><bool>false</bool></property>
+              <property name="toolTip"><string>Drag rows to reorder your classes</string></property>
+             </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_2">

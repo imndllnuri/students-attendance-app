@@ -7,6 +7,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import QEvent, Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QFileDialog,
     QFrame,
@@ -15,6 +16,7 @@ from PyQt5.QtWidgets import (
     QInputDialog,
     QLabel,
     QLineEdit,
+    QListWidgetItem,
     QMainWindow,
     QMenu,
     QMessageBox,
@@ -28,6 +30,7 @@ from matplotlib.figure import Figure
 
 from resources.images import qrc
 from services.api_client import ApiError
+from shared.class_order import load_class_order, save_class_order
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.palette import PALETTE, class_tag_color
 from shared.session_timeout import (
@@ -87,6 +90,8 @@ class MainWindow(QMainWindow):
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
         self.export_class_list_btn.clicked.connect(self.export_class_list)
+        self.custom_order_listWidget.setDragDropMode(QAbstractItemView.InternalMove)
+        self.custom_order_listWidget.model().rowsMoved.connect(self._save_custom_order)
 
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
@@ -304,6 +309,7 @@ class MainWindow(QMainWindow):
 
         showing_archived = self.show_archived_cb.isChecked()
         self.create_new_class_btn.setVisible(not showing_archived)
+        custom_order_mode = self.class_sort_combo.currentText() == "Custom Order" and not showing_archived
 
         classes = sorted(self.fetch_classes(), key=self._class_sort_key)
         self.empty_state_lbl.setText(
@@ -311,9 +317,15 @@ class MainWindow(QMainWindow):
             else "You haven't created any classes yet. Use \"Create New Class\" below to get started."
         )
         self.empty_state_lbl.setVisible(not classes)
-        row_builder = self._make_archived_class_row_widget if showing_archived else self._make_class_row_widget
-        for row, cls in enumerate(classes):
-            self.class_btns_layout.addWidget(row_builder(cls), row, 0)
+
+        self.class_grid_widget.setVisible(not custom_order_mode)
+        self.custom_order_listWidget.setVisible(custom_order_mode)
+        if custom_order_mode:
+            self._populate_custom_order_list(classes)
+        else:
+            row_builder = self._make_archived_class_row_widget if showing_archived else self._make_class_row_widget
+            for row, cls in enumerate(classes):
+                self.class_btns_layout.addWidget(row_builder(cls), row, 0)
 
         self.today_classes_title_lbl.setVisible(not showing_archived)
         if showing_archived:
@@ -321,6 +333,23 @@ class MainWindow(QMainWindow):
             self.no_classes_today_lbl.setVisible(False)
         else:
             self._populate_today_classes(classes)
+
+    def _populate_custom_order_list(self, classes):
+        self.custom_order_listWidget.clear()
+        saved_order = load_class_order()
+        order_index = {class_id: i for i, class_id in enumerate(saved_order)}
+        ordered = sorted(classes, key=lambda c: order_index.get(c.class_id, len(saved_order)))
+        for cls in ordered:
+            item = QListWidgetItem(f"{cls.class_name} ({cls.class_code})")
+            item.setData(Qt.UserRole, cls.class_id)
+            self.custom_order_listWidget.addItem(item)
+
+    def _save_custom_order(self, *args):
+        class_ids = [
+            self.custom_order_listWidget.item(i).data(Qt.UserRole)
+            for i in range(self.custom_order_listWidget.count())
+        ]
+        save_class_order(class_ids)
 
     def _classes_scheduled_today(self, classes):
         today = datetime.now().strftime("%A")
