@@ -366,7 +366,7 @@ class MainWindow(QMainWindow):
         color_chip.setFixedWidth(4)
         color_chip.setMinimumHeight(40)
         color_chip.setStyleSheet(
-            f"background-color: {class_tag_color(cls.class_code)}; border-radius: 2px;"
+            f"background-color: {cls.color or class_tag_color(cls.class_code)}; border-radius: 2px;"
         )
         row_layout.addWidget(color_chip)
 

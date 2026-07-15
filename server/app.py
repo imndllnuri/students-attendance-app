@@ -37,6 +37,7 @@ def class_row_to_dict(conn, row):
         "weekly_hours": row["weekly_hours"],
         "archived": bool(row["archived"]),
         "notes": row["notes"],
+        "color": row["color"],
         "schedule": dict(schedule),
     }
 
@@ -291,7 +292,7 @@ def create_class():
     conn.execute(
         "INSERT INTO classes (class_id, class_code, class_name, instructor_id, "
         "section, attendance_policy, late_threshold, total_weeks, total_hours, "
-        "weekly_hours) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "weekly_hours, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             class_id,
             data["class_code"],
@@ -303,6 +304,7 @@ def create_class():
             data["total_weeks"],
             data["total_hours"],
             data["weekly_hours"],
+            data.get("color"),
         ),
     )
     for day, slots in data.get("schedule", {}).items():
@@ -329,7 +331,7 @@ def create_class():
 
 _CLASS_UPDATABLE_FIELDS = (
     "class_name", "section", "attendance_policy", "late_threshold",
-    "total_weeks", "total_hours", "weekly_hours", "notes",
+    "total_weeks", "total_hours", "weekly_hours", "notes", "color",
 )
 
 

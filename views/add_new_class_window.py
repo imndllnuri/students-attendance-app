@@ -1,6 +1,15 @@
 import qtawesome as qta
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTimeEdit, QLabel, QHBoxLayout
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import (
+    QColorDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QTimeEdit,
+    QWidget,
+)
 from PyQt5 import uic
 import pandas as pd
 
@@ -21,9 +30,12 @@ class AddNewClassWindow(QWidget):
         self.class_manager = ClassManager()
         self.students = []
         self.existing_class = existing_class
+        self.selected_color = None
 
         self.spreadsheet_file_btn.clicked.connect(self.load_spreadsheet)
         self.create_class_btn.clicked.connect(self.create_class)
+        self.choose_color_btn.clicked.connect(self.choose_class_color)
+        self.reset_color_btn.clicked.connect(self.reset_class_color)
 
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         for day in days:
@@ -44,6 +56,26 @@ class AddNewClassWindow(QWidget):
         elif duplicate_from is not None:
             self._prefill_for_duplicate(duplicate_from)
 
+    def choose_class_color(self):
+        initial = QColor(self.selected_color) if self.selected_color else QColor("#4F46E5")
+        color = QColorDialog.getColor(initial, self, "Choose Class Color")
+        if not color.isValid():
+            return
+        self.selected_color = color.name()
+        self._update_color_swatch()
+
+    def reset_class_color(self):
+        self.selected_color = None
+        self._update_color_swatch()
+
+    def _update_color_swatch(self):
+        if self.selected_color:
+            self.choose_color_btn.setStyleSheet(
+                f"background-color: {self.selected_color}; color: white;"
+            )
+        else:
+            self.choose_color_btn.setStyleSheet("")
+
     def _prefill_fields(self, cls):
         self.class_name_le.setText(cls.class_name)
         self.class_section_le.setText(cls.section)
@@ -52,6 +84,8 @@ class AddNewClassWindow(QWidget):
         self.number_of_weeks_le.setText(str(cls.total_weeks))
         self.total_hours_le.setText(str(cls.total_hours))
         self.weekly_hours_le.setText(str(cls.weekly_hours))
+        self.selected_color = cls.color
+        self._update_color_swatch()
 
         for day, slots in cls.schedule.items():
             if not any(slot.selected for slot in slots):
@@ -161,6 +195,7 @@ class AddNewClassWindow(QWidget):
             weekly_hours=float(self.weekly_hours_le.text()),
             schedule=schedule,
             students=self.students,
+            color=self.selected_color,
         )
 
         try:
@@ -182,6 +217,7 @@ class AddNewClassWindow(QWidget):
             "total_weeks": int(self.number_of_weeks_le.text()),
             "total_hours": float(self.total_hours_le.text()),
             "weekly_hours": float(self.weekly_hours_le.text()),
+            "color": self.selected_color,
             "schedule": {
                 day: [
                     {

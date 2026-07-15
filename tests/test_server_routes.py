@@ -132,6 +132,26 @@ def test_new_class_starts_with_empty_notes_and_can_be_updated(client):
     assert refetched["notes"] == "TA covers Thursdays."
 
 
+def test_class_color_defaults_to_none_and_can_be_set(client):
+    instructor_id = create_instructor(client)
+    created = client.post("/classes", json=sample_class_payload(instructor_id)).get_json()
+    assert created["color"] is None
+
+    resp = client.patch(f"/classes/{created['class_id']}", json={"color": "#FF0000"})
+    assert resp.status_code == 200
+    assert resp.get_json()["color"] == "#FF0000"
+
+
+def test_class_color_can_be_set_at_creation(client):
+    instructor_id = create_instructor(client)
+    payload = sample_class_payload(instructor_id)
+    payload["color"] = "#00FF00"
+
+    created = client.post("/classes", json=payload).get_json()
+
+    assert created["color"] == "#00FF00"
+
+
 def test_add_and_remove_individual_roster_student(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

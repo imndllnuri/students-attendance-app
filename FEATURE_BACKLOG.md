@@ -64,6 +64,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 24. Bulk "Mark Selected Absent" for cancelled sessions
 - [x] 36. Configurable session-timeout duration
 - [x] 19. Class notes/memo field
+- [x] 20. Manual class tag color override
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

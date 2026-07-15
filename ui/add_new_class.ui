@@ -420,6 +420,32 @@
     </spacer>
    </item>
    <item alignment="Qt::AlignTop">
+    <widget class="QWidget" name="color_row_widget" native="true">
+     <layout class="QHBoxLayout" name="color_row_layout">
+      <item>
+       <widget class="QLabel" name="class_color_lbl">
+        <property name="text"><string>Class Color:</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="choose_color_btn">
+        <property name="text"><string>Choose Color</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="reset_color_btn">
+        <property name="text"><string>Use Default</string></property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="color_row_spacer">
+        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item alignment="Qt::AlignTop">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>

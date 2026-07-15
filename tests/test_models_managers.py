@@ -117,6 +117,19 @@ def test_class_from_dict_defaults_notes_to_empty_string():
     assert restored.notes == ""
 
 
+def test_class_color_round_trips_through_to_dict_and_from_dict():
+    original = make_class()
+    original.color = "#FF0000"
+
+    restored = Class.from_dict(original.to_dict())
+
+    assert restored.color == "#FF0000"
+
+
+def test_class_color_defaults_to_none():
+    assert make_class().color is None
+
+
 def test_account_manager_add_account_wraps_api_client():
     fake = FakeApiClient()
     manager = AccountManager(api_client=fake)

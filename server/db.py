@@ -19,6 +19,7 @@ def init_db():
     for statement in (
         "ALTER TABLE classes ADD COLUMN archived INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE classes ADD COLUMN notes TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE classes ADD COLUMN color TEXT",
     ):
         try:
             conn.execute(statement)
