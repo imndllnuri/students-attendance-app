@@ -21,6 +21,7 @@ server/attendance.db
 .list_density_preference
 .session_templates.json
 .offline_attendance_queue.json
+.font_scale_preference
 
 # Test/CI artifacts
 .pytest_cache/

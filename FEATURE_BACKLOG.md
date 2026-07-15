@@ -79,6 +79,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 29. Cross-class attendance comparison view
 - [x] 32. Attendance heatmap by day/time-slot
 - [x] 31. Downloadable PDF statistics report
+- [x] 35. Font size / accessibility scaling
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

@@ -36,6 +36,7 @@ from matplotlib.figure import Figure
 from resources.images import qrc
 from services.api_client import ApiError
 from shared.class_order import load_class_order, save_class_order
+from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
 from shared.palette import PALETTE, class_tag_color
@@ -139,6 +140,7 @@ class MainWindow(QMainWindow):
         self._setup_shortcuts()
         self._setup_session_timeout()
         self._setup_session_timeout_combo()
+        self._setup_font_scale_combo()
 
         self.load_classes()
         self._flush_offline_queue_on_startup()
@@ -189,6 +191,23 @@ class MainWindow(QMainWindow):
         self.session_timeout_combo.setCurrentIndex(TIMEOUT_OPTIONS.index(self.session_timeout_minutes))
         self.session_timeout_combo.blockSignals(False)
         self.session_timeout_combo.currentIndexChanged.connect(self.change_session_timeout)
+
+    def _setup_font_scale_combo(self):
+        self.font_scale_combo.blockSignals(True)
+        self.font_scale_combo.clear()
+        for scale, label in SCALE_LABELS.items():
+            self.font_scale_combo.addItem(label, scale)
+        current_scale = load_font_scale()
+        self.font_scale_combo.setCurrentIndex(list(SCALE_LABELS).index(current_scale))
+        self.font_scale_combo.blockSignals(False)
+        self.font_scale_combo.currentIndexChanged.connect(self.change_font_scale)
+
+    def change_font_scale(self):
+        scale = self.font_scale_combo.currentData()
+        save_font_scale(scale)
+        font = QApplication.instance().font()
+        font.setPointSize(point_size_for_scale(scale))
+        QApplication.instance().setFont(font)
 
     def _setup_icons(self):
         self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#94A3B8"))
