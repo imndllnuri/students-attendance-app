@@ -10,9 +10,9 @@ from PyQt5.QtWidgets import (
     QHeaderView,
     QInputDialog,
     QLabel,
-    QMainWindow,
     QMessageBox,
     QTableWidgetItem,
+    QWidget,
 )
 
 from services.api_client import ApiError
@@ -21,7 +21,7 @@ from shared.palette import qcolor
 logger = logging.getLogger(__name__)
 
 
-class ClassWindow(QMainWindow):
+class ClassWindow(QWidget):
     def __init__(self, class_obj, main_window, class_manager):
         super().__init__()
         uic.loadUi("ui/class_window.ui", self)

@@ -20,14 +20,10 @@ class CreateAccountWindow(QDialog):
         self.account_manager = account_manager
 
         self.sign_up_btn.clicked.connect(self.create_account)
-        self.show_password_btn.toggled.connect(
-            lambda checked: self._toggle_echo(self.password_le, self.show_password_btn, checked)
-        )
-        self.show_password_again_btn.toggled.connect(
-            lambda checked: self._toggle_echo(
-                self.password_again_le, self.show_password_again_btn, checked
-            )
-        )
+
+        self.email_le.addAction(qta.icon("fa5s.envelope", color="#94A3B8"), QLineEdit.LeadingPosition)
+        self._password_toggle = self._add_password_toggle(self.password_le)
+        self._password_again_toggle = self._add_password_toggle(self.password_again_le)
 
         self.email_le.textChanged.connect(self.validate_email)
         self.password_le.textChanged.connect(self.validate_password)
@@ -39,20 +35,21 @@ class CreateAccountWindow(QDialog):
         if len(SECURITY_QUESTIONS) > 1:
             self.security_question_2_ComboBox.setCurrentIndex(1)
 
-        for btn in (self.show_password_btn, self.show_password_again_btn):
-            btn.setText("")
-            btn.setIcon(qta.icon("fa5s.eye", color="#64748B"))
-            btn.setAccessibleName("Toggle password visibility")
-            btn.setToolTip("Show password")
-
         apply_card_shadow(self.card_frame)
 
         self.show()
 
-    def _toggle_echo(self, line_edit, button, checked):
+    def _add_password_toggle(self, line_edit):
+        action = line_edit.addAction(qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition)
+        action.setCheckable(True)
+        action.setToolTip("Show password")
+        action.toggled.connect(lambda checked: self._toggle_echo(line_edit, action, checked))
+        return action
+
+    def _toggle_echo(self, line_edit, action, checked):
         line_edit.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
-        button.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B"))
-        button.setToolTip("Hide password" if checked else "Show password")
+        action.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B"))
+        action.setToolTip("Hide password" if checked else "Show password")
 
     def validate_email(self):
         email = self.email_le.text().strip()

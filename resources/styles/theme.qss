@@ -179,7 +179,10 @@ QLabel#security_question_section_lbl,
 QLabel#roster_section_title_lbl,
 QLabel#class_details_title_lbl,
 QLabel#statistics_filter_lbl,
-QLabel#search_status_lbl {
+QLabel#search_status_lbl,
+QLabel#title_lbl_2,
+QLabel#security_question_lbl,
+QLabel#security_question_2_lbl {
     font-size: 12pt;
     font-weight: 600;
     color: #1E293B;

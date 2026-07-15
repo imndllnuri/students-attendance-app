@@ -417,7 +417,8 @@
        <height>40</height>
       </size>
      </property>
-    </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+   </spacer>
    </item>
    <item alignment="Qt::AlignTop">
     <widget class="QWidget" name="color_row_widget" native="true">
@@ -440,7 +441,9 @@
       <item>
        <spacer name="color_row_spacer">
         <property name="orientation"><enum>Qt::Horizontal</enum></property>
-       </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
       </item>
      </layout>
     </widget>
@@ -466,7 +469,8 @@
           <height>20</height>
          </size>
         </property>
-       </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+   </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="spreadsheet_file_btn">

@@ -56,7 +56,9 @@
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-          </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="class_settings_btn">
@@ -208,7 +210,9 @@
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-            </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
            </item>
            <item>
             <widget class="QPushButton" name="merge_students_btn">

@@ -17,13 +17,14 @@ class ResetPasswordWindow(QDialog):
         self.cancel_btn.clicked.connect(self.reject)
         self.back_btn.clicked.connect(lambda: self.steps_stack.setCurrentIndex(0))
         self.reset_btn.clicked.connect(self.submit_reset)
-        self.show_password_btn.toggled.connect(self.toggle_password_visibility)
         self.new_password_le.textChanged.connect(self._update_password_strength)
 
-        self.show_password_btn.setText("")
-        self.show_password_btn.setIcon(qta.icon("fa5s.eye", color="#64748B"))
-        self.show_password_btn.setAccessibleName("Toggle password visibility")
-        self.show_password_btn.setToolTip("Show password")
+        self._password_toggle = self.new_password_le.addAction(
+            qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition
+        )
+        self._password_toggle.setCheckable(True)
+        self._password_toggle.setToolTip("Show password")
+        self._password_toggle.toggled.connect(self.toggle_password_visibility)
 
         apply_card_shadow(self.card_frame)
 
@@ -87,8 +88,8 @@ class ResetPasswordWindow(QDialog):
         mode = QLineEdit.Normal if checked else QLineEdit.Password
         self.new_password_le.setEchoMode(mode)
         self.confirm_password_le.setEchoMode(mode)
-        self.show_password_btn.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B"))
-        self.show_password_btn.setToolTip("Hide password" if checked else "Show password")
+        self._password_toggle.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B"))
+        self._password_toggle.setToolTip("Hide password" if checked else "Show password")
 
     def _show_error(self, label, message):
         label.setText(message)

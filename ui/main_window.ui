@@ -183,7 +183,9 @@
               <item>
                <spacer name="class_sort_spacer">
                 <property name="orientation"><enum>Qt::Horizontal</enum></property>
-               </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
               </item>
               <item>
                <widget class="QCheckBox" name="compact_view_cb">
@@ -235,7 +237,8 @@
                 <height>40</height>
                </size>
               </property>
-             </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+   </spacer>
             </item>
             <item>
              <widget class="QPushButton" name="create_new_class_btn">
@@ -272,14 +275,18 @@
           <item>
            <spacer name="settings_top_spacer">
             <property name="orientation"><enum>Qt::Vertical</enum></property>
-           </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+   </spacer>
           </item>
           <item>
            <layout class="QHBoxLayout" name="settings_center_layout">
             <item>
              <spacer name="settings_left_spacer">
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-             </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
             </item>
             <item>
              <widget class="QFrame" name="settings_card_frame">
@@ -402,7 +409,9 @@
                  <item>
                   <spacer name="settings_show_password_spacer">
                    <property name="orientation"><enum>Qt::Horizontal</enum></property>
-                  </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
                  </item>
                  <item>
                   <widget class="QToolButton" name="settings_show_password_btn">
@@ -492,14 +501,18 @@
             <item>
              <spacer name="settings_right_spacer">
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-             </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
             </item>
            </layout>
           </item>
           <item>
            <spacer name="settings_bottom_spacer">
             <property name="orientation"><enum>Qt::Vertical</enum></property>
-           </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+   </spacer>
           </item>
          </layout>
         </widget>
@@ -526,7 +539,8 @@
               <height>40</height>
              </size>
             </property>
-           </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+   </spacer>
           </item>
          </layout>
         </widget>
@@ -535,14 +549,18 @@
           <item>
            <spacer name="profile_top_spacer">
             <property name="orientation"><enum>Qt::Vertical</enum></property>
-           </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+   </spacer>
           </item>
           <item>
            <layout class="QHBoxLayout" name="profile_center_layout">
             <item>
              <spacer name="profile_left_spacer">
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-             </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
             </item>
             <item>
              <widget class="QFrame" name="profile_card_frame">
@@ -631,14 +649,18 @@
             <item>
              <spacer name="profile_right_spacer">
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-             </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
             </item>
            </layout>
           </item>
           <item>
            <spacer name="profile_bottom_spacer">
             <property name="orientation"><enum>Qt::Vertical</enum></property>
-           </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+   </spacer>
           </item>
          </layout>
         </widget>
@@ -662,7 +684,9 @@
             <item>
              <spacer name="statistics_filter_spacer">
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-             </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
             </item>
             <item>
              <widget class="QPushButton" name="compare_classes_btn">
@@ -807,7 +831,8 @@
           <height>398</height>
          </size>
         </property>
-       </spacer>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+   </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="log_out_btn">
