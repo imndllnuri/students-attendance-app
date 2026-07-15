@@ -232,6 +232,30 @@
           </widget>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="roster_add_student_layout">
+           <item>
+            <widget class="QLineEdit" name="new_student_number_le">
+             <property name="placeholderText"><string> Student Number</string></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="new_student_name_le">
+             <property name="placeholderText"><string> Name Surname</string></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="add_student_btn">
+             <property name="text"><string>Add Student</string></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="remove_selected_student_btn">
+             <property name="text"><string>Remove Selected</string></property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
           <widget class="QTableWidget" name="student_list_tableWidget">
            <property name="gridStyle">
             <enum>Qt::SolidLine</enum>

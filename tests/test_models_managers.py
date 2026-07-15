@@ -35,6 +35,13 @@ class FakeApiClient:
         self.calls.append(("get_login_history", user_id, limit))
         return ["2026-07-14T10:00:00+00:00"]
 
+    def add_student(self, class_id, student_number, name_surname):
+        self.calls.append(("add_student", class_id, student_number, name_surname))
+        return {"student_id": 1, "student_number": student_number, "name_surname": name_surname}
+
+    def remove_student(self, student_id):
+        self.calls.append(("remove_student", student_id))
+
 
 class FailingApiClient(FakeApiClient):
     def create_class(self, class_data):
@@ -44,6 +51,9 @@ class FailingApiClient(FakeApiClient):
         raise ApiError("boom")
 
     def get_login_history(self, user_id, limit=10):
+        raise ApiError("boom")
+
+    def remove_student(self, student_id):
         raise ApiError("boom")
 
 
@@ -132,6 +142,21 @@ def test_account_manager_get_login_history_returns_data():
 def test_account_manager_get_login_history_returns_empty_on_api_error():
     manager = AccountManager(api_client=FailingApiClient())
     assert manager.get_login_history("u1") == []
+
+
+def test_class_manager_add_student_wraps_api_client():
+    fake = FakeApiClient()
+    manager = ClassManager(api_client=fake)
+
+    result = manager.add_student("c1", "123", "New Student")
+
+    assert result["student_id"] == 1
+    assert fake.calls == [("add_student", "c1", "123", "New Student")]
+
+
+def test_class_manager_remove_student_returns_false_on_api_error():
+    manager = ClassManager(api_client=FailingApiClient())
+    assert manager.remove_student(1) is False
 
 
 def test_class_manager_proxies_statistics_without_touching_api_client_directly():

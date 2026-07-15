@@ -118,6 +118,59 @@ class ClassWindow(QMainWindow):
         self.roster_retry_btn.clicked.connect(self.load_student_list)
         self.take_attendance_btn.clicked.connect(self.attendance_page_show)
         self.class_settings_btn.clicked.connect(self.open_edit_class_window)
+        self.add_student_btn.clicked.connect(self.add_roster_student)
+        self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
+
+    def add_roster_student(self):
+        student_number = self.new_student_number_le.text().strip()
+        name_surname = self.new_student_name_le.text().strip()
+        if not student_number or not name_surname:
+            QMessageBox.warning(self, "Missing Field", "Student number and name are required.")
+            return
+
+        try:
+            self.class_manager.add_student(self.class_obj.class_id, student_number, name_surname)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not add student:\n{e}")
+            return
+
+        self.new_student_number_le.clear()
+        self.new_student_name_le.clear()
+        self.load_student_list()
+
+    def remove_selected_student(self):
+        row = self.student_list_tableWidget.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "No Selection", "Select a student row to remove first.")
+            return
+        student_number = self.student_list_tableWidget.item(row, 0).text()
+
+        try:
+            roster = self.class_manager.get_roster(self.class_obj.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load roster:\n{e}")
+            return
+
+        match = next((s for s in roster if s["student_number"] == student_number), None)
+        if match is None:
+            QMessageBox.critical(self, "Error", "Could not find that student in the roster.")
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Confirm Removal",
+            f"Remove {match['name_surname']} ({match['student_number']}) from the roster? "
+            "This also deletes their attendance history for this class.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        if self.class_manager.remove_student(match["student_id"]):
+            self.load_student_list()
+        else:
+            QMessageBox.critical(self, "Error", "Could not remove that student.")
 
     def open_edit_class_window(self):
         from views.add_new_class_window import AddNewClassWindow

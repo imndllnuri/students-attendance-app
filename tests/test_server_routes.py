@@ -117,6 +117,31 @@ def test_update_class_edits_fields_and_schedule(client):
     }
 
 
+def test_add_and_remove_individual_roster_student(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+
+    added = client.post(
+        "/roster",
+        json={"class_id": class_id, "student_number": "99999999", "name_surname": "New Student"},
+    )
+    assert added.status_code == 201
+    student_id = added.get_json()["student_id"]
+
+    roster = client.get("/roster", query_string={"class_id": class_id}).get_json()
+    assert any(s["student_id"] == student_id for s in roster)
+    assert len(roster) == 4  # 3 seeded + 1 added
+
+    removed = client.delete(f"/roster/{student_id}")
+    assert removed.status_code == 204
+
+    roster_after = client.get("/roster", query_string={"class_id": class_id}).get_json()
+    assert len(roster_after) == 3
+    assert all(s["student_id"] != student_id for s in roster_after)
+
+
 def test_roster_attend_and_statistics_flow(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

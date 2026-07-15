@@ -149,6 +149,17 @@ class ClassManager:
     def get_roster(self, class_id: str) -> list:
         return self.api_client.get_roster(class_id)
 
+    def add_student(self, class_id: str, student_number: str, name_surname: str) -> dict:
+        """Raises ApiError on failure."""
+        return self.api_client.add_student(class_id, student_number, name_surname)
+
+    def remove_student(self, student_id) -> bool:
+        try:
+            self.api_client.remove_student(student_id)
+        except ApiError:
+            return False
+        return True
+
     def register_card(self, student_id: str, card_id: str) -> None:
         self.api_client.register_card(student_id, card_id)
 

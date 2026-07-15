@@ -101,6 +101,20 @@ class ApiClient:
     def get_roster(self, class_id):
         return self._request("GET", "/roster", params={"class_id": class_id})
 
+    def add_student(self, class_id, student_number, name_surname):
+        return self._request(
+            "POST",
+            "/roster",
+            json={
+                "class_id": class_id,
+                "student_number": student_number,
+                "name_surname": name_surname,
+            },
+        )
+
+    def remove_student(self, student_id):
+        return self._request("DELETE", f"/roster/{student_id}")
+
     def register_card(self, student_id, card_id):
         return self._request("POST", f"/roster/{student_id}/card", json={"card_id": card_id})
 

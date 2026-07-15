@@ -390,6 +390,34 @@ def get_roster():
     return jsonify([dict(r) for r in rows])
 
 
+@app.post("/roster")
+def add_student():
+    data = request.get_json()
+    conn = get_connection()
+    cursor = conn.execute(
+        "INSERT INTO students (class_id, student_number, name_surname, card_id) "
+        "VALUES (?, ?, ?, NULL)",
+        (data["class_id"], data["student_number"], data["name_surname"]),
+    )
+    conn.commit()
+    row = conn.execute(
+        "SELECT student_id, student_number, name_surname, card_id FROM students "
+        "WHERE student_id = ?",
+        (cursor.lastrowid,),
+    ).fetchone()
+    conn.close()
+    return jsonify(dict(row)), 201
+
+
+@app.delete("/roster/<int:student_id>")
+def remove_student(student_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
+    conn.commit()
+    conn.close()
+    return "", 204
+
+
 @app.post("/roster/<int:student_id>/card")
 def register_card(student_id):
     data = request.get_json()
