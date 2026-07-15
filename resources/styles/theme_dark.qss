@@ -1,26 +1,29 @@
-/* GENERATED FILE - do not edit directly. Run
-   scripts/generate_dark_theme.py after changing theme.qss or
-   shared/palette.py's DARK_PALETTE instead.
-   Dark-mode counterpart to theme.qss ("Modern SaaS, Light" direction).
+/* Shared theme for the whole app - "Enterprise Dense" direction: a
+   subdued professional blue accent, tighter spacing, flatter cards
+   (smaller radius, minimal shadow) and a slightly smaller type scale
+   than the earlier "Modern SaaS" pass, so more fits on screen.
+   theme_dark.qss is generated from this file by
+   scripts/generate_dark_theme.py - re-run it after editing colors here.
    Tokens (mirrored in shared/palette.py - keep both in sync):
      bg_app         #0F172A   bg_card    #1E293B   bg_sidebar #0B1120
      bg_hover       #334155
      text_primary   #F1F5F9   text_secondary #94A3B8  text_disabled #475569
      text_on_dark   #E2E8F0   text_on_dark_muted #94A3B8
-     accent         #6366F1   accent_hover #818CF8    accent_pressed #4F46E5
-     accent_subtle  #312E81
+     accent         #3B82F6   accent_hover #60A5FA    accent_pressed #2563EB
+     accent_subtle  #1E3A8A
      success        #22C55E   success_tint #14532D    success_border #16A34A   success_text #BBF7D0
      warning        #F59E0B   warning_tint #78350F    warning_border #D97706   warning_text #FDE68A
      error          #EF4444   error_tint   #7F1D1D    error_border   #DC2626   error_text   #FECACA
      border         #334155   border_strong #475569
 
-   Spacing scale (8px grid): xs=4 sm=8 md=16 lg=24 xl=32
-   Typography scale (all sizes in pt, standardized - previously mixed px/pt):
-     page title (title_lbl)        20pt / 700
-     section header                13pt / 600
-     body (inputs, form labels)    11pt / 400
+   Spacing scale (dense 4px grid): xs=4 sm=6 md=12 lg=20 xl=28
+   Card/control radius: card=8px  button/input=6px  pill/circle=unchanged
+   Typography scale (all sizes in pt):
+     page title (title_lbl)        18pt / 700
+     section header                12pt / 600
+     body (inputs, form labels)    10pt / 400
      table text / header           10pt / 400 (header 600)
-     caption (subtitle/error/hint)  9pt / 400
+     caption (subtitle/error/hint) 8pt / 400
 
    Error/active/state on widgets is driven by dynamic Qt properties set in
    Python: widget.setProperty("error"/"active"/"state", value);
@@ -44,6 +47,15 @@ QWidget#addNewClass {
     background-color: #1E293B;
 }
 
+/* Logo is a static raster asset with dark text baked in - keeps a fixed
+   near-white plate behind it (not the #1E293B bg_card token) so it stays
+   readable in dark mode too, regardless of theme. */
+QLabel#agu_logo_lbl {
+    background-color: #FFFFFE;
+    border-radius: 6px;
+    padding: 4px 14px;
+}
+
 /* --- Cards / panels --- */
 
 QFrame#card_frame,
@@ -53,7 +65,7 @@ QFrame#class_details_card,
 QFrame#roster_section_card,
 QFrame#statistics_card {
     background-color: #1E293B;
-    border-radius: 16px;
+    border-radius: 8px;
     border: 1px solid #334155;
 }
 
@@ -63,7 +75,7 @@ QLabel#title_lbl,
 QLabel#title_lbl_settings,
 QLabel#statistics_title_lbl,
 QLabel#my_classes_title_lbl {
-    font-size: 20pt;
+    font-size: 18pt;
     font-weight: 700;
     color: #F1F5F9;
 }
@@ -76,7 +88,7 @@ QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
 QLabel#roster_status_lbl,
 QLabel#attendance_progress_lbl {
-    font-size: 9pt;
+    font-size: 8pt;
     color: #94A3B8;
 }
 
@@ -85,8 +97,8 @@ QLabel#attendance_progress_lbl {
 }
 
 QLabel#roster_status_lbl {
-    font-size: 11pt;
-    padding: 24px;
+    font-size: 10pt;
+    padding: 16px;
 }
 
 QLabel#login_error_lbl[error="true"] {
@@ -95,14 +107,14 @@ QLabel#login_error_lbl[error="true"] {
 
 QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl {
-    font-size: 11pt;
-    padding: 32px;
+    font-size: 10pt;
+    padding: 20px;
     qproperty-alignment: AlignCenter;
 }
 
 QLabel#class_row_caption_lbl {
-    padding-left: 12px;
-    padding-bottom: 8px;
+    padding-left: 8px;
+    padding-bottom: 6px;
 }
 
 /* --- Weekly schedule grid --- */
@@ -113,8 +125,8 @@ QLabel#schedule_day_header_lbl {
 }
 
 QLabel#schedule_slot_chip_lbl {
-    background-color: #312E81;
-    color: #6366F1;
+    background-color: #1E3A8A;
+    color: #3B82F6;
     border-radius: 6px;
     padding: 4px 8px;
     margin: 2px;
@@ -168,24 +180,24 @@ QLabel#roster_section_title_lbl,
 QLabel#class_details_title_lbl,
 QLabel#statistics_filter_lbl,
 QLabel#search_status_lbl {
-    font-size: 13pt;
+    font-size: 12pt;
     font-weight: 600;
     color: #0B1120;
 }
 
 QLabel#class_name_header_lbl {
-    font-size: 20pt;
+    font-size: 18pt;
     font-weight: 700;
     color: #F1F5F9;
 }
 
 QLabel[fieldLabel="true"] {
-    font-size: 11pt;
+    font-size: 10pt;
     color: #94A3B8;
 }
 
 QLabel[fieldValue="true"] {
-    font-size: 11pt;
+    font-size: 10pt;
     font-weight: 600;
     color: #F1F5F9;
 }
@@ -196,13 +208,13 @@ QLineEdit {
     background-color: transparent;
     border: none;
     border-bottom: 2px solid #475569;
-    padding: 8px 2px;
-    font-size: 11pt;
+    padding: 6px 2px;
+    font-size: 10pt;
     color: #F1F5F9;
 }
 
 QLineEdit:focus {
-    border-bottom: 2px solid #6366F1;
+    border-bottom: 2px solid #3B82F6;
 }
 
 QLineEdit[error="true"] {
@@ -223,15 +235,15 @@ QComboBox {
     background-color: transparent;
     border: none;
     border-bottom: 2px solid #475569;
-    padding: 8px 2px;
-    font-size: 11pt;
+    padding: 6px 2px;
+    font-size: 10pt;
 }
 
 QComboBox:focus {
-    border-bottom: 2px solid #6366F1;
+    border-bottom: 2px solid #3B82F6;
 }
 
-/* --- Primary filled buttons (indigo) --- */
+/* --- Primary filled buttons (blue) --- */
 
 QPushButton#login_btn,
 QPushButton#sign_up_btn,
@@ -245,12 +257,12 @@ QPushButton#create_class_btn,
 QPushButton#take_attendance_btn,
 QPushButton#start_attendance_btn,
 QPushButton#submit_attendance_btn {
-    background-color: #6366F1;
+    background-color: #3B82F6;
     color: #1E293B;
     border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 11pt;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 10pt;
     font-weight: 600;
 }
 
@@ -266,7 +278,7 @@ QPushButton#create_class_btn:hover,
 QPushButton#take_attendance_btn:hover,
 QPushButton#start_attendance_btn:hover,
 QPushButton#submit_attendance_btn:hover {
-    background-color: #818CF8;
+    background-color: #60A5FA;
 }
 
 QPushButton#login_btn:pressed,
@@ -281,7 +293,7 @@ QPushButton#create_class_btn:pressed,
 QPushButton#take_attendance_btn:pressed,
 QPushButton#start_attendance_btn:pressed,
 QPushButton#submit_attendance_btn:pressed {
-    background-color: #4F46E5;
+    background-color: #2563EB;
 }
 
 QPushButton#login_btn:disabled,
@@ -290,11 +302,11 @@ QPushButton#create_class_btn:disabled,
 QPushButton#take_attendance_btn:disabled,
 QPushButton#start_attendance_btn:disabled,
 QPushButton#submit_attendance_btn:disabled {
-    background-color: #3730A3;
-    color: #312E81;
+    background-color: #1E3A8A;
+    color: #1E3A8A;
 }
 
-/* --- Secondary outline buttons (indigo) --- */
+/* --- Secondary outline buttons (blue) --- */
 
 QPushButton#create_account_btn,
 QPushButton#cancel_btn,
@@ -311,11 +323,11 @@ QPushButton#add_slot_wednesday_btn,
 QPushButton#add_slot_thursday_btn,
 QPushButton#add_slot_friday_btn {
     background-color: transparent;
-    color: #6366F1;
-    border: 1px solid #6366F1;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 11pt;
+    color: #3B82F6;
+    border: 1px solid #3B82F6;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 10pt;
 }
 
 QPushButton#create_account_btn:hover,
@@ -332,7 +344,7 @@ QPushButton#add_slot_tuesday_btn:hover,
 QPushButton#add_slot_wednesday_btn:hover,
 QPushButton#add_slot_thursday_btn:hover,
 QPushButton#add_slot_friday_btn:hover {
-    background-color: #312E81;
+    background-color: #1E3A8A;
 }
 
 /* --- Destructive buttons ---
@@ -344,9 +356,9 @@ QPushButton#delete_account_btn {
     background-color: #7F1D1D;
     color: #FECACA;
     border: 1px solid #DC2626;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 11pt;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 10pt;
     font-weight: 600;
 }
 
@@ -366,9 +378,9 @@ QPushButton#remove_slot_friday_btn {
     background-color: transparent;
     color: #EF4444;
     border: 1px solid #DC2626;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 11pt;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 10pt;
 }
 
 QPushButton#remove_slot_monday_btn:hover,
@@ -403,13 +415,13 @@ QPushButton#class_delete_btn:hover {
 QPushButton#forgot_password_btn {
     background-color: transparent;
     border: none;
-    color: #6366F1;
-    font-size: 10pt;
+    color: #3B82F6;
+    font-size: 9pt;
     text-align: left;
 }
 
 QPushButton#forgot_password_btn:hover {
-    color: #818CF8;
+    color: #60A5FA;
     text-decoration: underline;
 }
 
@@ -426,17 +438,17 @@ QPushButton#close_window_btn:hover {
 QToolButton {
     background-color: transparent;
     border: none;
-    color: #6366F1;
-    font-size: 9pt;
+    color: #3B82F6;
+    font-size: 8pt;
 }
 
 QToolButton:hover {
-    color: #818CF8;
+    color: #60A5FA;
 }
 
 QCheckBox {
     spacing: 6px;
-    font-size: 10pt;
+    font-size: 9pt;
     color: #94A3B8;
 }
 
@@ -449,12 +461,12 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:hover {
-    border: 2px solid #6366F1;
+    border: 2px solid #3B82F6;
 }
 
 QCheckBox::indicator:checked {
-    background: #6366F1;
-    border: 2px solid #6366F1;
+    background: #3B82F6;
+    border: 2px solid #3B82F6;
 }
 
 /* --- Class row card (My Classes / Search) --- */
@@ -462,11 +474,11 @@ QCheckBox::indicator:checked {
 QWidget#class_row_widget {
     background-color: #1E293B;
     border: 1px solid #334155;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 QWidget#class_row_widget:hover {
-    border: 1px solid #3730A3;
+    border: 1px solid #1E3A8A;
 }
 
 QPushButton#class_row_name_btn {
@@ -474,13 +486,13 @@ QPushButton#class_row_name_btn {
     border: none;
     text-align: left;
     color: #F1F5F9;
-    font-size: 11pt;
+    font-size: 10pt;
     font-weight: 600;
-    padding: 10px 12px;
+    padding: 8px 10px;
 }
 
 QPushButton#class_row_name_btn:hover {
-    color: #6366F1;
+    color: #3B82F6;
 }
 
 /* --- RFID scan status card (Take Attendance) --- */
@@ -488,7 +500,7 @@ QPushButton#class_row_name_btn:hover {
 QFrame#scan_status_card {
     background-color: #0F172A;
     border: 1px solid #334155;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 QFrame#scan_status_card[state="success"] {
@@ -507,12 +519,12 @@ QFrame#scan_status_card[state="error"] {
 }
 
 QLabel#scan_status_text_lbl {
-    font-size: 11pt;
+    font-size: 10pt;
     color: #F1F5F9;
 }
 
 QLabel#scan_status_icon_lbl {
-    font-size: 16pt;
+    font-size: 14pt;
 }
 
 /* --- Sidebar navigation --- */
@@ -525,9 +537,9 @@ QPushButton#log_out_btn {
     color: #475569;
     text-align: left;
     border: none;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 11pt;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 10pt;
 }
 
 QPushButton#my_classes_btn:hover,
@@ -548,23 +560,23 @@ QPushButton#log_out_btn:pressed {
 QPushButton#my_classes_btn[active="true"],
 QPushButton#settings_btn[active="true"],
 QPushButton#statistics_btn[active="true"] {
-    background-color: rgba(79, 70, 229, 40);
+    background-color: rgba(37, 99, 235, 40);
     color: #1E293B;
-    border-left: 3px solid #6366F1;
-    padding-left: 11px;
+    border-left: 3px solid #3B82F6;
+    padding-left: 9px;
 }
 
 QPushButton#search_btn,
 QPushButton#profile_btn {
     background-color: transparent;
     border: none;
-    border-radius: 18px;
-    padding: 6px;
+    border-radius: 16px;
+    padding: 5px;
 }
 
 QPushButton#search_btn:hover,
 QPushButton#profile_btn:hover {
-    background-color: rgba(79, 70, 229, 15);
+    background-color: rgba(37, 99, 235, 15);
 }
 
 /* --- Tables --- */
@@ -572,14 +584,14 @@ QPushButton#profile_btn:hover {
 QTableWidget {
     background-color: #1E293B;
     border: 1px solid #334155;
-    border-radius: 8px;
+    border-radius: 6px;
     gridline-color: #334155;
     alternate-background-color: #0F172A;
     font-size: 10pt;
 }
 
 QTableWidget::item {
-    padding: 8px;
+    padding: 6px;
 }
 
 QTableWidget::item:hover {
@@ -587,14 +599,14 @@ QTableWidget::item:hover {
 }
 
 QTableWidget::item:selected {
-    background-color: #312E81;
+    background-color: #1E3A8A;
     color: #F1F5F9;
 }
 
 QHeaderView::section {
     background-color: #334155;
     color: #CBD5E1;
-    padding: 8px;
+    padding: 6px;
     border: none;
     border-bottom: 2px solid #334155;
     font-weight: 600;
@@ -611,11 +623,11 @@ QCalendarWidget QToolButton {
 }
 
 QCalendarWidget QToolButton:hover {
-    background-color: rgba(79, 70, 229, 20);
+    background-color: rgba(37, 99, 235, 20);
 }
 
 QCalendarWidget QAbstractItemView:enabled {
-    selection-background-color: #6366F1;
+    selection-background-color: #3B82F6;
     selection-color: #1E293B;
 }
 
@@ -627,9 +639,9 @@ QCalendarWidget QWidget#qt_calendar_navigationbar {
 
 QGroupBox {
     border: 1px solid #334155;
-    border-radius: 8px;
-    margin-top: 10px;
-    padding-top: 12px;
+    border-radius: 6px;
+    margin-top: 8px;
+    padding-top: 10px;
     font-weight: 600;
     color: #CBD5E1;
 }
@@ -648,16 +660,16 @@ QMessageBox {
 }
 
 QMessageBox QPushButton {
-    background-color: #6366F1;
+    background-color: #3B82F6;
     color: #1E293B;
     border: none;
     border-radius: 6px;
-    padding: 6px 16px;
-    min-width: 70px;
+    padding: 6px 14px;
+    min-width: 64px;
 }
 
 QMessageBox QPushButton:hover {
-    background-color: #818CF8;
+    background-color: #60A5FA;
 }
 
 /* --- Scrollbars --- */

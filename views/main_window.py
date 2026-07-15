@@ -16,7 +16,6 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QFileDialog,
     QFrame,
-    QGraphicsDropShadowEffect,
     QHBoxLayout,
     QInputDialog,
     QLabel,
@@ -40,6 +39,7 @@ from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scal
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
 from shared.palette import PALETTE, class_tag_color
+from shared.shadow import apply_card_shadow
 from shared.session_timeout import (
     TIMEOUT_OPTIONS,
     load_session_timeout_minutes,
@@ -378,12 +378,7 @@ class MainWindow(QMainWindow):
 
     def _apply_card_shadows(self):
         for frame in (self.profile_card_frame, self.settings_card_frame):
-            shadow = QGraphicsDropShadowEffect(frame)
-            shadow.setBlurRadius(24)
-            shadow.setXOffset(0)
-            shadow.setYOffset(4)
-            shadow.setColor(QColor(15, 23, 42, 40))
-            frame.setGraphicsEffect(shadow)
+            apply_card_shadow(frame)
 
     def _set_active_nav(self, active_btn):
         for btn in self._nav_buttons:

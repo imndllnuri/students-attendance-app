@@ -51,4 +51,4 @@ def test_specific_known_substitutions_are_correct():
 
     assert "background-color: #334155;\n    color: #CBD5E1;" in dark_qss  # header row
     assert "QPushButton#delete_account_btn:hover {\n    background-color: #7F1D1D;" in dark_qss
-    assert "#3730A3" in dark_qss  # disabled-button background (was light indigo #C7D2FE)
+    assert "#1E3A8A" in dark_qss  # disabled-button background (was light blue #BFDBFE)

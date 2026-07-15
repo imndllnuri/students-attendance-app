@@ -3,11 +3,11 @@ from pathlib import Path
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QLineEdit, QMainWindow
+from PyQt5.QtWidgets import QLineEdit, QWidget
 
 from models.accounts import AccountManager
 from shared.i18n import t
+from shared.shadow import apply_card_shadow
 from views.create_account_window import CreateAccountWindow
 from views.main_window import MainWindow
 from views.reset_password_window import ResetPasswordWindow
@@ -16,7 +16,7 @@ from resources.images import qrc
 REMEMBERED_EMAIL_PATH = Path(".remembered_email")
 
 
-class LoginWindow(QMainWindow):
+class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi("ui/login_window.ui", self)
@@ -32,16 +32,19 @@ class LoginWindow(QMainWindow):
         self.close_window_btn.setIcon(qta.icon("fa5s.times", color="#64748B"))
         self.close_window_btn.setIconSize(QSize(14, 14))
 
-        shadow = QGraphicsDropShadowEffect(self.card_frame)
-        shadow.setBlurRadius(24)
-        shadow.setXOffset(0)
-        shadow.setYOffset(4)
-        shadow.setColor(QColor(15, 23, 42, 40))
-        self.card_frame.setGraphicsEffect(shadow)
+        apply_card_shadow(self.card_frame)
+
+        self.email_le.addAction(qta.icon("fa5s.envelope", color="#94A3B8"), QLineEdit.LeadingPosition)
+        self.password_le.addAction(qta.icon("fa5s.lock", color="#94A3B8"), QLineEdit.LeadingPosition)
+        self._toggle_password_action = self.password_le.addAction(
+            qta.icon("fa5s.eye", color="#64748B"), QLineEdit.TrailingPosition
+        )
+        self._toggle_password_action.setCheckable(True)
+        self._toggle_password_action.setToolTip("Show password")
+        self._toggle_password_action.toggled.connect(self._toggle_password_visibility)
 
         self.email_le.textChanged.connect(self._clear_login_error)
         self.password_le.textChanged.connect(self._clear_login_error)
-        self.show_password_cb.toggled.connect(self._toggle_password_visibility)
 
         self._apply_translations()
         self.load_remembered_email()
@@ -49,12 +52,17 @@ class LoginWindow(QMainWindow):
 
     def _apply_translations(self):
         self.title_lbl.setText(t("welcome_back"))
+        self.subtitle_lbl.setText(t("sign_in_subtitle"))
         self.forgot_password_btn.setText(t("forgot_password"))
         self.login_btn.setText(t("log_in"))
         self.create_account_btn.setText(t("create_account"))
 
     def _toggle_password_visibility(self, checked):
         self.password_le.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
+        self._toggle_password_action.setIcon(
+            qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#64748B")
+        )
+        self._toggle_password_action.setToolTip("Hide password" if checked else "Show password")
 
     def load_remembered_email(self):
         if REMEMBERED_EMAIL_PATH.exists():

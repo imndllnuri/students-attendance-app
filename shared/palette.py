@@ -27,10 +27,10 @@ PALETTE = {
     "text_on_dark_muted": "#94A3B8",
 
     # Accent / brand
-    "accent": "#4F46E5",
-    "accent_hover": "#4338CA",
-    "accent_pressed": "#3730A3",
-    "accent_subtle": "#EEF2FF",
+    "accent": "#2563EB",
+    "accent_hover": "#1D4ED8",
+    "accent_pressed": "#1E40AF",
+    "accent_subtle": "#EFF6FF",
 
     # Semantic status colors (Present/Pass, Late, Absent/Fail)
     "success": "#16A34A",
@@ -72,10 +72,10 @@ DARK_PALETTE = {
     "text_on_dark": "#E2E8F0",
     "text_on_dark_muted": "#94A3B8",
 
-    "accent": "#6366F1",
-    "accent_hover": "#818CF8",
-    "accent_pressed": "#4F46E5",
-    "accent_subtle": "#312E81",
+    "accent": "#3B82F6",
+    "accent_hover": "#60A5FA",
+    "accent_pressed": "#2563EB",
+    "accent_subtle": "#1E3A8A",
 
     "success": "#22C55E",
     "success_tint": "#14532D",

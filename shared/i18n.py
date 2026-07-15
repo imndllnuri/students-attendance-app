@@ -15,6 +15,10 @@ LANGUAGES = {"en": "English", "tr": "Türkçe"}
 
 STRINGS = {
     "welcome_back": {"en": "Welcome back", "tr": "Tekrar hoş geldiniz"},
+    "sign_in_subtitle": {
+        "en": "Sign in to manage your classes and attendance",
+        "tr": "Sınıflarınızı ve yoklamalarınızı yönetmek için giriş yapın",
+    },
     "forgot_password": {"en": "Forgot password?", "tr": "Şifremi unuttum?"},
     "log_in": {"en": "Log in", "tr": "Giriş yap"},
     "create_account": {"en": "Create Account", "tr": "Hesap Oluştur"},

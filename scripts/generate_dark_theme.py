@@ -12,7 +12,7 @@ from shared.palette import DARK_PALETTE, PALETTE
 # One-off hex literals in theme.qss that aren't PALETTE tokens (e.g. a
 # hover-state tint used in exactly one place) -> their dark-mode replacement.
 EXTRA_HEX_MAP = {
-    "#C7D2FE": "#3730A3",  # light indigo (disabled bg / hover border)
+    "#BFDBFE": "#1E3A8A",  # light blue (disabled bg / hover border)
     "#FECACA": "#7F1D1D",  # light red hover background
     "#334155": "#CBD5E1",  # dark slate text -> light slate text on dark bg
 }

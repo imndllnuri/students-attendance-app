@@ -17,6 +17,7 @@ def build_window(qtbot, monkeypatch):
 def test_defaults_to_english_strings(qtbot, monkeypatch):
     monkeypatch.setattr(lw, "t", lambda key: {
         "welcome_back": "Welcome back",
+        "sign_in_subtitle": "Sign in to manage your classes and attendance",
         "forgot_password": "Forgot password?",
         "log_in": "Log in",
         "create_account": "Create Account",
@@ -31,6 +32,7 @@ def test_defaults_to_english_strings(qtbot, monkeypatch):
 def test_uses_turkish_strings_when_that_is_the_saved_language(qtbot, monkeypatch):
     turkish = {
         "welcome_back": "Tekrar hoş geldiniz",
+        "sign_in_subtitle": "Sınıflarınızı ve yoklamalarınızı yönetmek için giriş yapın",
         "forgot_password": "Şifremi unuttum?",
         "log_in": "Giriş yap",
         "create_account": "Hesap Oluştur",

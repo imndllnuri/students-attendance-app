@@ -1,8 +1,8 @@
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QDialog, QGraphicsDropShadowEffect, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QDialog, QLineEdit, QMessageBox
 
+from shared.shadow import apply_card_shadow
 from shared.validation import MIN_PASSWORD_LENGTH, is_valid_password, password_strength
 
 
@@ -25,12 +25,7 @@ class ResetPasswordWindow(QDialog):
         self.show_password_btn.setAccessibleName("Toggle password visibility")
         self.show_password_btn.setToolTip("Show password")
 
-        shadow = QGraphicsDropShadowEffect(self.card_frame)
-        shadow.setBlurRadius(24)
-        shadow.setXOffset(0)
-        shadow.setYOffset(4)
-        shadow.setColor(QColor(15, 23, 42, 40))
-        self.card_frame.setGraphicsEffect(shadow)
+        apply_card_shadow(self.card_frame)
 
     def fetch_question(self):
         email = self.email_le.text().strip()

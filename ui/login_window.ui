@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
-    <height>600</height>
+    <width>480</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,8 @@
         <item>
          <spacer name="close_btn_spacer">
           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+          <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
          </spacer>
         </item>
         <item>
@@ -45,6 +47,8 @@
       <item>
        <spacer name="top_spacer">
         <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
        </spacer>
       </item>
       <item>
@@ -52,21 +56,23 @@
         <item>
          <spacer name="left_spacer">
           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+          <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
          </spacer>
         </item>
         <item>
          <widget class="QFrame" name="card_frame">
-          <property name="minimumSize"><size><width>400</width><height>0</height></size></property>
-          <property name="maximumSize"><size><width>400</width><height>16777215</height></size></property>
+          <property name="minimumSize"><size><width>380</width><height>0</height></size></property>
+          <property name="maximumSize"><size><width>380</width><height>16777215</height></size></property>
           <layout class="QVBoxLayout" name="card_layout">
-           <property name="leftMargin"><number>36</number></property>
-           <property name="topMargin"><number>32</number></property>
-           <property name="rightMargin"><number>36</number></property>
-           <property name="bottomMargin"><number>32</number></property>
-           <property name="spacing"><number>12</number></property>
+           <property name="leftMargin"><number>28</number></property>
+           <property name="topMargin"><number>24</number></property>
+           <property name="rightMargin"><number>28</number></property>
+           <property name="bottomMargin"><number>24</number></property>
+           <property name="spacing"><number>8</number></property>
            <item>
             <widget class="QLabel" name="agu_logo_lbl">
-             <property name="maximumSize"><size><width>16777215</width><height>90</height></size></property>
+             <property name="maximumSize"><size><width>16777215</width><height>56</height></size></property>
              <property name="alignment"><set>Qt::AlignCenter</set></property>
              <property name="pixmap">
               <pixmap resource="../resources/images/qrc.qrc">:/images/abdullah_gul-universitesi-logo.png</pixmap>
@@ -81,14 +87,21 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="subtitle_lbl">
+             <property name="alignment"><set>Qt::AlignCenter</set></property>
+             <property name="wordWrap"><bool>true</bool></property>
+             <property name="text"><string>Sign in to manage your classes and attendance</string></property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLineEdit" name="email_le">
-             <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+             <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
              <property name="placeholderText"><string> Email</string></property>
             </widget>
            </item>
            <item>
             <widget class="QLineEdit" name="password_le">
-             <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+             <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
              <property name="echoMode"><enum>QLineEdit::Password</enum></property>
              <property name="placeholderText"><string> Password</string></property>
             </widget>
@@ -108,13 +121,10 @@
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="show_password_cb">
-               <property name="text"><string>Show password</string></property>
-              </widget>
-             </item>
-             <item>
               <spacer name="options_spacer">
                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+               <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+               <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
               </spacer>
              </item>
              <item>
@@ -126,13 +136,13 @@
            </item>
            <item>
             <widget class="QPushButton" name="login_btn">
-             <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+             <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
              <property name="text"><string>Log in</string></property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="create_account_btn">
-             <property name="minimumSize"><size><width>0</width><height>48</height></size></property>
+             <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
              <property name="text"><string>Create Account</string></property>
             </widget>
            </item>
@@ -142,6 +152,8 @@
         <item>
          <spacer name="right_spacer">
           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+          <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
          </spacer>
         </item>
        </layout>
@@ -149,6 +161,8 @@
       <item>
        <spacer name="bottom_spacer">
         <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
        </spacer>
       </item>
      </layout>
