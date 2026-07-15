@@ -52,6 +52,9 @@ marked "not selected" were intentionally left out of this batch.
 ## Also implemented (not in the original 30, explicitly requested)
 - [x] Show-password checkbox on the login screen
 
+## Batch 2 (from ideas.md)
+- [x] 34. Per-student attendance CSV export
+
 ## Notes on scope
 - **#29 Notifications**: in-app bell-icon feed only (in-memory, not
   persisted across restarts) - no email/SMTP is configured for this

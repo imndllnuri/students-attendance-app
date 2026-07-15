@@ -6,6 +6,7 @@ import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
+    QFileDialog,
     QHeaderView,
     QInputDialog,
     QLabel,
@@ -181,8 +182,10 @@ class ClassWindow(QMainWindow):
         student_name_item = self.student_list_tableWidget.item(row, 1)
         if student_number_item is None or student_name_item is None:
             return
+        student_number = student_number_item.text()
+        student_name = student_name_item.text()
 
-        lines = [f"{student_name_item.text()} ({student_number_item.text()})", ""]
+        lines = [f"{student_name} ({student_number})", ""]
 
         not_attended_item = self.student_list_tableWidget.item(row, 2)
         attended_item = self.student_list_tableWidget.item(row, 3)
@@ -198,6 +201,7 @@ class ClassWindow(QMainWindow):
                 lines.append(f"Attended: {attended_item.text()}  |  Not Attended: {not_attended_item.text()}")
             lines.append("")
 
+        session_rows = []
         for col in range(self._FIRST_SESSION_COLUMN, self.student_list_tableWidget.columnCount()):
             header_item = self.student_list_tableWidget.horizontalHeaderItem(col)
             cell_item = self.student_list_tableWidget.item(row, col)
@@ -206,8 +210,37 @@ class ClassWindow(QMainWindow):
             value = cell_item.text()
             status = value.split(" ", 1)[1] if value.startswith("1 ") else "Absent"
             lines.append(f"{header_item.text()}: {status}")
+            session_rows.append((header_item.text(), status))
 
-        QMessageBox.information(self, "Student Detail", "\n".join(lines))
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Student Detail")
+        msg.setText("\n".join(lines))
+        export_btn = msg.addButton("Export CSV", QMessageBox.ActionRole)
+        msg.addButton(QMessageBox.Ok)
+        msg.exec_()
+        if msg.clickedButton() == export_btn:
+            self.export_student_attendance_csv(student_name, student_number, session_rows)
+
+    def export_student_attendance_csv(self, student_name, student_number, session_rows):
+        if not session_rows:
+            QMessageBox.information(self, "Nothing to Export", "No session history for this student yet.")
+            return
+
+        default_name = f"{student_number}_{student_name.replace(' ', '_')}_attendance.csv"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Attendance History", default_name, "CSV Files (*.csv)"
+        )
+        if not file_path:
+            return
+
+        df = pd.DataFrame(session_rows, columns=["Session", "Status"])
+        try:
+            df.to_csv(file_path, index=False)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write file:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Attendance history exported to:\n{file_path}")
 
     def correct_attendance_cell(self, row, col):
         """Double-clicking a session cell in the roster table lets the

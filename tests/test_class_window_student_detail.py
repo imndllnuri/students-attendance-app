@@ -1,9 +1,9 @@
-"""Covers #23: per-student detail statistics."""
+"""Covers #23 (per-student detail statistics) and #34 (per-student CSV export)."""
 
 import types
 
 from PyQt5.QtCore import QTime
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
 from models.classes import Class, ScheduleSlot
 from views.class_window import ClassWindow
@@ -59,19 +59,21 @@ def test_double_clicking_name_column_shows_detail_dialog(qtbot, monkeypatch):
     window = build_window(qtbot)
     _set_up_table(window)
 
-    shown = {}
-    monkeypatch.setattr(
-        "views.class_window.QMessageBox.information",
-        lambda self, title, text: shown.update(title=title, text=text),
-    )
+    captured = {}
 
+    def fake_exec(self):
+        captured["title"] = self.windowTitle()
+        captured["text"] = self.text()
+        return None
+
+    monkeypatch.setattr(QMessageBox, "exec_", fake_exec)
     window.handle_roster_cell_double_click(0, 1)
 
-    assert shown["title"] == "Student Detail"
-    assert "Grace Hopper (20230001)" in shown["text"]
-    assert "Attendance Rate: 50%" in shown["text"]
-    assert "01-09-2025 - 09:00-10:50: Present" in shown["text"]
-    assert "08-09-2025 - 09:00-10:50: Absent" in shown["text"]
+    assert captured["title"] == "Student Detail"
+    assert "Grace Hopper (20230001)" in captured["text"]
+    assert "Attendance Rate: 50%" in captured["text"]
+    assert "01-09-2025 - 09:00-10:50: Present" in captured["text"]
+    assert "08-09-2025 - 09:00-10:50: Absent" in captured["text"]
 
 
 def test_double_clicking_a_session_column_still_opens_correction(qtbot, monkeypatch):
@@ -84,3 +86,38 @@ def test_double_clicking_a_session_column_still_opens_correction(qtbot, monkeypa
     window.handle_roster_cell_double_click(0, 4)
 
     assert corrections == [(0, 4)]
+
+
+def test_export_student_attendance_csv_writes_session_rows(qtbot, monkeypatch, tmp_path):
+    window = build_window(qtbot)
+
+    out_file = tmp_path / "report.csv"
+    monkeypatch.setattr(
+        "views.class_window.QFileDialog.getSaveFileName",
+        lambda *a, **k: (str(out_file), "CSV Files (*.csv)"),
+    )
+    monkeypatch.setattr(QMessageBox, "information", lambda *a, **k: None)
+
+    window.export_student_attendance_csv(
+        "Grace Hopper", "20230001",
+        [("01-09-2025 - 09:00-10:50", "Present"), ("08-09-2025 - 09:00-10:50", "Absent")],
+    )
+
+    assert out_file.exists()
+    content = out_file.read_text()
+    assert "Present" in content and "Absent" in content
+
+
+def test_export_with_no_sessions_shows_nothing_to_export(qtbot, monkeypatch):
+    window = build_window(qtbot)
+
+    monkeypatch.setattr(QMessageBox, "information", lambda *a, **k: None)
+    save_dialog_called = []
+    monkeypatch.setattr(
+        "views.class_window.QFileDialog.getSaveFileName",
+        lambda *a, **k: save_dialog_called.append(True),
+    )
+
+    window.export_student_attendance_csv("Grace Hopper", "20230001", [])
+
+    assert save_dialog_called == []
