@@ -36,6 +36,7 @@ def class_row_to_dict(conn, row):
         "total_hours": row["total_hours"],
         "weekly_hours": row["weekly_hours"],
         "archived": bool(row["archived"]),
+        "notes": row["notes"],
         "schedule": dict(schedule),
     }
 
@@ -328,7 +329,7 @@ def create_class():
 
 _CLASS_UPDATABLE_FIELDS = (
     "class_name", "section", "attendance_policy", "late_threshold",
-    "total_weeks", "total_hours", "weekly_hours",
+    "total_weeks", "total_hours", "weekly_hours", "notes",
 )
 
 

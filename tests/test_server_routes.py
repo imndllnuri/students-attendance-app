@@ -117,6 +117,21 @@ def test_update_class_edits_fields_and_schedule(client):
     }
 
 
+def test_new_class_starts_with_empty_notes_and_can_be_updated(client):
+    instructor_id = create_instructor(client)
+    created = client.post("/classes", json=sample_class_payload(instructor_id)).get_json()
+    assert created["notes"] == ""
+
+    resp = client.patch(f"/classes/{created['class_id']}", json={"notes": "TA covers Thursdays."})
+    assert resp.status_code == 200
+    assert resp.get_json()["notes"] == "TA covers Thursdays."
+
+    refetched = client.get(
+        "/classes", query_string={"instructor_id": instructor_id}
+    ).get_json()[0]
+    assert refetched["notes"] == "TA covers Thursdays."
+
+
 def test_add_and_remove_individual_roster_student(client):
     instructor_id = create_instructor(client)
     class_id = client.post(

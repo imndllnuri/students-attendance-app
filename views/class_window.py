@@ -155,6 +155,17 @@ class ClassWindow(QMainWindow):
         self.total_hours_lbl.setText(f"Total Hours: {self.class_obj.total_hours}")
         self.weekly_hours_lbl.setText(f"Weekly Hours: {self.class_obj.weekly_hours}")
         self.render_schedule_grid(self.class_obj.schedule)
+        self.class_notes_edit.setPlainText(self.class_obj.notes)
+
+    def save_class_notes(self):
+        notes = self.class_notes_edit.toPlainText()
+        try:
+            self.class_manager.update_class(self.class_obj.class_id, {"notes": notes})
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not save notes:\n{e}")
+            return
+        self.class_obj.notes = notes
+        QMessageBox.information(self, "Success", "Notes saved.")
 
     def setup_connections(self):
         self.back_to_my_classes_btn.clicked.connect(self.return_to_main_window)
@@ -162,6 +173,7 @@ class ClassWindow(QMainWindow):
         self.roster_retry_btn.clicked.connect(self.load_student_list)
         self.take_attendance_btn.clicked.connect(self.attendance_page_show)
         self.class_settings_btn.clicked.connect(self.open_edit_class_window)
+        self.save_notes_btn.clicked.connect(self.save_class_notes)
         self.add_student_btn.clicked.connect(self.add_roster_student)
         self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
         self.student_list_tableWidget.cellDoubleClicked.connect(self.handle_roster_cell_double_click)

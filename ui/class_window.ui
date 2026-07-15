@@ -155,6 +155,27 @@
            <layout class="QGridLayout" name="schedule_grid_layout"/>
           </widget>
          </item>
+         <item>
+          <widget class="Line" name="class_notes_divider">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="class_notes_title_lbl">
+           <property name="text"><string>Notes</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="class_notes_edit">
+           <property name="placeholderText"><string>Instructor-only notes for this class...</string></property>
+           <property name="maximumSize"><size><width>16777215</width><height>100</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="save_notes_btn">
+           <property name="text"><string>Save Notes</string></property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>

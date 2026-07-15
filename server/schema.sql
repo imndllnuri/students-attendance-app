@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS classes (
     total_weeks INTEGER NOT NULL,
     total_hours REAL NOT NULL,
     weekly_hours REAL NOT NULL,
-    archived INTEGER NOT NULL DEFAULT 0
+    archived INTEGER NOT NULL DEFAULT 0,
+    notes TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS schedule_slots (

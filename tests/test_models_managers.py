@@ -98,6 +98,25 @@ def test_class_to_dict_from_dict_round_trip():
     assert restored.schedule["Monday"][0].selected is True
 
 
+def test_class_from_dict_parses_notes_field():
+    data = make_class().to_dict()
+    data["class_id"] = "c1"
+    data["notes"] = "TA covers Thursdays."
+
+    restored = Class.from_dict(data)
+
+    assert restored.notes == "TA covers Thursdays."
+
+
+def test_class_from_dict_defaults_notes_to_empty_string():
+    data = make_class().to_dict()
+    data["class_id"] = "c1"
+
+    restored = Class.from_dict(data)
+
+    assert restored.notes == ""
+
+
 def test_account_manager_add_account_wraps_api_client():
     fake = FakeApiClient()
     manager = AccountManager(api_client=fake)
