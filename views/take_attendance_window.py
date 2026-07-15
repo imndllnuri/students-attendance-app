@@ -383,6 +383,7 @@ class TakeAttendance(QDialog):
             QMessageBox.critical(self, "Error", f"Failed to submit attendance:\n{e}")
             return
 
+        self.staged_records = []
         self.class_window.load_student_list()
         QMessageBox.information(self, "Success", "Attendance submitted successfully!")
         self.close()
@@ -445,6 +446,17 @@ class TakeAttendance(QDialog):
 
     def closeEvent(self, event):
         """Cleanup when window closes"""
+        if self.staged_records:
+            reply = QMessageBox.question(
+                self, "Unsubmitted Attendance",
+                f"You have {len(self.staged_records)} recorded attendance row(s) that haven't been "
+                "submitted yet. Close anyway and lose them?",
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+            )
+            if reply != QMessageBox.Yes:
+                event.ignore()
+                return
+
         self._closed = True
         if hasattr(self, 'timer'):
             self.timer.stop()
