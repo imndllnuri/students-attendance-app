@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QTableWidgetItem,
 )
-from PyQt5.QtCore import QDateTime, QEasingCurve, QPropertyAnimation, QTime, QTimer
+from PyQt5.QtCore import QDate, QDateTime, QEasingCurve, QPropertyAnimation, QTime, QTimer
 from PyQt5 import uic
 import serial
 import serial.tools.list_ports
@@ -78,6 +78,11 @@ class TakeAttendance(QDialog):
         ])
         self.take_attendance_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.update_date_info()
+
+        self.hours_comboBox.currentIndexChanged.connect(self.update_session_countdown)
+        self._countdown_timer = QTimer(self)
+        self._countdown_timer.timeout.connect(self.update_session_countdown)
+        self._countdown_timer.start(30000)  # refresh every 30s
 
         self._scan_opacity_effect = QGraphicsOpacityEffect(self.scan_status_card)
         self.scan_status_card.setGraphicsEffect(self._scan_opacity_effect)
@@ -433,6 +438,29 @@ class TakeAttendance(QDialog):
 
         self.selected_day_lbl.setText(f"{day_name} - {date_str}")
         self.update_hours_combobox(day_name)
+        self.update_session_countdown()
+
+    def update_session_countdown(self):
+        """Shows time remaining in the currently selected time slot, only
+        when the selected date is today (a countdown for a past/future
+        date wouldn't mean anything)."""
+        if self.calendarWidget.selectedDate() != QDate.currentDate():
+            self.session_countdown_lbl.setText("")
+            return
+
+        time_slot = self.hours_comboBox.currentText()
+        if not time_slot or "-" not in time_slot:
+            self.session_countdown_lbl.setText("")
+            return
+
+        end_time = QTime.fromString(time_slot.split("-")[-1].strip(), "HH:mm")
+        seconds_remaining = QTime.currentTime().secsTo(end_time)
+        if seconds_remaining <= 0:
+            self.session_countdown_lbl.setText("Session ended")
+            return
+
+        minutes_remaining = seconds_remaining // 60
+        self.session_countdown_lbl.setText(f"Time remaining: {minutes_remaining} min")
 
     def update_hours_combobox(self, day_name):
         """Update hours combobox based on selected day's schedule"""

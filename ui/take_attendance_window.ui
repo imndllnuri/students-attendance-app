@@ -147,6 +147,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="session_countdown_lbl">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="export_to_excel_btn">
               <property name="minimumSize">
                <size>

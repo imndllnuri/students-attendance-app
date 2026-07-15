@@ -58,6 +58,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 5. Export/download your own account data as JSON
 - [x] 38. Type-your-email confirmation before permanent account deletion
 - [x] 28. Confirm closing Take Attendance with unsubmitted records
+- [x] 26. Session countdown/timer display
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope
