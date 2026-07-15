@@ -632,6 +632,11 @@
               <property name="text"><string>Export Chart</string></property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="export_pdf_report_btn">
+              <property name="text"><string>Download PDF Report</string></property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>

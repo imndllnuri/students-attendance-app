@@ -1,5 +1,6 @@
 import csv
 import json
+import math
 from collections import defaultdict
 from datetime import datetime
 
@@ -97,6 +98,7 @@ class MainWindow(QMainWindow):
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.compare_classes_btn.clicked.connect(self.show_class_comparison)
         self.attendance_heatmap_btn.clicked.connect(self.show_attendance_heatmap)
+        self.export_pdf_report_btn.clicked.connect(self.export_statistics_pdf)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
         self.compact_view_cb.blockSignals(True)
@@ -1290,6 +1292,88 @@ class MainWindow(QMainWindow):
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
+
+    def export_statistics_pdf(self):
+        """Combines class policy, present/late/absent rates, the
+        at-risk-students list, and the trend chart into a single-page PDF."""
+        cls = self.statistics_class_combo.currentData()
+        if cls is None:
+            QMessageBox.information(self, "No Class Selected", "Select a class first.")
+            return
+
+        try:
+            stats = self.class_manager.get_statistics(cls.class_id)
+            table = self.class_manager.get_student_table(cls.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Server Error", str(e))
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Download PDF Report", f"{cls.class_code}_report.pdf", "PDF Files (*.pdf)"
+        )
+        if not file_path:
+            return
+
+        at_risk_lines = self._at_risk_lines_for_report(cls, table)
+
+        figure = Figure(figsize=(8.5, 11))
+        gs = figure.add_gridspec(3, 2, height_ratios=[1, 2, 2])
+
+        ax_text = figure.add_subplot(gs[0, :])
+        ax_text.axis("off")
+        summary = "\n".join([
+            f"Attendance Report - {cls.class_name} ({cls.class_code})",
+            f"Attendance Policy: {cls.attendance_policy}%   Late Threshold: {cls.late_threshold} min",
+            f"Present: {stats['present']}   Late: {stats['late']}   Absent: {stats['absent']}",
+        ])
+        ax_text.text(0, 1, summary, va="top", fontsize=11)
+
+        ax_pie = figure.add_subplot(gs[1, 0])
+        values = [stats["present"], stats["late"], stats["absent"]]
+        if sum(values):
+            ax_pie.pie(
+                values, labels=["Present", "Late", "Absent"], autopct="%1.1f%%",
+                colors=[PALETTE["success"], PALETTE["warning"], PALETTE["error"]],
+            )
+        else:
+            ax_pie.axis("off")
+
+        ax_trend = figure.add_subplot(gs[1, 1])
+        self._render_attendance_trend(ax_trend, cls)
+
+        ax_risk = figure.add_subplot(gs[2, :])
+        ax_risk.axis("off")
+        risk_text = "At-Risk Students:\n" + ("\n".join(at_risk_lines) if at_risk_lines else "None")
+        ax_risk.text(0, 1, risk_text, va="top", fontsize=10)
+
+        try:
+            figure.savefig(file_path, format="pdf")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write PDF:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Report exported to:\n{file_path}")
+
+    def _at_risk_lines_for_report(self, cls, table):
+        if "Not Attended Hours" not in table["columns"]:
+            return []
+
+        failure = math.ceil(cls.total_hours * (100 - cls.attendance_policy) / 100)
+        safe = failure * 0.5
+        not_attended_idx = table["columns"].index("Not Attended Hours")
+        name_idx = table["columns"].index("Student Name Surname")
+        number_idx = table["columns"].index("Student Number")
+
+        lines = []
+        for row in table["rows"]:
+            try:
+                not_attended = float(row[not_attended_idx])
+            except (ValueError, TypeError):
+                continue
+            if not_attended >= safe:
+                label = "FAILING RISK" if not_attended >= failure else "at risk"
+                lines.append(f"{row[name_idx]} ({row[number_idx]}) - {not_attended:g} missed - {label}")
+        return lines
 
     def _render_attendance_trend(self, axes, cls):
         """Plots the per-session attendance rate (% Present+Late) over
