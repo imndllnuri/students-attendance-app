@@ -171,3 +171,7 @@ class ClassManager:
 
     def get_attendance_sheet(self, class_id: str, date: str) -> list:
         return self.api_client.get_attendance_sheet(class_id, date)
+
+    def correct_attendance(self, class_id: str, student_id, date: str, time_slot: str, status: str) -> dict:
+        """Raises ApiError on failure."""
+        return self.api_client.correct_attendance(class_id, student_id, date, time_slot, status)

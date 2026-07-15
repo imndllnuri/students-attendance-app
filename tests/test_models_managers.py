@@ -42,6 +42,10 @@ class FakeApiClient:
     def remove_student(self, student_id):
         self.calls.append(("remove_student", student_id))
 
+    def correct_attendance(self, class_id, student_id, date, time_slot, status):
+        self.calls.append(("correct_attendance", class_id, student_id, date, time_slot, status))
+        return {"deleted": status == "Absent"}
+
 
 class FailingApiClient(FakeApiClient):
     def create_class(self, class_data):
@@ -157,6 +161,16 @@ def test_class_manager_add_student_wraps_api_client():
 def test_class_manager_remove_student_returns_false_on_api_error():
     manager = ClassManager(api_client=FailingApiClient())
     assert manager.remove_student(1) is False
+
+
+def test_class_manager_correct_attendance_wraps_api_client():
+    fake = FakeApiClient()
+    manager = ClassManager(api_client=fake)
+
+    result = manager.correct_attendance("c1", 1, "01-09-2025", "09:00-10:50", "Late")
+
+    assert result == {"deleted": False}
+    assert fake.calls == [("correct_attendance", "c1", 1, "01-09-2025", "09:00-10:50", "Late")]
 
 
 def test_class_manager_proxies_statistics_without_touching_api_client_directly():

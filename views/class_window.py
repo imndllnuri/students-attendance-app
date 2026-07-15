@@ -4,7 +4,7 @@ import math
 import pandas as pd
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtWidgets import QHeaderView, QMainWindow, QMessageBox, QTableWidgetItem
+from PyQt5.QtWidgets import QHeaderView, QInputDialog, QMainWindow, QMessageBox, QTableWidgetItem
 
 from services.api_client import ApiError
 from shared.palette import qcolor
@@ -120,6 +120,61 @@ class ClassWindow(QMainWindow):
         self.class_settings_btn.clicked.connect(self.open_edit_class_window)
         self.add_student_btn.clicked.connect(self.add_roster_student)
         self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
+        self.student_list_tableWidget.cellDoubleClicked.connect(self.correct_attendance_cell)
+
+    _FIRST_SESSION_COLUMN = 4  # Student Number, Name Surname, Not Attended, Attended
+
+    def correct_attendance_cell(self, row, col):
+        """Double-clicking a session cell in the roster table lets the
+        instructor correct a past attendance record (e.g. it was marked
+        wrong during the live session)."""
+        if col < self._FIRST_SESSION_COLUMN:
+            return
+        header_item = self.student_list_tableWidget.horizontalHeaderItem(col)
+        if header_item is None or " - " not in header_item.text():
+            return
+        date, time_slot = header_item.text().split(" - ", 1)
+
+        student_number_item = self.student_list_tableWidget.item(row, 0)
+        student_name_item = self.student_list_tableWidget.item(row, 1)
+        if student_number_item is None or student_name_item is None:
+            return
+        student_number = student_number_item.text()
+        student_name = student_name_item.text()
+
+        current_cell = self.student_list_tableWidget.item(row, col)
+        current_text = current_cell.text() if current_cell else "0"
+        current_status = current_text.split(" ", 1)[1] if current_text.startswith("1 ") else "Absent"
+
+        statuses = ["Present", "Late", "Absent"]
+        default_index = statuses.index(current_status) if current_status in statuses else 0
+        new_status, ok = QInputDialog.getItem(
+            self, "Correct Attendance",
+            f"{student_name} - {date} {time_slot}:",
+            statuses, default_index, False,
+        )
+        if not ok or new_status == current_status:
+            return
+
+        try:
+            roster = self.class_manager.get_roster(self.class_obj.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load roster:\n{e}")
+            return
+        match = next((s for s in roster if s["student_number"] == student_number), None)
+        if match is None:
+            QMessageBox.critical(self, "Error", "Could not find that student in the roster.")
+            return
+
+        try:
+            self.class_manager.correct_attendance(
+                self.class_obj.class_id, match["student_id"], date, time_slot, new_status
+            )
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not update attendance:\n{e}")
+            return
+
+        self.load_student_list()
 
     def add_roster_student(self):
         student_number = self.new_student_number_le.text().strip()

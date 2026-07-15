@@ -494,6 +494,46 @@ def submit_attendance():
     return "", 204
 
 
+@app.post("/attend/correct")
+def correct_attendance():
+    """Upsert-by-natural-key correction for a past attendance record,
+    identified by (class_id, student_id, date, time_slot) rather than a raw
+    attendance_records.id, since the GUI's pivoted student table doesn't
+    carry record ids."""
+    data = request.get_json()
+    conn = get_connection()
+    existing = conn.execute(
+        "SELECT id FROM attendance_records WHERE class_id = ? AND student_id = ? "
+        "AND date = ? AND time_slot = ?",
+        (data["class_id"], data["student_id"], data["date"], data["time_slot"]),
+    ).fetchone()
+
+    if data["status"] == "Absent":
+        if existing:
+            conn.execute("DELETE FROM attendance_records WHERE id = ?", (existing["id"],))
+            conn.commit()
+        conn.close()
+        return jsonify({"deleted": True})
+
+    if existing:
+        conn.execute(
+            "UPDATE attendance_records SET status = ? WHERE id = ?",
+            (data["status"], existing["id"]),
+        )
+    else:
+        conn.execute(
+            "INSERT INTO attendance_records (class_id, student_id, date, time_slot, "
+            "time, status) VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                data["class_id"], data["student_id"], data["date"], data["time_slot"],
+                data.get("time", ""), data["status"],
+            ),
+        )
+    conn.commit()
+    conn.close()
+    return jsonify({"deleted": False})
+
+
 @app.get("/attendance_sheet")
 def attendance_sheet():
     class_id = request.args.get("class_id")

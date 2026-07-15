@@ -125,6 +125,19 @@ class ApiClient:
     def submit_attendance(self, class_id, records):
         return self._request("POST", "/attend", json={"class_id": class_id, "records": records})
 
+    def correct_attendance(self, class_id, student_id, date, time_slot, status):
+        return self._request(
+            "POST",
+            "/attend/correct",
+            json={
+                "class_id": class_id,
+                "student_id": student_id,
+                "date": date,
+                "time_slot": time_slot,
+                "status": status,
+            },
+        )
+
     def get_attendance_sheet(self, class_id, date):
         return self._request("GET", "/attendance_sheet", params={"class_id": class_id, "date": date})
 

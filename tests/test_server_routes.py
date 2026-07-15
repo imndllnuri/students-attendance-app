@@ -142,6 +142,58 @@ def test_add_and_remove_individual_roster_student(client):
     assert all(s["student_id"] != student_id for s in roster_after)
 
 
+def test_correct_attendance_upserts_and_deletes_by_natural_key(client):
+    instructor_id = create_instructor(client)
+    class_id = client.post(
+        "/classes", json=sample_class_payload(instructor_id)
+    ).get_json()["class_id"]
+    student_id = client.get(
+        "/roster", query_string={"class_id": class_id}
+    ).get_json()[0]["student_id"]
+
+    # No existing record -> correcting to Present inserts a new one.
+    resp = client.post(
+        "/attend/correct",
+        json={
+            "class_id": class_id, "student_id": student_id,
+            "date": "01-09-2025", "time_slot": "09:00-10:50", "status": "Present",
+        },
+    )
+    assert resp.status_code == 200
+    sheet = client.get(
+        "/attendance_sheet", query_string={"class_id": class_id, "date": "01-09-2025"}
+    ).get_json()
+    assert len(sheet) == 1
+    assert sheet[0]["status"] == "Present"
+
+    # Existing record -> correcting to Late updates it in place (no duplicate row).
+    client.post(
+        "/attend/correct",
+        json={
+            "class_id": class_id, "student_id": student_id,
+            "date": "01-09-2025", "time_slot": "09:00-10:50", "status": "Late",
+        },
+    )
+    sheet_after_update = client.get(
+        "/attendance_sheet", query_string={"class_id": class_id, "date": "01-09-2025"}
+    ).get_json()
+    assert len(sheet_after_update) == 1
+    assert sheet_after_update[0]["status"] == "Late"
+
+    # Correcting to Absent deletes the record entirely.
+    client.post(
+        "/attend/correct",
+        json={
+            "class_id": class_id, "student_id": student_id,
+            "date": "01-09-2025", "time_slot": "09:00-10:50", "status": "Absent",
+        },
+    )
+    sheet_after_absent = client.get(
+        "/attendance_sheet", query_string={"class_id": class_id, "date": "01-09-2025"}
+    ).get_json()
+    assert sheet_after_absent == []
+
+
 def test_roster_attend_and_statistics_flow(client):
     instructor_id = create_instructor(client)
     class_id = client.post(
