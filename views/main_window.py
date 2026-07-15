@@ -53,6 +53,12 @@ from shared.validation import (
     is_valid_password,
     password_strength,
 )
+from shared.whats_new import (
+    APP_VERSION,
+    CHANGELOG,
+    save_last_seen_version,
+    should_show_whats_new,
+)
 from views.add_new_class_window import AddNewClassWindow
 from models.accounts import AccountManager
 from models.classes import Class, ClassManager
@@ -1015,6 +1021,13 @@ class MainWindow(QMainWindow):
             self.add_notification(
                 f"Resubmitted {flushed} attendance record batch(es) saved offline earlier."
             )
+
+    def _maybe_show_whats_new(self):
+        if not should_show_whats_new():
+            return
+        bullet_list = "\n".join(f"• {item}" for item in CHANGELOG)
+        QMessageBox.information(self, f"What's New in v{APP_VERSION}", bullet_list)
+        save_last_seen_version(APP_VERSION)
 
     def add_notification(self, message):
         """Appends an in-app activity notification (e.g. a roster upload

@@ -22,6 +22,7 @@ server/attendance.db
 .session_templates.json
 .offline_attendance_queue.json
 .font_scale_preference
+.last_seen_version
 
 # Test/CI artifacts
 .pytest_cache/

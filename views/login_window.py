@@ -98,4 +98,5 @@ class LoginWindow(QMainWindow):
     def open_main_window(self, account):
         self.main_window = MainWindow(account)
         self.main_window.show()
+        self.main_window._maybe_show_whats_new()
         self.close()
