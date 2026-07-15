@@ -712,25 +712,59 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Server Error", str(e))
             return
 
-        figure = Figure(figsize=(4, 4))
+        figure = Figure(figsize=(8, 4))
         figure.patch.set_facecolor(PALETTE["bg_card"])
-        axes = figure.add_subplot(111)
+        axes_pie = figure.add_subplot(121)
+        axes_trend = figure.add_subplot(122)
         labels = ["Present", "Late", "Absent"]
         values = [stats["present"], stats["late"], stats["absent"]]
         if sum(values) == 0:
             self.statistics_empty_lbl.setText("No attendance recorded yet for this class.")
             self.statistics_empty_lbl.setVisible(True)
-            axes.axis("off")
+            axes_pie.axis("off")
+            axes_trend.axis("off")
         else:
             self.statistics_empty_lbl.setVisible(False)
-            axes.pie(
+            axes_pie.pie(
                 values,
                 labels=labels,
                 autopct="%1.1f%%",
                 colors=[PALETTE["success"], PALETTE["warning"], PALETTE["error"]],
                 textprops={"color": PALETTE["text_primary"]},
             )
-            axes.set_title(f"Attendance for {cls.class_code}", color=PALETTE["text_primary"])
+            axes_pie.set_title(f"Attendance for {cls.class_code}", color=PALETTE["text_primary"])
+            self._render_attendance_trend(axes_trend, cls)
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
+
+    def _render_attendance_trend(self, axes, cls):
+        """Plots the per-session attendance rate (% Present+Late) over
+        time, reusing the same pivoted student table the roster page
+        already fetches rather than adding a parallel server aggregate."""
+        try:
+            table = self.class_manager.get_student_table(cls.class_id)
+        except ApiError:
+            axes.axis("off")
+            return
+
+        fixed_columns = {"Student Number", "Student Name Surname", "Not Attended Hours", "Attended Hours"}
+        session_columns = [c for c in table["columns"] if c not in fixed_columns]
+        num_students = len(table["rows"])
+
+        if not session_columns or num_students == 0:
+            axes.axis("off")
+            return
+
+        rates = []
+        for col in session_columns:
+            col_index = table["columns"].index(col)
+            recorded = sum(1 for row in table["rows"] if str(row[col_index]).startswith("1 "))
+            rates.append(recorded / num_students * 100)
+
+        axes.plot(range(1, len(rates) + 1), rates, marker="o", color=PALETTE["accent"])
+        axes.set_ylim(0, 100)
+        axes.set_xlabel("Session", color=PALETTE["text_primary"])
+        axes.set_ylabel("Attendance Rate (%)", color=PALETTE["text_primary"])
+        axes.set_title("Attendance Trend", color=PALETTE["text_primary"])
+        axes.tick_params(colors=PALETTE["text_primary"])
