@@ -664,10 +664,7 @@ class MainWindow(QMainWindow):
 
         query = self.search_bar_le.text().strip().lower()
         classes = self.fetch_classes()
-        matches = [
-            c for c in classes
-            if query in c.class_name.lower() or query in c.class_code.lower()
-        ] if query else classes
+        matches = [c for c in classes if self._class_matches_query(c, query)] if query else classes
 
         if not matches:
             self.search_status_lbl.setText("No matching classes found.")
@@ -675,6 +672,15 @@ class MainWindow(QMainWindow):
             self.search_status_lbl.setText(f"{len(matches)} class(es) found:")
             for row, cls in enumerate(sorted(matches, key=self._class_sort_key)):
                 self.search_results_layout.addWidget(self._make_class_row_widget(cls), row, 0)
+
+    def _class_matches_query(self, cls, query):
+        if query in cls.class_name.lower() or query in cls.class_code.lower():
+            return True
+        try:
+            roster = self.class_manager.get_roster(cls.class_id)
+        except ApiError:
+            return False
+        return any(query in student["name_surname"].lower() for student in roster)
 
     # --- Statistics ---
 
