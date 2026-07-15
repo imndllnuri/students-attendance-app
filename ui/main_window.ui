@@ -162,6 +162,11 @@
                </spacer>
               </item>
               <item>
+               <widget class="QCheckBox" name="compact_view_cb">
+                <property name="text"><string>Compact View</string></property>
+               </widget>
+              </item>
+              <item>
                <widget class="QCheckBox" name="show_archived_cb">
                 <property name="text"><string>Show Archived</string></property>
                </widget>

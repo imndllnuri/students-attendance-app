@@ -32,6 +32,7 @@ from resources.images import qrc
 from services.api_client import ApiError
 from shared.class_order import load_class_order, save_class_order
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
+from shared.list_density import load_list_density, save_list_density
 from shared.palette import PALETTE, class_tag_color
 from shared.session_timeout import (
     TIMEOUT_OPTIONS,
@@ -89,6 +90,10 @@ class MainWindow(QMainWindow):
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
+        self.compact_view_cb.blockSignals(True)
+        self.compact_view_cb.setChecked(load_list_density() == "compact")
+        self.compact_view_cb.blockSignals(False)
+        self.compact_view_cb.toggled.connect(self.toggle_list_density)
         self.export_class_list_btn.clicked.connect(self.export_class_list)
         self.custom_order_listWidget.setDragDropMode(QAbstractItemView.InternalMove)
         self.custom_order_listWidget.model().rowsMoved.connect(self._save_custom_order)
@@ -390,10 +395,11 @@ class MainWindow(QMainWindow):
         return row
 
     def _make_class_row_widget(self, cls):
+        compact = self.compact_view_cb.isChecked()
         class_widget = QWidget()
         class_widget.setObjectName("class_row_widget")
         row_layout = QHBoxLayout(class_widget)
-        row_layout.setContentsMargins(4, 4, 4, 4)
+        row_layout.setContentsMargins(*((4, 2, 4, 2) if compact else (4, 4, 4, 4)))
 
         color_chip = QFrame()
         color_chip.setFixedWidth(4)
@@ -413,6 +419,7 @@ class MainWindow(QMainWindow):
 
         caption_lbl = QLabel(f"Section {cls.section}")
         caption_lbl.setObjectName("class_row_caption_lbl")
+        caption_lbl.setVisible(not compact)
 
         text_layout.addWidget(class_btn)
         text_layout.addWidget(caption_lbl)
@@ -762,6 +769,10 @@ class MainWindow(QMainWindow):
         save_theme_preference(theme)
         with open(stylesheet_path(theme)) as f:
             QApplication.instance().setStyleSheet(f.read())
+
+    def toggle_list_density(self, checked):
+        save_list_density("compact" if checked else "comfortable")
+        self.load_classes()
 
     def _apply_translations(self):
         self.my_classes_btn.setText(t("my_classes"))
