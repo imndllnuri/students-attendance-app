@@ -87,6 +87,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 42. Admin audit log (account deletion, class archive/unarchive/delete,
       student merges, attendance corrections)
 - [x] 41. Scheduled automatic database backup (daily, retains last 10)
+- [x] 50. Plugin-style hook for real RFID/ESP8266 hardware integration
 
 ## Notes on scope
 - **#29 Notifications**: in-app bell-icon feed only (in-memory, not
@@ -123,3 +124,14 @@ marked "not selected" were intentionally left out of this batch.
   on-demand (used by the tests, since a real 24h timer isn't practical to
   test). No restore tooling is included - this only covers taking the
   backups, not a UI for restoring from one.
+- **#50 RFID/ESP8266 hardware hook**: `services/card_reader.py` defines a
+  `CardReader` interface (`connect`/`poll`/`close`) with two
+  implementations - `SerialCardReader` (wraps the existing pyserial
+  reader, used by default) and `ESP8266CardReader` (a TCP client for a
+  WiFi reader that streams newline-delimited card IDs). The backend is
+  chosen via `shared/hardware_config.py`'s `.hardware_config.json`
+  (defaults to `"serial"`, so behavior is unchanged unless explicitly
+  configured for `"esp8266"`). `TakeAttendance.check_rfid()` polls through
+  whichever backend is active; no real ESP8266 hardware was available to
+  test against, so the TCP transport is verified against a local loopback
+  server in `tests/test_card_reader_plugin.py` instead.

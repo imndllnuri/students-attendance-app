@@ -24,6 +24,7 @@ server/backups/
 .offline_attendance_queue.json
 .font_scale_preference
 .last_seen_version
+.hardware_config.json
 
 # Test/CI artifacts
 .pytest_cache/

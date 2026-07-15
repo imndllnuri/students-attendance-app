@@ -23,6 +23,8 @@ import serial
 import serial.tools.list_ports
 
 from services.api_client import ApiError
+from services.card_reader import create_card_reader
+from shared.hardware_config import load_hardware_config
 from shared.offline_queue import enqueue
 from shared.palette import qcolor
 from shared.session_templates import load_session_template, save_session_template
@@ -45,6 +47,7 @@ class TakeAttendance(QDialog):
         self.staged_records = []
         self.staged_student_ids = set()
         self.ser = None
+        self.card_reader = None
         self._listening = False
         self._closed = False
 
@@ -108,6 +111,11 @@ class TakeAttendance(QDialog):
 
     def setup_serial(self):
         """Improved serial connection setup with manual fallback"""
+        config = load_hardware_config()
+        if config.get("backend") == "esp8266":
+            self.setup_esp8266_reader(config)
+            return
+
         ports = list(serial.tools.list_ports.comports())
         rfid_port = None
 
@@ -152,9 +160,25 @@ class TakeAttendance(QDialog):
             self._set_scan_status("error", f"Couldn't connect to {rfid_port}: {e}")
             self.ser = None
 
+    def setup_esp8266_reader(self, config):
+        """Alternate hardware backend (#50): connects to a WiFi RFID
+        reader (e.g. an ESP8266) over TCP instead of a serial port, using
+        the CardReader interface so check_rfid() doesn't need to know
+        which transport is in use."""
+        host = config.get("host")
+        port = config.get("port", 8888)
+        try:
+            self.card_reader = create_card_reader("esp8266", host=host, port=port)
+            self.card_reader.connect()
+            self._set_scan_status("idle", f"ESP8266 reader connected ({host}:{port}).")
+        except Exception as e:
+            logger.warning("Failed to connect to ESP8266 reader %s:%s: %s", host, port, e)
+            self._set_scan_status("error", f"Couldn't connect to ESP8266 reader at {host}:{port}: {e}")
+            self.card_reader = None
+
     def start_attendance(self):
         """Start listening for RFID cards"""
-        if not self.ser:
+        if not self.ser and not self.card_reader:
             QMessageBox.warning(self, "Error", "RFID reader not connected!")
             return
 
@@ -197,6 +221,13 @@ class TakeAttendance(QDialog):
 
     def check_rfid(self):
         """Check for RFID card presence"""
+        if self.card_reader is not None:
+            card_id = self.card_reader.poll()
+            if card_id and card_id != self.current_card_id:
+                self.current_card_id = card_id
+                self.process_card(card_id)
+            return
+
         if self.ser.in_waiting > 0:
             try:
                 card_id = self.ser.readline().decode().strip()
@@ -606,4 +637,6 @@ class TakeAttendance(QDialog):
             self.timer.stop()
         if self.ser:
             self.ser.close()
+        if self.card_reader:
+            self.card_reader.close()
         super().closeEvent(event)
