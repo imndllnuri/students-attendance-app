@@ -47,7 +47,7 @@ from shared.session_timeout import (
     save_session_timeout_minutes,
 )
 from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
-from shared.widgets import make_stat_card, make_tag_pill
+from shared.widgets import clear_layout, make_stat_card, make_tag_pill
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -159,8 +159,6 @@ class MainWindow(QMainWindow):
         self._info_panel_expanded = True
         self._info_panel_animation = None
         self.info_panel_collapse_btn.clicked.connect(self.toggle_info_panel)
-        self.info_panel_pinned_btn.clicked.connect(self.show_pinned_classes)
-        self.info_panel_activity_btn.clicked.connect(self.show_notifications_menu)
 
         self._nav_buttons = (self.my_classes_btn, self.settings_btn, self.statistics_btn)
         self._setup_icons()
@@ -427,24 +425,34 @@ class MainWindow(QMainWindow):
         )
 
     def _sync_info_panel_visibility(self):
-        """The Info panel only applies to My Classes (and, once its content
-        is wired in a later phase, Statistics) - Settings/Profile/Search
-        keep the 3rd grid column hidden entirely, per the redesign's scope
-        decision that the panel is not a global chrome element."""
-        applicable = self.stackedWidget.currentIndex() in (MY_CLASSES_PAGE,)
+        """The Info panel only applies to My Classes and Class Detail
+        (and, once its content is wired in a later phase, Statistics) -
+        Settings/Profile/Search keep the 3rd grid column hidden entirely,
+        per the redesign's scope decision that the panel is not a global
+        chrome element."""
+        from views.class_window import ClassWindow
+
+        current = self.stackedWidget.currentWidget()
+        applicable = self.stackedWidget.currentIndex() == MY_CLASSES_PAGE or isinstance(current, ClassWindow)
         self.info_panel_widget.setVisible(applicable and self._info_panel_expanded)
 
-    def set_info_panel_content(self, stats=(), properties=(), tags=()):
-        """Repopulates the Info panel's 3 dynamic sections.
+    def set_info_panel_content(self, stats=(), properties=(), tags=(), footer_actions=()):
+        """Repopulates the Info panel's 3 dynamic sections plus its bottom
+        action row.
         `stats`: iterable of (label, value, percent, fill_color_or_None) tuples.
         `properties`: iterable of (label, value) tuples.
-        `tags`: iterable of (text, color_key) tuples."""
+        `tags`: iterable of (text, color_key) tuples.
+        `footer_actions`: iterable of up to 2 (label, callback) tuples,
+        rendered onto the panel's 2 fixed bottom buttons - callers always
+        pass their own actions explicitly rather than relying on a shared
+        default, since the same 2 buttons are reused across every screen
+        that shows this panel (My Classes, Class Detail, ...)."""
         for layout in (
             self.info_panel_stats_layout,
             self.info_panel_properties_layout,
             self.info_panel_tags_layout,
         ):
-            self._clear_layout(layout)
+            clear_layout(layout)
 
         for label, value, percent, fill_color in stats:
             self.info_panel_stats_layout.addWidget(
@@ -467,6 +475,19 @@ class MainWindow(QMainWindow):
         for text, color_key in tags:
             self.info_panel_tags_layout.addWidget(make_tag_pill(text, color_key))
         self.info_panel_tags_layout.addStretch(1)
+
+        footer_buttons = (self.info_panel_pinned_btn, self.info_panel_activity_btn)
+        for button in footer_buttons:
+            try:
+                button.clicked.disconnect()
+            except TypeError:
+                pass  # nothing connected yet
+        for button, (label, callback) in zip(footer_buttons, footer_actions):
+            button.setText(label)
+            button.setVisible(True)
+            button.clicked.connect(callback)
+        for button in footer_buttons[len(footer_actions):]:
+            button.setVisible(False)
 
     def _set_active_nav(self, active_btn):
         for btn in self._nav_buttons:
@@ -559,28 +580,9 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(self, "Success", f"Class list exported to:\n{file_path}")
 
-    @staticmethod
-    def _clear_layout(layout):
-        """Empties a layout's widgets. Reparents to None immediately (not
-        just deleteLater(), which only schedules destruction for the next
-        event-loop pass) so a stale widget can never still be visible/
-        painted at its old position if this layout is repopulated again
-        before that deferred deletion actually runs - e.g. the class-card
-        grid's column count can change between calls (it depends on the
-        container's live width, which isn't final until the window is
-        actually shown), so an old, wrong-column-count card layout must be
-        fully gone before the next one is laid out, not just "on its way
-        out"."""
-        while layout.count():
-            item = layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.setParent(None)
-                widget.deleteLater()
-
     def load_classes(self):
         """Load class buttons into class_btns_layout"""
-        self._clear_layout(self.class_btns_layout)
+        clear_layout(self.class_btns_layout)
 
         self.selected_class_ids = set()
         showing_archived = self.show_archived_cb.isChecked()
@@ -620,10 +622,10 @@ class MainWindow(QMainWindow):
     def _update_info_panel_for_my_classes(self):
         """My Classes' Info panel shows an at-a-glance overview rather than
         a single class's detail: unlike Kintsugi's file browser, clicking a
-        class here navigates away to Class Window (which gets its own Info
-        panel of per-class detail in a later phase) rather than selecting
-        it in place, so there's no single "currently selected" class to
-        show here."""
+        class here navigates away to Class Window (which has its own Info
+        panel of per-class detail, see ClassWindow._update_info_panel)
+        rather than selecting it in place, so there's no single "currently
+        selected" class to show here."""
         try:
             all_classes = self.class_manager.load_classes_for_instructor(self.user_id, include_archived=True)
         except ApiError:
@@ -646,7 +648,13 @@ class MainWindow(QMainWindow):
             ("Total Classes", str(total)),
             ("Archived", str(archived)),
         ]
-        self.set_info_panel_content(stats=stats, properties=properties, tags=[])
+        self.set_info_panel_content(
+            stats=stats, properties=properties, tags=[],
+            footer_actions=[
+                ("📌  Pinned items", self.show_pinned_classes),
+                ("✉  Activity", self.show_notifications_menu),
+            ],
+        )
 
     def _populate_custom_order_list(self, classes):
         self.custom_order_listWidget.clear()
@@ -676,7 +684,7 @@ class MainWindow(QMainWindow):
         ]
 
     def _populate_today_classes(self, classes):
-        self._clear_layout(self.today_classes_layout)
+        clear_layout(self.today_classes_layout)
 
         todays_classes = self._classes_scheduled_today(classes)
         self.no_classes_today_lbl.setVisible(not todays_classes)
@@ -707,7 +715,7 @@ class MainWindow(QMainWindow):
         self.recently_viewed_class_ids = self.recently_viewed_class_ids[:5]
 
     def _populate_recently_viewed(self, classes):
-        self._clear_layout(self.recently_viewed_layout)
+        clear_layout(self.recently_viewed_layout)
 
         by_id = {c.class_id: c for c in classes}
         recent_classes = [
@@ -939,7 +947,10 @@ class MainWindow(QMainWindow):
 
         if existing_index is not None:
             self.stackedWidget.setCurrentIndex(existing_index)
-            return self.stackedWidget.widget(existing_index)
+            class_page = self.stackedWidget.widget(existing_index)
+            class_page.refresh_info_panel()
+            self._sync_info_panel_visibility()
+            return class_page
 
         from views.class_window import ClassWindow
 
@@ -947,11 +958,22 @@ class MainWindow(QMainWindow):
         index = self.stackedWidget.addWidget(class_page)
         class_page.setProperty("class_code", class_obj.class_code)
         self.stackedWidget.setCurrentIndex(index)
+        self._sync_info_panel_visibility()
         return class_page
 
     def open_take_attendance_for(self, cls):
         class_page = self.open_class_window(cls)
         class_page.attendance_page_show()
+
+    def show_statistics_for_class(self, cls):
+        """Jump to Statistics pre-filtered to one class - used by Class
+        Window's Info panel "View Full Statistics" action."""
+        self.show_statistics()
+        for i in range(self.statistics_class_combo.count()):
+            item_cls = self.statistics_class_combo.itemData(i)
+            if item_cls is not None and item_cls.class_id == cls.class_id:
+                self.statistics_class_combo.setCurrentIndex(i)
+                break
 
     def find_class_tab(self, class_code):
         for i in range(self.stackedWidget.count()):
@@ -1422,7 +1444,7 @@ class MainWindow(QMainWindow):
     def show_search(self):
         self.stackedWidget.setCurrentIndex(SEARCH_PAGE)
         self._sync_info_panel_visibility()
-        self._clear_layout(self.search_results_layout)
+        clear_layout(self.search_results_layout)
 
         query = self.search_bar_le.text().strip().lower()
         classes = self.fetch_classes()

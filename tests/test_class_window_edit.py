@@ -42,7 +42,7 @@ def make_class(class_name="Intro to Programming", late_threshold=15):
 def test_edit_button_opens_add_new_class_window_in_edit_mode(qtbot, monkeypatch):
     cls = make_class()
     manager = FakeClassManager([cls])
-    main_window = types.SimpleNamespace(load_classes=lambda: None)
+    main_window = types.SimpleNamespace(load_classes=lambda: None, set_info_panel_content=lambda **k: None)
     window = ClassWindow(cls, main_window, manager)
     qtbot.addWidget(window)
 
@@ -56,7 +56,9 @@ def test_reload_after_edit_refreshes_class_details(qtbot, monkeypatch):
     cls = make_class()
     manager = FakeClassManager([cls])
     calls = []
-    main_window = types.SimpleNamespace(load_classes=lambda: calls.append("reloaded"))
+    main_window = types.SimpleNamespace(
+        load_classes=lambda: calls.append("reloaded"), set_info_panel_content=lambda **k: None
+    )
     window = ClassWindow(cls, main_window, manager)
     qtbot.addWidget(window)
 

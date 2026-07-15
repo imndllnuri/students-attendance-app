@@ -22,8 +22,17 @@
         <layout class="QHBoxLayout" name="class_header_layout">
          <item>
           <widget class="QPushButton" name="back_to_my_classes_btn">
-           <property name="text">
+           <property name="minimumSize">
+            <size><width>32</width><height>32</height></size>
+           </property>
+           <property name="maximumSize">
+            <size><width>32</width><height>32</height></size>
+           </property>
+           <property name="toolTip">
             <string>Back to My Classes</string>
+           </property>
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -35,6 +44,13 @@
            <property name="leftMargin">
             <number>16</number>
            </property>
+           <item>
+            <widget class="QLabel" name="class_breadcrumb_lbl">
+             <property name="text">
+              <string>My Classes</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QLabel" name="class_name_header_lbl">
              <property name="text">
@@ -100,41 +116,42 @@
           </widget>
          </item>
          <item>
-          <layout class="QGridLayout" name="class_details_grid">
-           <item row="0" column="0">
-            <widget class="QLabel" name="attendance_policy_lbl">
-             <property name="text">
-              <string>Attendance Policy:</string>
-             </property>
-            </widget>
+          <layout class="QVBoxLayout" name="class_details_grid">
+           <property name="spacing"><number>6</number></property>
+           <item>
+            <layout class="QHBoxLayout" name="attendance_policy_row">
+             <item><widget class="QLabel" name="attendance_policy_key_lbl"><property name="text"><string>Attendance Policy</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+             <item><spacer name="attendance_policy_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+             <item><widget class="QLabel" name="attendance_policy_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+            </layout>
            </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="late_threshold_lbl">
-             <property name="text">
-              <string>Late Threshold:</string>
-             </property>
-            </widget>
+           <item>
+            <layout class="QHBoxLayout" name="late_threshold_row">
+             <item><widget class="QLabel" name="late_threshold_key_lbl"><property name="text"><string>Late Threshold</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+             <item><spacer name="late_threshold_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+             <item><widget class="QLabel" name="late_threshold_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+            </layout>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="number_of_weeks_lbl">
-             <property name="text">
-              <string>Number of Weeks:</string>
-             </property>
-            </widget>
+           <item>
+            <layout class="QHBoxLayout" name="number_of_weeks_row">
+             <item><widget class="QLabel" name="number_of_weeks_key_lbl"><property name="text"><string>Number of Weeks</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+             <item><spacer name="number_of_weeks_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+             <item><widget class="QLabel" name="number_of_weeks_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+            </layout>
            </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="total_hours_lbl">
-             <property name="text">
-              <string>Total Hours:</string>
-             </property>
-            </widget>
+           <item>
+            <layout class="QHBoxLayout" name="total_hours_row">
+             <item><widget class="QLabel" name="total_hours_key_lbl"><property name="text"><string>Total Hours</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+             <item><spacer name="total_hours_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+             <item><widget class="QLabel" name="total_hours_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+            </layout>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="weekly_hours_lbl">
-             <property name="text">
-              <string>Weekly Hours:</string>
-             </property>
-            </widget>
+           <item>
+            <layout class="QHBoxLayout" name="weekly_hours_row">
+             <item><widget class="QLabel" name="weekly_hours_key_lbl"><property name="text"><string>Weekly Hours</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+             <item><spacer name="weekly_hours_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+             <item><widget class="QLabel" name="weekly_hours_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -254,6 +271,11 @@
           <widget class="QWidget" name="at_risk_widget" native="true">
            <property name="visible"><bool>false</bool></property>
            <layout class="QVBoxLayout" name="at_risk_layout">
+            <property name="leftMargin"><number>14</number></property>
+            <property name="topMargin"><number>10</number></property>
+            <property name="rightMargin"><number>14</number></property>
+            <property name="bottomMargin"><number>10</number></property>
+            <property name="spacing"><number>4</number></property>
             <item>
              <widget class="QLabel" name="at_risk_title_lbl">
               <property name="text"><string>At-Risk Students</string></property>

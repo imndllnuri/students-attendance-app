@@ -24,6 +24,20 @@ from PyQt5.QtWidgets import (
 from shared.palette import RADIUS, TAG_COLORS, DARK_TAG_COLORS, active_palette
 
 
+def clear_layout(layout) -> None:
+    """Empties a layout, detaching each child widget immediately via
+    setParent(None) rather than relying on deleteLater() alone - a bare
+    deleteLater() defers destruction, so a widget can still be painted at
+    its old position if the layout is repopulated (e.g. with a different
+    column count) before the event loop gets around to deleting it."""
+    while layout.count():
+        item = layout.takeAt(0)
+        widget = item.widget()
+        if widget:
+            widget.setParent(None)
+            widget.deleteLater()
+
+
 def make_stat_card(label: str, value: str, percent: int, fill_color: str = None) -> QFrame:
     """A small rounded card: a label, a big value, and a thin rounded
     progress bar - e.g. "Attendance Rate" / "82%" / a mostly-filled bar."""

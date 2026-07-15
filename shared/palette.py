@@ -189,3 +189,14 @@ def class_tag_color(class_code: str) -> str:
 
     index = zlib.crc32(class_code.encode("utf-8")) % len(CLASS_TAG_COLORS)
     return CLASS_TAG_COLORS[index]
+
+
+def class_tag_color_key(class_code: str) -> str:
+    """Deterministic TAG_COLORS/DARK_TAG_COLORS key per class code, for
+    contexts that need a named tag-pill color (see shared.widgets.make_tag_pill)
+    rather than class_tag_color()'s raw hex (used for the class-card
+    illustration tint)."""
+    import zlib
+
+    keys = list(TAG_COLORS.keys())
+    return keys[zlib.crc32(class_code.encode("utf-8")) % len(keys)]

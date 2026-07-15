@@ -33,7 +33,10 @@ def make_class():
 
 
 def build_window(qtbot, rows):
-    main_window = types.SimpleNamespace(load_classes=lambda: None, add_notification=lambda msg: None)
+    main_window = types.SimpleNamespace(
+        load_classes=lambda: None, add_notification=lambda msg: None,
+        set_info_panel_content=lambda **k: None,
+    )
     window = ClassWindow(make_class(), main_window, FakeClassManager(rows))
     qtbot.addWidget(window)
     window.show()
@@ -72,7 +75,8 @@ def test_at_risk_widget_hidden_when_roster_empty(qtbot):
 def test_at_risk_summary_notifies_main_window(qtbot):
     notified = []
     main_window = types.SimpleNamespace(
-        load_classes=lambda: None, add_notification=lambda msg: notified.append(msg)
+        load_classes=lambda: None, add_notification=lambda msg: notified.append(msg),
+        set_info_panel_content=lambda **k: None,
     )
     rows = [
         ["20230001", "Grace Hopper", 8, 5],

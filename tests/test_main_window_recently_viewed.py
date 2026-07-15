@@ -94,8 +94,12 @@ def test_open_class_window_tracks_the_class(qtbot, monkeypatch):
     window = build_window(qtbot, monkeypatch)
     c1 = make_class("c1", "COMP101")
     monkeypatch.setattr(window, "find_class_tab", lambda code: 0)
+    fake_class_page = types.SimpleNamespace(refresh_info_panel=lambda: None)
     monkeypatch.setattr(window, "stackedWidget", types.SimpleNamespace(
-        setCurrentIndex=lambda i: None, widget=lambda i: None
+        setCurrentIndex=lambda i: None,
+        widget=lambda i: fake_class_page,
+        currentWidget=lambda: fake_class_page,
+        currentIndex=lambda: 0,
     ))
 
     window.open_class_window(c1)

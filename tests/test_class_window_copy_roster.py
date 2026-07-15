@@ -49,7 +49,7 @@ def make_class(class_id, code):
 
 def build_window(qtbot, classes, rosters):
     manager = FakeClassManager(classes, rosters)
-    main_window = types.SimpleNamespace(load_classes=lambda: None)
+    main_window = types.SimpleNamespace(load_classes=lambda: None, set_info_panel_content=lambda **k: None)
     window = ClassWindow(classes[0], main_window, manager)
     qtbot.addWidget(window)
     return window, manager

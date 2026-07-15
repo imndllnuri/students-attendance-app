@@ -32,7 +32,7 @@ def make_class(schedule):
 
 def build_window(qtbot, schedule):
     cls = make_class(schedule)
-    main_window = types.SimpleNamespace(load_classes=lambda: None)
+    main_window = types.SimpleNamespace(load_classes=lambda: None, set_info_panel_content=lambda **k: None)
     window = ClassWindow(cls, main_window, FakeClassManager())
     qtbot.addWidget(window)
     return window

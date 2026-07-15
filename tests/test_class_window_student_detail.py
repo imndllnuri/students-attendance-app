@@ -33,7 +33,7 @@ def make_class():
 
 
 def build_window(qtbot):
-    main_window = types.SimpleNamespace(load_classes=lambda: None)
+    main_window = types.SimpleNamespace(load_classes=lambda: None, set_info_panel_content=lambda **k: None)
     window = ClassWindow(make_class(), main_window, FakeClassManager())
     qtbot.addWidget(window)
     return window

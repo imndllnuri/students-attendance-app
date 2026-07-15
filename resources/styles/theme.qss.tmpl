@@ -153,7 +153,8 @@ QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
 QLabel#roster_status_lbl,
 QLabel#attendance_progress_lbl,
-QLabel#sidebar_user_email_lbl {
+QLabel#sidebar_user_email_lbl,
+QLabel#class_breadcrumb_lbl {
     font-size: 9pt;
     color: {{text_secondary}};
 }
@@ -202,6 +203,41 @@ QLabel#schedule_slot_chip_lbl {
     border-radius: {{radius_pill}}px;
     padding: 4px 10px;
     margin: 2px;
+}
+
+/* --- Notes (Class Window) --- */
+
+QTextEdit#class_notes_edit {
+    background-color: {{bg_hover}};
+    border: 1.5px solid transparent;
+    border-radius: {{radius_control_sm}}px;
+    padding: 10px 14px;
+    font-size: 10pt;
+    color: {{text_primary}};
+}
+
+QTextEdit#class_notes_edit:focus {
+    border: 1.5px solid {{accent}};
+    background-color: {{bg_card}};
+}
+
+/* --- At-risk callout (Class Window) --- */
+
+QWidget#at_risk_widget {
+    background-color: {{warning_tint}};
+    border: 1px solid {{warning_border}};
+    border-radius: {{radius_control_sm}}px;
+}
+
+QLabel#at_risk_title_lbl {
+    font-weight: 700;
+    font-size: 10pt;
+    color: {{warning_text}};
+}
+
+QLabel#at_risk_students_lbl {
+    font-size: 9pt;
+    color: {{warning_text}};
 }
 
 /* --- Notifications badge --- */
@@ -412,7 +448,6 @@ QPushButton#change_password_btn,
 QPushButton#update_security_question_btn,
 QPushButton#create_new_class_btn,
 QPushButton#create_class_btn,
-QPushButton#take_attendance_btn,
 QPushButton#start_attendance_btn,
 QPushButton#submit_attendance_btn {
     background-color: {{accent}};
@@ -429,7 +464,6 @@ QPushButton#change_password_btn:hover,
 QPushButton#update_security_question_btn:hover,
 QPushButton#create_new_class_btn:hover,
 QPushButton#create_class_btn:hover,
-QPushButton#take_attendance_btn:hover,
 QPushButton#start_attendance_btn:hover,
 QPushButton#submit_attendance_btn:hover {
     background-color: {{accent_hover}};
@@ -440,14 +474,12 @@ QPushButton#change_password_btn:pressed,
 QPushButton#update_security_question_btn:pressed,
 QPushButton#create_new_class_btn:pressed,
 QPushButton#create_class_btn:pressed,
-QPushButton#take_attendance_btn:pressed,
 QPushButton#start_attendance_btn:pressed,
 QPushButton#submit_attendance_btn:pressed {
     background-color: {{accent_pressed}};
 }
 
 QPushButton#create_class_btn:disabled,
-QPushButton#take_attendance_btn:disabled,
 QPushButton#start_attendance_btn:disabled,
 QPushButton#submit_attendance_btn:disabled {
     background-color: {{accent_subtle}};
@@ -457,9 +489,6 @@ QPushButton#submit_attendance_btn:disabled {
 /* --- Secondary outline buttons (blue) - legacy objectName chain --- */
 
 QPushButton#edit_profile_btn,
-QPushButton#refresh_student_list_btn,
-QPushButton#back_to_my_classes_btn,
-QPushButton#class_settings_btn,
 QPushButton#export_to_excel_btn,
 QPushButton#spreadsheet_file_btn,
 QPushButton#add_slot_monday_btn,
@@ -476,9 +505,6 @@ QPushButton#add_slot_friday_btn {
 }
 
 QPushButton#edit_profile_btn:hover,
-QPushButton#refresh_student_list_btn:hover,
-QPushButton#back_to_my_classes_btn:hover,
-QPushButton#class_settings_btn:hover,
 QPushButton#export_to_excel_btn:hover,
 QPushButton#spreadsheet_file_btn:hover,
 QPushButton#add_slot_monday_btn:hover,
@@ -667,7 +693,9 @@ QPushButton#class_card_illustration_btn {
     border: none;
 }
 
-QPushButton#card_icon_btn {
+QPushButton#card_icon_btn,
+QPushButton#back_to_my_classes_btn,
+QPushButton#refresh_student_list_btn {
     background-color: transparent;
     border: none;
     border-radius: {{radius_control_sm}}px;
@@ -675,7 +703,9 @@ QPushButton#card_icon_btn {
     padding: 2px;
 }
 
-QPushButton#card_icon_btn:hover {
+QPushButton#card_icon_btn:hover,
+QPushButton#back_to_my_classes_btn:hover,
+QPushButton#refresh_student_list_btn:hover {
     background-color: {{bg_hover}};
 }
 
