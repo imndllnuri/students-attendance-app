@@ -165,6 +165,11 @@
                 <property name="text"><string>Show Archived</string></property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="export_class_list_btn">
+                <property name="text"><string>Export List</string></property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>

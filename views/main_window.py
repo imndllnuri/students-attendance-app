@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 
 import qtawesome as qta
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
+        self.export_class_list_btn.clicked.connect(self.export_class_list)
 
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
@@ -225,6 +227,45 @@ class MainWindow(QMainWindow):
             days = [_WEEKDAY_ORDER.get(day, 99) for day, slots in cls.schedule.items() if slots]
             return (min(days) if days else 99, cls.class_code.lower())
         return (cls.class_code.lower(),)
+
+    def _format_schedule_for_export(self, schedule):
+        parts = []
+        for day, slots in schedule.items():
+            times = [f"{s.start_time.toString('HH:mm')}-{s.end_time.toString('HH:mm')}" for s in slots if s.selected]
+            if times:
+                parts.append(f"{day}: {', '.join(times)}")
+        return "; ".join(parts)
+
+    def export_class_list(self):
+        classes = self.fetch_classes()
+        if not classes:
+            QMessageBox.information(self, "Nothing to Export", "No classes to export.")
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Class List", "classes.csv", "CSV Files (*.csv)"
+        )
+        if not file_path:
+            return
+
+        try:
+            with open(file_path, "w", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    "Class Code", "Class Name", "Section", "Attendance Policy (%)",
+                    "Late Threshold (min)", "Weeks", "Total Hours", "Weekly Hours", "Schedule",
+                ])
+                for cls in classes:
+                    writer.writerow([
+                        cls.class_code, cls.class_name, cls.section, cls.attendance_policy,
+                        cls.late_threshold, cls.total_weeks, cls.total_hours, cls.weekly_hours,
+                        self._format_schedule_for_export(cls.schedule),
+                    ])
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write file:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Class list exported to:\n{file_path}")
 
     def load_classes(self):
         """Load class buttons into class_btns_layout"""

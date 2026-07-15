@@ -53,6 +53,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] Show-password checkbox on the login screen
 
 ## Batch 2 (from ideas.md)
+- [x] 13. CSV export of the class list
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope
