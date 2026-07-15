@@ -15,7 +15,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 6. Sort/filter classes (by code, name, day)
 - [x] 7. Color tag per class card
 - [x] 8. Archive a class instead of hard delete
-- [ ] 9. "Duplicate Class" (copy settings into a new class)
+- [x] 9. "Duplicate Class" (copy settings into a new class)
 - [ ] 10. Search by student name, not just class name/code
 
 ## Class Detail & Roster

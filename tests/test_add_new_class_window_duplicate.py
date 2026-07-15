@@ -1,4 +1,4 @@
-"""Covers #11: Edit Class (was previously create-only)."""
+"""Covers #9: "Duplicate Class" (copy schedule/policy into a new class)."""
 
 from PyQt5.QtCore import QTime
 
@@ -8,11 +8,11 @@ from models.classes import Class, ScheduleSlot
 
 class FakeClassManager:
     def __init__(self):
-        self.updated = None
+        self.added = None
 
-    def update_class(self, class_id, fields):
-        self.updated = (class_id, fields)
-        return {"class_id": class_id, **fields}
+    def add_class(self, new_class):
+        self.added = new_class
+        new_class.class_id = "new-id"
 
 
 def make_class():
@@ -28,9 +28,7 @@ def make_class():
         weekly_hours=3,
         schedule={
             "Monday": [
-                ScheduleSlot(
-                    day="Monday", start_time=QTime(9, 0), end_time=QTime(10, 50), selected=True
-                )
+                ScheduleSlot(day="Monday", start_time=QTime(9, 0), end_time=QTime(10, 50), selected=True)
             ]
         },
         class_id="c1",
@@ -41,36 +39,34 @@ def build_window(qtbot, monkeypatch, cls):
     monkeypatch.setattr(acw, "ClassManager", FakeClassManager)
     monkeypatch.setattr(acw.QMessageBox, "information", lambda *a, **k: None)
     monkeypatch.setattr(acw.QMessageBox, "warning", lambda *a, **k: None)
-    window = acw.AddNewClassWindow("instr-1", existing_class=cls)
+    window = acw.AddNewClassWindow("instr-1", duplicate_from=cls)
     qtbot.addWidget(window)
     window.show()
     return window
 
 
-def test_prefills_fields_and_schedule_for_editing(qtbot, monkeypatch):
+def test_prefills_schedule_and_policy_but_leaves_class_code_blank(qtbot, monkeypatch):
     cls = make_class()
     window = build_window(qtbot, monkeypatch, cls)
 
-    assert window.class_code_le.text() == "COMP101"
-    assert window.class_code_le.isReadOnly()
+    assert window.class_code_le.text() == ""
+    assert not window.class_code_le.isReadOnly()
     assert window.class_name_le.text() == "Intro to Programming"
-    assert window.create_class_btn.text() == "Save Changes"
+    assert window.create_class_btn.text() == "Create New Class"  # unchanged from create-mode default
     assert window.monday_cb.isChecked()
     assert window.time_slots["Monday"][0][0].time() == QTime(9, 0)
-    assert not window.spreadsheet_file_btn.isVisible()
+    assert window.spreadsheet_file_btn.isVisible()
 
 
-def test_saving_edits_calls_update_class_not_create(qtbot, monkeypatch):
+def test_saving_creates_a_new_class_not_an_update(qtbot, monkeypatch):
     cls = make_class()
     window = build_window(qtbot, monkeypatch, cls)
-
-    window.class_name_le.setText("Advanced Programming")
-    window.late_threshold_le.setText("20")
+    window.class_code_le.setText("COMP101-B")
 
     window.create_class()
 
-    class_id, fields = window.class_manager.updated
-    assert class_id == "c1"
-    assert fields["class_name"] == "Advanced Programming"
-    assert fields["late_threshold"] == 20
-    assert fields["schedule"]["Monday"][0]["start_time"] == "09:00"
+    added = window.class_manager.added
+    assert added is not None
+    assert added.class_code == "COMP101-B"
+    assert added.attendance_policy == 70
+    assert "Monday" in added.schedule

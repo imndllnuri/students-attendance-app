@@ -298,6 +298,11 @@ class MainWindow(QMainWindow):
         text_layout.addWidget(class_btn)
         text_layout.addWidget(caption_lbl)
 
+        duplicate_btn = QPushButton("Duplicate")
+        duplicate_btn.setCursor(Qt.PointingHandCursor)
+        duplicate_btn.setToolTip("Create a new class with the same schedule and policy")
+        duplicate_btn.clicked.connect(lambda _, c=cls: self.open_duplicate_class_window(c))
+
         archive_btn = QPushButton("X")
         archive_btn.setObjectName("class_delete_btn")
         archive_btn.setFixedSize(25, 25)
@@ -306,8 +311,14 @@ class MainWindow(QMainWindow):
         archive_btn.clicked.connect(lambda _, c=cls: self.archive_class(c))
 
         row_layout.addLayout(text_layout, 1)
+        row_layout.addWidget(duplicate_btn)
         row_layout.addWidget(archive_btn)
         return class_widget
+
+    def open_duplicate_class_window(self, cls):
+        self.duplicate_class_window = AddNewClassWindow(user_id=self.user_id, duplicate_from=cls)
+        self.duplicate_class_window.class_created.connect(self.load_classes)
+        self.duplicate_class_window.show()
 
     def _make_archived_class_row_widget(self, cls):
         class_widget = QWidget()

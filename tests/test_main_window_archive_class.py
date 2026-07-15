@@ -100,3 +100,13 @@ def test_unarchive_button_calls_manager(qtbot, monkeypatch):
     window.unarchive_class(cls)
 
     assert window.class_manager.unarchived_ids == ["c-COMP102"]
+
+
+def test_duplicate_button_opens_add_new_class_window_with_duplicate_from(qtbot, monkeypatch):
+    window = build_window(qtbot, monkeypatch)
+    cls = make_class("COMP101", archived=False)
+
+    window.open_duplicate_class_window(cls)
+
+    assert window.duplicate_class_window.existing_class is None
+    assert window.duplicate_class_window.class_name_le.text() == "COMP101 Name"

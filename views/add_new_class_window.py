@@ -11,7 +11,7 @@ from services.api_client import ApiError
 class AddNewClassWindow(QWidget):
     class_created = pyqtSignal()
 
-    def __init__(self, user_id, existing_class=None):
+    def __init__(self, user_id, existing_class=None, duplicate_from=None):
         super().__init__()
         uic.loadUi("ui/add_new_class.ui", self)
         for col, stretch in enumerate((0, 1, 0, 0, 1)):
@@ -40,12 +40,10 @@ class AddNewClassWindow(QWidget):
 
         if existing_class is not None:
             self._prefill_for_edit(existing_class)
+        elif duplicate_from is not None:
+            self._prefill_for_duplicate(duplicate_from)
 
-    def _prefill_for_edit(self, cls):
-        self.setWindowTitle(f"Edit Class - {cls.class_code}")
-        self.create_class_btn.setText("Save Changes")
-        self.class_code_le.setText(cls.class_code)
-        self.class_code_le.setReadOnly(True)
+    def _prefill_fields(self, cls):
         self.class_name_le.setText(cls.class_name)
         self.class_section_le.setText(cls.section)
         self.attendance_policy_le.setText(str(cls.attendance_policy))
@@ -53,11 +51,6 @@ class AddNewClassWindow(QWidget):
         self.number_of_weeks_le.setText(str(cls.total_weeks))
         self.total_hours_le.setText(str(cls.total_hours))
         self.weekly_hours_le.setText(str(cls.weekly_hours))
-
-        # Roster edits are handled separately (add/remove individual students);
-        # this dialog only edits schedule/policy fields when editing a class.
-        self.spreadsheet_lbl.setVisible(False)
-        self.spreadsheet_file_btn.setVisible(False)
 
         for day, slots in cls.schedule.items():
             if not any(slot.selected for slot in slots):
@@ -73,6 +66,23 @@ class AddNewClassWindow(QWidget):
                 start_edit, end_edit = self.time_slots[day][-1]
                 start_edit.setTime(slot.start_time)
                 end_edit.setTime(slot.end_time)
+
+    def _prefill_for_edit(self, cls):
+        self.setWindowTitle(f"Edit Class - {cls.class_code}")
+        self.create_class_btn.setText("Save Changes")
+        self.class_code_le.setText(cls.class_code)
+        self.class_code_le.setReadOnly(True)
+        self._prefill_fields(cls)
+
+        # Roster edits are handled separately (add/remove individual students);
+        # this dialog only edits schedule/policy fields when editing a class.
+        self.spreadsheet_lbl.setVisible(False)
+        self.spreadsheet_file_btn.setVisible(False)
+
+    def _prefill_for_duplicate(self, cls):
+        self.setWindowTitle(f"Duplicate Class - Based on {cls.class_code}")
+        self._prefill_fields(cls)
+        # class_code_le is left blank/editable: the copy needs its own unique code.
 
     def add_time_slot(self, day):
         container = self.findChild(QWidget, f"{day.lower()}GroupBox")
