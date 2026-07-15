@@ -60,6 +60,7 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 28. Confirm closing Take Attendance with unsubmitted records
 - [x] 26. Session countdown/timer display
 - [x] 25. Duplicate-card warning
+- [x] 17. Duplicate student-number detection on roster upload
 - [x] 34. Per-student attendance CSV export
 
 ## Notes on scope

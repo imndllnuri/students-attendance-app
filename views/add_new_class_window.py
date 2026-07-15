@@ -232,6 +232,17 @@ class AddNewClassWindow(QWidget):
                         "name_surname": full_name,
                     })
 
+            duplicates = self._find_duplicate_student_numbers(students)
+            if duplicates:
+                reply = QMessageBox.warning(
+                    self, "Duplicate Student Numbers",
+                    "These student numbers appear more than once in the spreadsheet: "
+                    f"{', '.join(sorted(duplicates))}. Load anyway?",
+                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+                )
+                if reply != QMessageBox.Yes:
+                    return
+
             self.students = students
             QMessageBox.information(self, "Success",
                                   f"Loaded {len(students)} students. They'll be saved with the class.")
@@ -239,6 +250,16 @@ class AddNewClassWindow(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Spreadsheet processing failed: {str(e)}")
             self.roster_load_failed.emit(str(e))
+
+    def _find_duplicate_student_numbers(self, students):
+        seen = set()
+        duplicates = set()
+        for student in students:
+            number = student["student_number"]
+            if number in seen:
+                duplicates.add(number)
+            seen.add(number)
+        return duplicates
 
     def validate_inputs(self):
         required_fields = [
