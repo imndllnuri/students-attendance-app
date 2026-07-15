@@ -7,7 +7,7 @@ marked "not selected" were intentionally left out of this batch.
 ## Login & Account
 - [x] 1. Password strength indicator on password-creation fields
 - [ ] 2. Email verification step on signup (not selected)
-- [ ] 3. Session timeout / auto-logout after inactivity
+- [x] 3. Session timeout / auto-logout after inactivity
 - [ ] 4. "Recent logins" log on the Profile page
 
 ## Dashboard / My Classes / Search

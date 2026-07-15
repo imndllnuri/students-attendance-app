@@ -1,8 +1,9 @@
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import QEvent, Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
+    QApplication,
     QFrame,
     QGraphicsDropShadowEffect,
     QHBoxLayout,
@@ -33,6 +34,9 @@ from models.accounts import AccountManager
 from models.classes import Class, ClassManager
 
 MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(5)
+
+SESSION_TIMEOUT_MINUTES = 15
+_ACTIVITY_EVENTS = (QEvent.MouseMove, QEvent.MouseButtonPress, QEvent.KeyPress, QEvent.Wheel)
 
 _WEEKDAY_ORDER = {
     "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3,
@@ -84,9 +88,36 @@ class MainWindow(QMainWindow):
         self._apply_card_shadows()
         self._set_active_nav(self.my_classes_btn)
         self._setup_shortcuts()
+        self._setup_session_timeout()
 
         self.load_classes()
         self.show()
+
+    # --- Session timeout ---
+
+    def _setup_session_timeout(self):
+        self._inactivity_timer = QTimer(self)
+        self._inactivity_timer.setSingleShot(True)
+        self._inactivity_timer.timeout.connect(self._handle_session_timeout)
+        QApplication.instance().installEventFilter(self)
+        self._reset_inactivity_timer()
+
+    def eventFilter(self, obj, event):
+        if event.type() in _ACTIVITY_EVENTS:
+            self._reset_inactivity_timer()
+        return super().eventFilter(obj, event)
+
+    def _reset_inactivity_timer(self):
+        self._inactivity_timer.start(SESSION_TIMEOUT_MINUTES * 60 * 1000)
+
+    def _handle_session_timeout(self):
+        QApplication.instance().removeEventFilter(self)
+        QMessageBox.information(
+            self,
+            "Session Expired",
+            f"You've been logged out after {SESSION_TIMEOUT_MINUTES} minutes of inactivity.",
+        )
+        self.logout()
 
     def _setup_icons(self):
         self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#94A3B8"))
@@ -269,6 +300,8 @@ class MainWindow(QMainWindow):
 
     def logout(self):
         from views.login_window import LoginWindow
+        self._inactivity_timer.stop()
+        QApplication.instance().removeEventFilter(self)
         self.close()
         self.login_window = LoginWindow()
         self.login_window.show()
