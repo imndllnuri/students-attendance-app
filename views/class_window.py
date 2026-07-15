@@ -165,6 +165,7 @@ class ClassWindow(QMainWindow):
         self.add_student_btn.clicked.connect(self.add_roster_student)
         self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
         self.student_list_tableWidget.cellDoubleClicked.connect(self.handle_roster_cell_double_click)
+        self.export_roster_btn.clicked.connect(self.export_roster)
 
     _FIRST_SESSION_COLUMN = 4  # Student Number, Name Surname, Not Attended, Attended
 
@@ -291,6 +292,38 @@ class ClassWindow(QMainWindow):
             return
 
         self.load_student_list()
+
+    def export_roster(self):
+        try:
+            roster = self.class_manager.get_roster(self.class_obj.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load roster:\n{e}")
+            return
+
+        if not roster:
+            QMessageBox.information(self, "Nothing to Export", "This class has no students yet.")
+            return
+
+        default_name = f"{self.class_obj.class_code}_roster.xlsx"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Roster", default_name, "Excel Files (*.xlsx);;CSV Files (*.csv)"
+        )
+        if not file_path:
+            return
+
+        df = pd.DataFrame(
+            [{"Student Number": s["student_number"], "Name Surname": s["name_surname"]} for s in roster]
+        )
+        try:
+            if file_path.endswith(".csv"):
+                df.to_csv(file_path, index=False)
+            else:
+                df.to_excel(file_path, index=False)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to write file:\n{e}")
+            return
+
+        QMessageBox.information(self, "Success", f"Roster exported to:\n{file_path}")
 
     def add_roster_student(self):
         student_number = self.new_student_number_le.text().strip()

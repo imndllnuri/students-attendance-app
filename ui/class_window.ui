@@ -190,6 +190,13 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="export_roster_btn">
+             <property name="text">
+              <string>Export Roster</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="refresh_student_list_btn">
              <property name="maximumSize">
               <size>
