@@ -93,6 +93,7 @@ class MainWindow(QMainWindow):
         self.notifications_btn.clicked.connect(self.show_notifications_menu)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
+        self.compare_classes_btn.clicked.connect(self.show_class_comparison)
         self.class_sort_combo.currentIndexChanged.connect(self.load_classes)
         self.show_archived_cb.toggled.connect(self.load_classes)
         self.compact_view_cb.blockSignals(True)
@@ -1172,6 +1173,50 @@ class MainWindow(QMainWindow):
             )
             axes_pie.set_title(f"Attendance for {cls.class_code}", color=PALETTE["text_primary"])
             self._render_attendance_trend(axes_trend, cls)
+
+        self.statistics_canvas = FigureCanvasQTAgg(figure)
+        self.statistics_chart_layout.addWidget(self.statistics_canvas)
+
+    def show_class_comparison(self):
+        """Bar chart comparing attendance rate across all of the
+        instructor's classes side by side, instead of one class at a time."""
+        classes = self.fetch_classes()
+        if not classes:
+            QMessageBox.information(self, "No Classes", "You have no classes to compare.")
+            return
+
+        if self.statistics_canvas is not None:
+            self.statistics_chart_layout.removeWidget(self.statistics_canvas)
+            self.statistics_canvas.deleteLater()
+            self.statistics_canvas = None
+
+        labels = []
+        rates = []
+        for cls in classes:
+            try:
+                stats = self.class_manager.get_statistics(cls.class_id)
+            except ApiError:
+                continue
+            total = stats["present"] + stats["late"] + stats["absent"]
+            if total == 0:
+                continue
+            rates.append((stats["present"] + stats["late"]) / total * 100)
+            labels.append(cls.class_code)
+
+        if not rates:
+            self.statistics_empty_lbl.setText("No attendance data yet across your classes.")
+            self.statistics_empty_lbl.setVisible(True)
+            return
+        self.statistics_empty_lbl.setVisible(False)
+
+        figure = Figure(figsize=(8, 4))
+        figure.patch.set_facecolor(PALETTE["bg_card"])
+        axes = figure.add_subplot(111)
+        axes.bar(labels, rates, color=PALETTE["accent"])
+        axes.set_ylim(0, 100)
+        axes.set_ylabel("Attendance Rate (%)", color=PALETTE["text_primary"])
+        axes.set_title("Attendance Comparison Across Classes", color=PALETTE["text_primary"])
+        axes.tick_params(colors=PALETTE["text_primary"])
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)

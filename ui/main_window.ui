@@ -618,6 +618,11 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="compare_classes_btn">
+              <property name="text"><string>Compare All Classes</string></property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="export_chart_btn">
               <property name="text"><string>Export Chart</string></property>
              </widget>
