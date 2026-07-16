@@ -23,7 +23,13 @@ views/                   # PyQt5 window/dialog controllers (one per .ui file)
                             # display + attendance-status coloring; add/remove
                             # of students happens via the Edit Class wizard's
                             # Roster step), launches TakeAttendance
-  take_attendance_window.py# RFID/manual attendance capture dialog
+  take_attendance_window.py# RFID/manual attendance capture, embedded as a
+                            # MainWindow.stackedWidget page (like
+                            # ClassWindow) rather than a separate window -
+                            # torn down (removeWidget + deleteLater()) on
+                            # the way out instead of cached, since a
+                            # session's roster/serial connection goes
+                            # stale if kept around
 
 ui/                       # Qt Designer .ui files, one per view above
 

@@ -510,3 +510,36 @@ detail is in `ROADMAP.md` itself; summary:
   here would be introducing an abstraction with no current problem to solve, which cuts against this
   project's own stated engineering principles. Left as an explicitly-declined roadmap item with
   reasoning attached, rather than silently dropped or done anyway for completeness.
+
+## 22. Take Attendance is no longer a separate window
+
+Per your request. `TakeAttendance` (`views/take_attendance_window.py`) was a `QDialog` shown via
+`.show()` - non-modal, but still a second top-level window floating independently of `MainWindow`.
+Converted to a `QWidget` (its `.ui` root was already `QWidget` - only the Python wrapper class was a
+`QDialog`) and embedded into `MainWindow.stackedWidget` by `ClassWindow.attendance_page_show()`,
+exactly the pattern already used for `ClassWindow` itself (§21's Phase-3 item -
+`open_class_window()`'s `addWidget()`/`setCurrentIndex()`).
+
+- **Not cached like `ClassWindow`'s tabs.** `open_class_window()` reuses an existing page for a
+  class you've already opened (`find_class_tab()`); Take Attendance doesn't get the same treatment
+  on purpose - each session freshly loads the roster and opens a serial/RFID connection in
+  `__init__`, so a cached instance would silently show a stale roster or a dead reader connection
+  the next time you opened it. Instead, `_return_to_class()` (new) does `removeWidget()` +
+  `deleteLater()` on the way out - the page is genuinely torn down, not hidden-and-kept.
+- **The unsubmitted-records confirmation still works unchanged.** `_return_to_class()` calls
+  `self.close()` first - which still runs the existing `closeEvent()` (Qt fires it regardless of
+  whether the widget is top-level) - and only proceeds with the stacked-widget navigation/teardown
+  if `close()` returns `True`, i.e. the user didn't decline the "discard unsubmitted records?"
+  prompt.
+- **Defensive against tests with no real `MainWindow`.** A dozen existing tests construct
+  `TakeAttendance` directly against lightweight duck-typed fakes (`class_window=None` or a
+  `FakeClassWindow` with just a `load_student_list()` method, no `main_window`/`stackedWidget`) -
+  `_return_to_class()` only attempts the stacked-widget navigation if
+  `self.class_window.main_window.stackedWidget` actually resolves, so those tests keep working
+  unmodified.
+- **New tests**: `tests/test_take_attendance_embedded_page.py` builds a real `MainWindow` +
+  `ClassWindow` (the other take-attendance tests all use fakes that never exercise this path) and
+  confirms: the page is added to `stackedWidget` and becomes current, `isWindow()` is `False`, the
+  back button returns to the class page and removes the attendance page from the stack, and
+  declining the unsubmitted-records prompt correctly stays put. Also verified visually via an
+  offscreen `window.grab()` smoke run through My Classes → Class Detail → Take Attendance → Back.

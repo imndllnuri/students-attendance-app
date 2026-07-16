@@ -512,9 +512,14 @@ class ClassWindow(QWidget):
         self.main_window.load_classes()
 
     def attendance_page_show(self):
+        """Take Attendance is embedded as a MainWindow.stackedWidget page,
+        like this class's own page, rather than opened as a separate
+        window - see TakeAttendance._return_to_class() for the trip back."""
         from views.take_attendance_window import TakeAttendance
         self.take_attendance_page = TakeAttendance(self.class_obj, self, self.class_manager)
-        self.take_attendance_page.show()
+        stacked_widget = self.main_window.stackedWidget
+        index = stacked_widget.addWidget(self.take_attendance_page)
+        stacked_widget.setCurrentIndex(index)
 
     _WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 

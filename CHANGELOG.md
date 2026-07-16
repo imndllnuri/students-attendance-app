@@ -7,6 +7,15 @@ YYYY-MM-DD.
 ## [Unreleased]
 
 ### Changed
+- **Take Attendance is no longer a separate window.** `TakeAttendance` changed from a `QDialog`
+  shown via `.show()` to a `QWidget` embedded as a `MainWindow.stackedWidget` page, exactly like
+  `ClassWindow` already was - opening it now navigates within the same window instead of popping
+  up a second one. Unlike `ClassWindow`'s cached per-class tabs, a Take Attendance page is torn
+  down (`removeWidget()` + `deleteLater()`) on the way out rather than kept around, since its
+  roster snapshot and serial/RFID connection would go stale if reused across sessions. The
+  "discard unsubmitted records?" confirmation and reader/timer cleanup in `closeEvent()` are
+  unchanged - back-navigation still runs through `close()` first and only proceeds if that's
+  accepted.
 - Renamed the last 3 `.ui` widget-naming outliers to match the dominant convention (ROADMAP.md
   Phase 3): `security_question_ComboBox`/`security_question_2_ComboBox` → `security_question_combo`/
   `security_question_2_combo`, `hours_comboBox` → `hours_combo`.

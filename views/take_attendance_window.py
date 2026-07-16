@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QTableWidgetItem,
     QVBoxLayout,
+    QWidget,
 )
 from PyQt5.QtCore import QDate, QDateTime, QEasingCurve, QPropertyAnimation, QTime, QTimer
 from PyQt5 import uic
@@ -35,7 +36,12 @@ logger = logging.getLogger(__name__)
 _SCAN_ICONS = {"idle": "●", "success": "✓", "warning": "!", "error": "✗"}
 
 
-class TakeAttendance(QDialog):
+class TakeAttendance(QWidget):
+    """A page embedded in MainWindow.stackedWidget (like ClassWindow), not
+    a separate top-level window - torn down (removeWidget + deleteLater())
+    on the way out instead of cached like ClassWindow's tabs are, since a
+    session's roster/serial connection would go stale if kept around."""
+
     def __init__(self, class_obj, class_window, class_manager):
         super().__init__()
         uic.loadUi("ui/take_attendance_window.ui", self)
@@ -62,12 +68,12 @@ class TakeAttendance(QDialog):
             self.roster = self.class_manager.get_roster(self.class_obj.class_id)
         except ApiError as e:
             QMessageBox.critical(self, "Error", f"Failed to load roster: {e}")
-            self.close()
+            self._return_to_class()
 
     def setup_ui(self):
         self.attendance_class_name_lbl.setText(self.class_obj.class_name)
         self.back_to_class_btn.setText(f"←  {self.class_obj.class_name}")
-        self.back_to_class_btn.clicked.connect(self.close)
+        self.back_to_class_btn.clicked.connect(self._return_to_class)
         self.start_attendance_btn.clicked.connect(self.start_attendance)
         self.submit_attendance_btn.clicked.connect(self.submit_attendance)
         self.mark_all_present_btn.clicked.connect(self.mark_all_present)
@@ -551,13 +557,13 @@ class TakeAttendance(QDialog):
                 "were saved locally and will be resubmitted automatically next time the app "
                 "can reach the server.",
             )
-            self.close()
+            self._return_to_class()
             return
 
         self.staged_records = []
         self.class_window.load_student_list()
         QMessageBox.information(self, "Success", "Attendance submitted successfully!")
-        self.close()
+        self._return_to_class()
 
     def export_attendance_sheet(self):
         """Export the already-submitted attendance sheet for the selected date."""
@@ -637,6 +643,23 @@ class TakeAttendance(QDialog):
             if slot.selected:
                 time_str = f"{slot.start_time.toString('HH:mm')}-{slot.end_time.toString('HH:mm')}"
                 self.hours_combo.addItem(time_str)
+
+    def _return_to_class(self):
+        """Navigates back to the class's own stacked-widget page instead
+        of just hiding - close() still runs closeEvent()'s "discard
+        unsubmitted records?" confirmation first, so this only proceeds if
+        that's accepted (or there was nothing to confirm). No-ops the
+        navigation part (but still closes) when there's no real
+        MainWindow/stackedWidget to go back to, e.g. a TakeAttendance
+        built directly in a test."""
+        if not self.close():
+            return
+        main_window = getattr(self.class_window, "main_window", None)
+        stacked_widget = getattr(main_window, "stackedWidget", None)
+        if stacked_widget is not None:
+            stacked_widget.setCurrentWidget(self.class_window)
+            stacked_widget.removeWidget(self)
+        self.deleteLater()
 
     def closeEvent(self, event):
         """Cleanup when window closes"""
