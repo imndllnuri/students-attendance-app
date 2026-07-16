@@ -1,15 +1,17 @@
 import qtawesome as qta
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QColorDialog,
     QDialog,
     QFileDialog,
     QHBoxLayout,
+    QHeaderView,
     QInputDialog,
     QLabel,
     QLineEdit,
     QMessageBox,
+    QTableWidgetItem,
     QTimeEdit,
     QWidget,
 )
@@ -19,6 +21,8 @@ import pandas as pd
 from models.classes import Class, ClassManager, ScheduleSlot
 from services.api_client import ApiError
 from shared.qt_style import set_dynamic_property
+
+ROSTER_STEP = 2
 
 _STEP_TITLES = ("Create New Class", "Edit Class", "Duplicate Class")
 
@@ -35,10 +39,14 @@ class AddNewClassWindow(QDialog):
         self.user_id = user_id
         self.class_manager = ClassManager()
         self.students = []
+        self.roster = []
         self.existing_class = existing_class
         self.selected_color = None
         self._current_step = 0
-        self._step_labels = [self.step_dot_1_lbl, self.step_dot_2_lbl, self.step_dot_3_lbl]
+        self._show_roster_step = existing_class is not None
+        self._step_labels = [
+            self.step_dot_1_lbl, self.step_dot_2_lbl, self.step_dot_3_lbl, self.step_dot_4_lbl,
+        ]
 
         self.spreadsheet_file_btn.clicked.connect(self.load_spreadsheet)
         self.create_class_btn.clicked.connect(self.create_class)
@@ -48,6 +56,9 @@ class AddNewClassWindow(QDialog):
         self.wizard_back_btn.clicked.connect(self.go_to_previous_step)
         self.archive_class_btn.clicked.connect(self.archive_current_class)
         self.delete_class_btn.clicked.connect(self.delete_current_class)
+        self.wizard_add_student_btn.clicked.connect(self.add_wizard_roster_student)
+        self.wizard_remove_selected_student_btn.clicked.connect(self.remove_wizard_roster_student)
+        self.wizard_roster_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         for day in days:
@@ -68,6 +79,8 @@ class AddNewClassWindow(QDialog):
         set_dynamic_property(self.wizard_back_btn, "variant", "ghost")
         set_dynamic_property(self.archive_class_btn, "variant", "secondary")
         set_dynamic_property(self.delete_class_btn, "variant", "destructive")
+        set_dynamic_property(self.wizard_add_student_btn, "variant", "secondary")
+        set_dynamic_property(self.wizard_remove_selected_student_btn, "variant", "destructive")
         self._update_color_swatch()
 
         self.spreadsheet_file_btn.setIcon(qta.icon("fa5s.file-upload", color="#2F5CF0"))
@@ -75,8 +88,12 @@ class AddNewClassWindow(QDialog):
 
         self.time_slots = {day: [] for day in days}
 
-        # Danger Zone only makes sense once a class already exists.
+        # Danger Zone and the Roster step only make sense once a class
+        # already exists - a brand-new class has no class_id yet to add
+        # students against, and that's what the Schedule step's spreadsheet
+        # upload is for instead.
         self.danger_zone_card.setVisible(existing_class is not None)
+        self.step_dot_3_lbl.setVisible(self._show_roster_step)
 
         if existing_class is not None:
             self._prefill_for_edit(existing_class)
@@ -85,22 +102,38 @@ class AddNewClassWindow(QDialog):
 
         self._go_to_step(0)
 
+    def _step_sequence(self):
+        """The reachable step indices, in order - skips the Roster step for
+        a brand-new class (see the comment in __init__)."""
+        all_steps = range(self.wizard_stack.count())
+        if self._show_roster_step:
+            return list(all_steps)
+        return [step for step in all_steps if step != ROSTER_STEP]
+
     def _go_to_step(self, step):
         self._current_step = step
         self.wizard_stack.setCurrentIndex(step)
         for index, label in enumerate(self._step_labels):
             set_dynamic_property(label, "active", index == step)
 
-        self.wizard_back_btn.setVisible(step > 0)
-        is_last_step = step == self.wizard_stack.count() - 1
+        sequence = self._step_sequence()
+        self.wizard_back_btn.setVisible(step != sequence[0])
+        is_last_step = step == sequence[-1]
         self.wizard_next_btn.setVisible(not is_last_step)
         self.create_class_btn.setVisible(is_last_step)
 
+        if step == ROSTER_STEP:
+            self._load_wizard_roster()
+
     def go_to_next_step(self):
-        self._go_to_step(min(self._current_step + 1, self.wizard_stack.count() - 1))
+        sequence = self._step_sequence()
+        position = sequence.index(self._current_step)
+        self._go_to_step(sequence[min(position + 1, len(sequence) - 1)])
 
     def go_to_previous_step(self):
-        self._go_to_step(max(self._current_step - 1, 0))
+        sequence = self._step_sequence()
+        position = sequence.index(self._current_step)
+        self._go_to_step(sequence[max(position - 1, 0)])
 
     def archive_current_class(self):
         reply = QMessageBox.question(
@@ -189,8 +222,9 @@ class AddNewClassWindow(QDialog):
         self.class_code_le.setReadOnly(True)
         self._prefill_fields(cls)
 
-        # Roster edits are handled separately (add/remove individual students);
-        # this dialog only edits schedule/policy fields when editing a class.
+        # New students are added one at a time on the Roster step instead
+        # (see _load_wizard_roster) - the spreadsheet bulk-upload only makes
+        # sense once, when a class doesn't have a roster yet.
         self.spreadsheet_row_widget.setVisible(False)
 
     def _prefill_for_duplicate(self, cls):
@@ -199,6 +233,63 @@ class AddNewClassWindow(QDialog):
         self.wizard_title_lbl.setText(title)
         self._prefill_fields(cls)
         # class_code_le is left blank/editable: the copy needs its own unique code.
+
+    def _load_wizard_roster(self):
+        try:
+            self.roster = self.class_manager.get_roster(self.existing_class.class_id)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not load roster:\n{e}")
+            self.roster = []
+        self._populate_wizard_roster_table()
+
+    def _populate_wizard_roster_table(self):
+        table = self.wizard_roster_tableWidget
+        table.setRowCount(len(self.roster))
+        for row, student in enumerate(self.roster):
+            number_item = QTableWidgetItem(student["student_number"])
+            number_item.setData(Qt.UserRole, student["student_id"])
+            table.setItem(row, 0, number_item)
+            table.setItem(row, 1, QTableWidgetItem(student["name_surname"]))
+
+    def add_wizard_roster_student(self):
+        student_number = self.wizard_new_student_number_le.text().strip()
+        name_surname = self.wizard_new_student_name_le.text().strip()
+        if not student_number or not name_surname:
+            QMessageBox.warning(self, "Missing Field", "Student number and name are required.")
+            return
+
+        try:
+            self.class_manager.add_student(self.existing_class.class_id, student_number, name_surname)
+        except ApiError as e:
+            QMessageBox.critical(self, "Error", f"Could not add student:\n{e}")
+            return
+
+        self.wizard_new_student_number_le.clear()
+        self.wizard_new_student_name_le.clear()
+        self._load_wizard_roster()
+
+    def remove_wizard_roster_student(self):
+        row = self.wizard_roster_tableWidget.currentRow()
+        if row < 0:
+            QMessageBox.warning(self, "No Selection", "Select a student row to remove first.")
+            return
+        student = self.roster[row]
+
+        reply = QMessageBox.question(
+            self,
+            "Confirm Removal",
+            f"Remove {student['name_surname']} ({student['student_number']}) from the roster? "
+            "This also deletes their attendance history for this class.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        if self.class_manager.remove_student(student["student_id"]):
+            self._load_wizard_roster()
+        else:
+            QMessageBox.critical(self, "Error", "Could not remove that student.")
 
     def add_time_slot(self, day):
         container = self.findChild(QWidget, f"{day.lower()}GroupBox")

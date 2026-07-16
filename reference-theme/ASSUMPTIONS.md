@@ -349,3 +349,25 @@ that was never the "dark mode" feature (it doesn't toggle; it's the same permane
 navigation surface in what is now the app's only theme), so it's untouched. `PALETTE`'s
 `bg_sidebar`/`text_sidebar`/etc. tokens already held these fixed-dark values before this change
 and still do.
+
+## 17. Roster add/remove moved from Class Detail into the Edit Class wizard
+
+Per your request: the "Add Student" / "Remove Selected" row that used to sit under Class Detail's
+roster table now lives on a new **Roster** step of the Edit Class wizard (opened via Class Detail's
+"⚙ Settings" button), between Schedule and Color & Confirm - so the wizard is now Class Info →
+Schedule → Roster → Color & Confirm.
+
+- Class Detail keeps the roster **table** (Student Number / Name / Not Attended Hours / Attended
+  Hours) for viewing attendance - only the two mutation controls moved, per your wording ("student
+  adding and removing").
+- The Roster step only appears when **editing an existing class** - a brand-new class has no
+  `class_id` yet for `add_student`/`remove_student` to target, so the step is skipped entirely in
+  Create and Duplicate mode (its step-dot label is hidden, and Next/Back skip over it). Those two
+  modes keep using the Schedule step's spreadsheet bulk-upload, which was always create-only.
+  Editing an existing class's roster this way still uses the exact same `ClassManager.add_student`/
+  `remove_student`/`get_roster` calls as before, just placed on this new step instead of Class
+  Detail.
+- Since these mutations now happen immediately against the server as each button is clicked
+  (matching the original Class Detail behavior - there's no "unsaved roster changes" concept),
+  `ClassWindow._reload_after_edit` now also calls `load_student_list()` after the wizard closes, so
+  the roster table reflects any additions/removals made during that Settings session.

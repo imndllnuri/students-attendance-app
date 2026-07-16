@@ -53,8 +53,6 @@ class ClassWindow(QWidget):
         set_dynamic_property(self.merge_students_btn, "variant", "ghost")
         set_dynamic_property(self.copy_roster_btn, "variant", "ghost")
         set_dynamic_property(self.export_roster_btn, "variant", "ghost")
-        set_dynamic_property(self.add_student_btn, "variant", "secondary")
-        set_dynamic_property(self.remove_selected_student_btn, "variant", "destructive")
         set_dynamic_property(self.roster_retry_btn, "variant", "secondary")
         set_dynamic_property(self.save_notes_btn, "variant", "secondary")
 
@@ -213,8 +211,6 @@ class ClassWindow(QWidget):
         self.take_attendance_btn.clicked.connect(self.attendance_page_show)
         self.class_settings_btn.clicked.connect(self.open_edit_class_window)
         self.save_notes_btn.clicked.connect(self.save_class_notes)
-        self.add_student_btn.clicked.connect(self.add_roster_student)
-        self.remove_selected_student_btn.clicked.connect(self.remove_selected_student)
         self.student_list_tableWidget.cellDoubleClicked.connect(self.handle_roster_cell_double_click)
         self.export_roster_btn.clicked.connect(self.export_roster)
         self.copy_roster_btn.clicked.connect(self.copy_roster_from_class)
@@ -444,57 +440,6 @@ class ClassWindow(QWidget):
 
         QMessageBox.information(self, "Success", f"Roster exported to:\n{file_path}")
 
-    def add_roster_student(self):
-        student_number = self.new_student_number_le.text().strip()
-        name_surname = self.new_student_name_le.text().strip()
-        if not student_number or not name_surname:
-            QMessageBox.warning(self, "Missing Field", "Student number and name are required.")
-            return
-
-        try:
-            self.class_manager.add_student(self.class_obj.class_id, student_number, name_surname)
-        except ApiError as e:
-            QMessageBox.critical(self, "Error", f"Could not add student:\n{e}")
-            return
-
-        self.new_student_number_le.clear()
-        self.new_student_name_le.clear()
-        self.load_student_list()
-
-    def remove_selected_student(self):
-        row = self.student_list_tableWidget.currentRow()
-        if row < 0:
-            QMessageBox.warning(self, "No Selection", "Select a student row to remove first.")
-            return
-        student_number = self.student_list_tableWidget.item(row, 0).text()
-
-        try:
-            roster = self.class_manager.get_roster(self.class_obj.class_id)
-        except ApiError as e:
-            QMessageBox.critical(self, "Error", f"Could not load roster:\n{e}")
-            return
-
-        match = next((s for s in roster if s["student_number"] == student_number), None)
-        if match is None:
-            QMessageBox.critical(self, "Error", "Could not find that student in the roster.")
-            return
-
-        reply = QMessageBox.question(
-            self,
-            "Confirm Removal",
-            f"Remove {match['name_surname']} ({match['student_number']}) from the roster? "
-            "This also deletes their attendance history for this class.",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
-        )
-        if reply != QMessageBox.Yes:
-            return
-
-        if self.class_manager.remove_student(match["student_id"]):
-            self.load_student_list()
-        else:
-            QMessageBox.critical(self, "Error", "Could not remove that student.")
-
     def merge_students(self):
         """Merges an accidental duplicate roster entry into the correct
         one: attendance history moves onto the kept student, then the
@@ -563,6 +508,10 @@ class ClassWindow(QWidget):
             self.failure = math.ceil(self.class_obj.total_hours * (100 - self.class_obj.attendance_policy) / 100)
             self.safe = self.failure * 50 / 100
             self.display_class_details()
+        # The Edit Class wizard's Roster step adds/removes students directly
+        # against the server as each button is clicked, so the roster may
+        # have changed even though that's not part of `fields` above.
+        self.load_student_list()
         self.main_window.load_classes()
 
     def attendance_page_show(self):
