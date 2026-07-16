@@ -134,9 +134,11 @@ attendance stored in `.xlsx` files.
   `BUILDING.md`, `VERSIONING.md`, and `RELEASE_PROCESS.md`, intentionally
   skipped in Phase 1 since there's currently no compiled/packaged release
   process to document.
-- Turkish (or other) language support — no i18n infrastructure exists today;
-  every string is hardcoded English in both `.ui` files and Python
-  (`QMessageBox` text, f-strings). Two options when this becomes a priority:
-  Qt's built-in translation workflow (`pylupdate5` → `.ts` → `.qm` →
-  `QTranslator`, the standard/maintainable Qt approach) or a lighter
-  dict-based runtime language switch. Not started — revisit if/when needed.
+- Extending Turkish (or adding further) language support beyond what's
+  already there. `shared/i18n.py` already ships a dict-based
+  English/Turkish switch (`FEATURE_BACKLOG.md` #28) covering navigation,
+  page titles, and common actions — not a stale item, just incomplete:
+  most `QMessageBox` text and f-string-built strings still aren't routed
+  through `t()`. Extend coverage incrementally, or move to Qt's full
+  `pylupdate5` → `.ts` → `.qm` → `QTranslator` workflow if per-string
+  coverage becomes unmanageable by hand.
