@@ -175,6 +175,10 @@ class MainWindow(QMainWindow):
         self.change_password_btn.clicked.connect(self.change_password)
         self.update_security_question_btn.clicked.connect(self.update_security_questions)
         self.delete_account_btn.clicked.connect(self.confirm_delete_account)
+        self.export_settings_btn.clicked.connect(self.export_settings)
+        self.import_settings_btn.clicked.connect(self.import_settings)
+        set_dynamic_property(self.export_settings_btn, "variant", "secondary")
+        set_dynamic_property(self.import_settings_btn, "variant", "secondary")
         self._settings_password_toggle = self.new_password_le.addAction(
             qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
         )

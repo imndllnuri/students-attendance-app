@@ -1162,6 +1162,35 @@ QFrame#fridayGroupBox {
     border-radius: 10px;
 }
 
+/* --- Popup menus (notifications bell, profile avatar) --- */
+
+QMenu {
+    background-color: #FFFFFF;
+    border: 1px solid #E4E7ED;
+    border-radius: 10px;
+    padding: 6px;
+}
+
+QMenu::item {
+    padding: 8px 16px;
+    border-radius: 10px;
+    color: #1B1E2B;
+}
+
+QMenu::item:selected {
+    background-color: #F4F5F9;
+}
+
+QMenu::item:disabled {
+    color: #8A93A7;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #E4E7ED;
+    margin: 6px 8px;
+}
+
 /* --- Message boxes --- */
 
 QMessageBox {

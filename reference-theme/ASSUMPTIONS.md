@@ -241,3 +241,24 @@ rectangle in dark mode, because empty/undrawn space inside an Axes still paints 
 also call `axes.set_facecolor(...)`. Added that call to all three chart builders
 (`render_statistics`, `show_class_comparison`, `show_attendance_heatmap`) for consistency, even
 though the heatmap's `imshow` already covered its own axes rect edge-to-edge.
+
+### Settings
+
+Also turned out to be mostly already covered: the card frame, title, section headers, every
+`QLineEdit`/`QComboBox`/`QCheckBox` (all styled by generic type selectors, not per-screen), and
+`change_password_btn`/`update_security_question_btn`/`delete_account_btn` (an older but still
+coherent solid/tinted button convention, reused as-is rather than migrated to the newer pill
+system - not broken, just a smaller radius than the newest screens) were already themed from
+earlier phases. The one real problem: `export_settings_btn`/`import_settings_btn` had **no styling
+at all** (rendering as bare native OS buttons) **and were never connected to a click handler**,
+despite `export_settings()`/`import_settings()` already being fully implemented - clicking them
+did nothing. Wired both up and gave them `variant="secondary"` pill styling.
+
+### Notifications / Profile popover
+
+Both the notifications-bell menu and the profile-avatar menu are plain `QMenu`s with no styling
+applied anywhere in the app - they rendered as bare native OS popups, clashing with every other
+floating surface (cards, dialogs) which are themed. Added one generic `QMenu`/`QMenu::item`/
+`QMenu::separator` rule set (rounded corners, card background, hover highlight, muted color for
+disabled/header items) that styles both menus - and any future one - at once, rather than a
+per-screen fix.
