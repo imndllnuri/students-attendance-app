@@ -41,7 +41,8 @@ marked "not selected" were intentionally left out of this batch.
 - [x] 26. Export chart as PNG/PDF
 
 ## Settings & Profile
-- [x] 27. Dark mode
+- [ ] 27. Dark mode — shipped, then **removed entirely by request**; see
+      note below
 - [x] 28. Language selector (English/Turkish) - infrastructure + partial
       string coverage; see note below
 
@@ -96,15 +97,17 @@ marked "not selected" were intentionally left out of this batch.
   persisted across restarts) - no email/SMTP is configured for this
   project, so the "weekly risk summary email" idea became an at-risk
   summary notification shown when a class's roster is loaded instead.
-- **#27 Dark mode**: `theme.qss`/`theme_dark.qss` are both generated from
-  `resources/styles/theme.qss.tmpl` by `scripts/generate_theme.py`
-  (substitutes `{{token}}` placeholders by name from `shared/palette.py`'s
-  `PALETTE`/`DARK_PALETTE`) rather than hand-authored - edit the template
-  and re-run the script, never hand-edit the generated files. Preference persists to
-  `.theme_preference` and applies live via `QApplication.setStyleSheet()`.
-  Dynamic per-cell colors (`qcolor()`, `class_tag_color()`) intentionally
-  still use the light `PALETTE` in both themes; the top search bar isn't
-  covered either since it has no explicit background rule in either theme.
+- **#27 Dark mode**: originally shipped as `theme.qss`/`theme_dark.qss`
+  generated from a shared template, toggled via a `.theme_preference` file
+  and live `QApplication.setStyleSheet()` swap. **Removed entirely** in a
+  later pass, per an explicit request, after dark-mode-specific color bugs
+  were found in real screenshots — rather than leave a dormant toggle, all
+  of `shared/theme.py`, `DARK_PALETTE`, `theme_dark.qss`, and every
+  theme-preference code path were deleted, and `qcolor()` now always reads
+  the single remaining `PALETTE`. See
+  `reference-theme/ASSUMPTIONS.md` §15-16 and `CHANGELOG.md` for the full
+  removal details. Re-adding theming support later would need to rebuild
+  this infrastructure from scratch, not just flip a flag back on.
 - **#28 Language selector**: implements the lightweight dict-based
   approach (`shared/i18n.py`) discussed earlier - not Qt's full
   `QTranslator`/`.ts`/`.qm` workflow. Covers navigation, page titles, and

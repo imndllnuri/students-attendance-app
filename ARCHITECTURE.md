@@ -15,8 +15,14 @@ views/                   # PyQt5 window/dialog controllers (one per .ui file)
   main_window.py          # sidebar + QStackedWidget: My Classes / Settings / Search / Profile / Statistics
   create_account_window.py
   reset_password_window.py
-  add_new_class_window.py
-  class_window.py          # per-class detail page (roster table, launches TakeAttendance)
+  add_new_class_window.py  # create/edit/duplicate wizard; when editing an
+                            # existing class this also gains a "Roster" step
+                            # for adding/removing students (mutation only —
+                            # see class_window.py below)
+  class_window.py          # per-class detail page: roster table (read-only
+                            # display + attendance-status coloring; add/remove
+                            # of students happens via the Edit Class wizard's
+                            # Roster step), launches TakeAttendance
   take_attendance_window.py# RFID/manual attendance capture dialog
 
 ui/                       # Qt Designer .ui files, one per view above
@@ -41,8 +47,10 @@ server/                    # Flask + SQLite backend, runs as its own process
 
 resources/
   styles/theme.qss           # single shared stylesheet, loaded once in main.py
-  images/                    # qrc.py/qrc.qrc bundle the university logo; everything
-                              # else is a qtawesome icon drawn at runtime
+  images/                    # qrc.py/qrc.qrc bundle the university logo,
+                              # app_icon.png is the generated TapIn app icon;
+                              # everything else is a qtawesome icon drawn at
+                              # runtime
 
 tests/                     # pytest + pytest-qt suite (see TESTING.md)
 scripts/                   # dev helper scripts (seed_mock_data.py)

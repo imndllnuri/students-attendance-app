@@ -6,6 +6,61 @@ YYYY-MM-DD.
 
 ## [Unreleased]
 
+### Changed
+- App renamed from "AttendU" to **TapIn**, with a generated contactless-tap
+  icon wired into the taskbar/title-bar, sidebar wordmark, and auth screens.
+  See `reference-theme/ASSUMPTIONS.md` §18.
+- Roster add/remove moved off Class Detail's page and into a new "Roster"
+  step of the Edit Class wizard (`views/add_new_class_window.py`); the
+  roster table itself still lives on Class Detail, only the mutation
+  controls moved. See `reference-theme/ASSUMPTIONS.md` §17.
+
+### Removed
+- **Dark mode removed entirely** — the light/dark toggle, `DARK_PALETTE`,
+  `shared/theme.py`, `theme_dark.qss`, and every dynamic theme-preference
+  code path were deleted rather than left dormant. `FEATURE_BACKLOG.md`
+  #27 is corrected to reflect this. See `reference-theme/ASSUMPTIONS.md` §16.
+
+### Fixed
+- `qcolor()` (`shared/palette.py`) previously always read the light
+  palette regardless of the active theme, so table-cell tints (e.g. Class
+  Detail's "Not Attended Hours" column) rendered with light-mode colors in
+  dark mode. Fixed before dark mode was removed. See
+  `reference-theme/ASSUMPTIONS.md` §15.
+
+## [0.2.0] - feature batch (see FEATURE_BACKLOG.md for the full itemized list)
+
+Roughly 80 features landed across two backlog passes (the original 30 in
+`FEATURE_BACKLOG.md` plus all 50 ideas from `ideas.md`), each as its own
+commit. Grouped highlights rather than a full duplicate listing — see
+`FEATURE_BACKLOG.md` for the authoritative per-item checklist and scope
+notes:
+
+- **Login & Account**: password strength indicator, session timeout,
+  recent-logins log, two-of-three security questions.
+- **Dashboard / My Classes / Search**: Today's Classes + Recently Viewed
+  widgets, sort/filter/pin/archive/duplicate/bulk-actions, color tags,
+  drag-and-drop custom ordering, compact density toggle, Jump-to-Class
+  (Ctrl+K), multi-class spreadsheet import.
+- **Class Detail & Roster**: edit-class, roster add/remove, CSV/Excel
+  roster export, roster copy-from-another-class, student merge tool,
+  visual weekly schedule grid, class notes, at-risk students list,
+  attendance record correction.
+- **Take Attendance**: manual attendance mode, Mark All Present / Undo
+  Last Scan / Mark Selected Absent, live recorded-count, duplicate-card
+  warning, session templates, offline submission queueing, unsubmitted-
+  records close confirmation.
+- **Statistics**: per-student detail, attendance trend line chart,
+  cross-class comparison, day/time heatmap, PNG/PDF export.
+- **Settings & Profile**: dark mode (later removed, see Unreleased above),
+  English/Turkish language selector, font-scale accessibility option,
+  settings export/import as JSON, type-your-email delete confirmation.
+- **Cross-cutting**: notification/activity feed, keyboard shortcuts,
+  admin audit log, scheduled daily DB backup, server connectivity health
+  indicator, RFID/ESP8266 hardware plugin hook (`services/card_reader.py`).
+
+## [0.1.0] - initial prototype (Phase 1: hygiene, docs, tests, CI)
+
 ### Added
 - `tests/` suite (pytest + pytest-qt): server route tests, model/manager
   tests against a fake API client, validation tests, and a widget test
@@ -47,8 +102,6 @@ YYYY-MM-DD.
   (legacy per-instructor JSON/Excel storage), `IoT.zip`, and
   `server/attendance.db` deleted from disk — all were already gitignored
   and never part of git history.
-
-## [0.1.0] - initial prototype
 
 - Working PyQt5 GUI + Flask/SQLite server: accounts, classes, rosters,
   RFID-over-serial attendance capture, per-class attendance table,
