@@ -154,7 +154,48 @@ QWidget#topSideWidget {
 }
 
 QWidget#addNewClass {
+    background-color: #EEF0F5;
+}
+
+/* --- Add/Edit Class wizard --- */
+
+QLabel#wizard_title_lbl {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #1B1E2B;
+}
+
+QLabel#step_dot_1_lbl,
+QLabel#step_dot_2_lbl,
+QLabel#step_dot_3_lbl {
+    color: #8A93A7;
+    font-size: 9.5pt;
+    font-weight: 600;
+    padding: 6px 4px;
+}
+
+QLabel#step_dot_1_lbl[active="true"],
+QLabel#step_dot_2_lbl[active="true"],
+QLabel#step_dot_3_lbl[active="true"] {
+    color: #7C6EF7;
+    border-bottom: 2px solid #7C6EF7;
+}
+
+QFrame#class_info_card,
+QFrame#color_row_widget,
+QFrame#danger_zone_card {
     background-color: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E4E7ED;
+}
+
+QFrame#danger_zone_card {
+    border: 1px solid #FCA5A5;
+}
+
+QLabel#danger_zone_caption_lbl {
+    color: #8A93A7;
+    font-size: 9pt;
 }
 
 /* Dialog/page roots that show generous margins around their cards (rather
@@ -1074,23 +1115,16 @@ QCalendarWidget QWidget#qt_calendar_navigationbar {
     background-color: #F4F5F9;
 }
 
-/* --- Group boxes (Add New Class day selectors) --- */
+/* --- Weekday cards (Add/Edit Class wizard, Schedule step) --- */
 
-QGroupBox {
+QFrame#mondayGroupBox,
+QFrame#tuesdayGroupBox,
+QFrame#wednesdayGroupBox,
+QFrame#thursdayGroupBox,
+QFrame#fridayGroupBox {
     background-color: #F4F5F9;
     border: 1px solid #E4E7ED;
     border-radius: 10px;
-    margin-top: 8px;
-    padding-top: 10px;
-    font-weight: 600;
-    color: #1B1E2B;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 4px;
-    color: #1B1E2B;
 }
 
 /* --- Message boxes --- */

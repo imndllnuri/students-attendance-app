@@ -3,9 +3,12 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QColorDialog,
+    QDialog,
     QFileDialog,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
+    QLineEdit,
     QMessageBox,
     QTimeEdit,
     QWidget,
@@ -15,27 +18,36 @@ import pandas as pd
 
 from models.classes import Class, ClassManager, ScheduleSlot
 from services.api_client import ApiError
+from shared.qt_style import set_dynamic_property
+
+_STEP_TITLES = ("Create New Class", "Edit Class", "Duplicate Class")
 
 
-class AddNewClassWindow(QWidget):
+class AddNewClassWindow(QDialog):
     class_created = pyqtSignal()
     roster_load_failed = pyqtSignal(str)
 
     def __init__(self, user_id, existing_class=None, duplicate_from=None):
         super().__init__()
         uic.loadUi("ui/add_new_class.ui", self)
-        for col, stretch in enumerate((0, 1, 0, 0, 1)):
+        for col, stretch in enumerate((0, 1)):
             self.gridLayout.setColumnStretch(col, stretch)
         self.user_id = user_id
         self.class_manager = ClassManager()
         self.students = []
         self.existing_class = existing_class
         self.selected_color = None
+        self._current_step = 0
+        self._step_labels = [self.step_dot_1_lbl, self.step_dot_2_lbl, self.step_dot_3_lbl]
 
         self.spreadsheet_file_btn.clicked.connect(self.load_spreadsheet)
         self.create_class_btn.clicked.connect(self.create_class)
         self.choose_color_btn.clicked.connect(self.choose_class_color)
         self.reset_color_btn.clicked.connect(self.reset_class_color)
+        self.wizard_next_btn.clicked.connect(self.go_to_next_step)
+        self.wizard_back_btn.clicked.connect(self.go_to_previous_step)
+        self.archive_class_btn.clicked.connect(self.archive_current_class)
+        self.delete_class_btn.clicked.connect(self.delete_current_class)
 
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         for day in days:
@@ -43,18 +55,86 @@ class AddNewClassWindow(QWidget):
             remove_btn = getattr(self, f"remove_slot_{day.lower()}_btn")
             add_btn.clicked.connect(lambda _, d=day: self.add_time_slot(d))
             remove_btn.clicked.connect(lambda _, d=day: self.remove_time_slot(d))
-            add_btn.setIcon(qta.icon("fa5s.plus", color="#2563EB"))
-            remove_btn.setIcon(qta.icon("fa5s.minus", color="white"))
+            add_btn.setIcon(qta.icon("fa5s.plus", color="#2F5CF0"))
+            remove_btn.setIcon(qta.icon("fa5s.minus", color="#DC2626"))
+            set_dynamic_property(add_btn, "variant", "secondary")
+            set_dynamic_property(remove_btn, "variant", "destructive")
 
-        self.spreadsheet_file_btn.setIcon(qta.icon("fa5s.file-upload", color="#2563EB"))
+        set_dynamic_property(self.choose_color_btn, "variant", "secondary")
+        set_dynamic_property(self.reset_color_btn, "variant", "ghost")
+        set_dynamic_property(self.spreadsheet_file_btn, "variant", "secondary")
+        set_dynamic_property(self.create_class_btn, "variant", "primary")
+        set_dynamic_property(self.wizard_next_btn, "variant", "primary")
+        set_dynamic_property(self.wizard_back_btn, "variant", "ghost")
+        set_dynamic_property(self.archive_class_btn, "variant", "secondary")
+        set_dynamic_property(self.delete_class_btn, "variant", "destructive")
+        self._update_color_swatch()
+
+        self.spreadsheet_file_btn.setIcon(qta.icon("fa5s.file-upload", color="#2F5CF0"))
         self.create_class_btn.setIcon(qta.icon("fa5s.check", color="white"))
 
         self.time_slots = {day: [] for day in days}
+
+        # Danger Zone only makes sense once a class already exists.
+        self.danger_zone_card.setVisible(existing_class is not None)
 
         if existing_class is not None:
             self._prefill_for_edit(existing_class)
         elif duplicate_from is not None:
             self._prefill_for_duplicate(duplicate_from)
+
+        self._go_to_step(0)
+
+    def _go_to_step(self, step):
+        self._current_step = step
+        self.wizard_stack.setCurrentIndex(step)
+        for index, label in enumerate(self._step_labels):
+            set_dynamic_property(label, "active", index == step)
+
+        self.wizard_back_btn.setVisible(step > 0)
+        is_last_step = step == self.wizard_stack.count() - 1
+        self.wizard_next_btn.setVisible(not is_last_step)
+        self.create_class_btn.setVisible(is_last_step)
+
+    def go_to_next_step(self):
+        self._go_to_step(min(self._current_step + 1, self.wizard_stack.count() - 1))
+
+    def go_to_previous_step(self):
+        self._go_to_step(max(self._current_step - 1, 0))
+
+    def archive_current_class(self):
+        reply = QMessageBox.question(
+            self, "Archive Class",
+            f"Archive {self.existing_class.class_name}? It will be hidden from your active "
+            "class list, but its data and history are kept.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+        if self.class_manager.archive_class(self.existing_class.class_id):
+            self.class_created.emit()
+            self.close()
+        else:
+            QMessageBox.critical(self, "Error", "Could not archive this class.")
+
+    def delete_current_class(self):
+        typed_name, ok = QInputDialog.getText(
+            self, "Delete Class Permanently",
+            "This cannot be undone - all attendance history for "
+            f"{self.existing_class.class_name} will be lost.\n\n"
+            f"Type the class name ({self.existing_class.class_name}) to confirm:",
+            QLineEdit.Normal,
+        )
+        if not ok:
+            return
+        if typed_name.strip() != self.existing_class.class_name:
+            QMessageBox.warning(self, "Names Didn't Match", "Class not deleted.")
+            return
+        if self.class_manager.delete_class(self.existing_class.class_id):
+            self.class_created.emit()
+            self.close()
+        else:
+            QMessageBox.critical(self, "Error", "Could not delete this class.")
 
     def choose_class_color(self):
         initial = QColor(self.selected_color) if self.selected_color else QColor("#4F46E5")
@@ -69,12 +149,10 @@ class AddNewClassWindow(QWidget):
         self._update_color_swatch()
 
     def _update_color_swatch(self):
-        if self.selected_color:
-            self.choose_color_btn.setStyleSheet(
-                f"background-color: {self.selected_color}; color: white;"
-            )
-        else:
-            self.choose_color_btn.setStyleSheet("")
+        from shared.palette import active_palette
+
+        color = self.selected_color or active_palette()["border_strong"]
+        self.class_color_swatch.setStyleSheet(f"background-color: {color}; border-radius: 6px;")
 
     def _prefill_fields(self, cls):
         self.class_name_le.setText(cls.class_name)
@@ -103,7 +181,9 @@ class AddNewClassWindow(QWidget):
                 end_edit.setTime(slot.end_time)
 
     def _prefill_for_edit(self, cls):
-        self.setWindowTitle(f"Edit Class - {cls.class_code}")
+        title = f"Edit Class - {cls.class_code}"
+        self.setWindowTitle(title)
+        self.wizard_title_lbl.setText(title)
         self.create_class_btn.setText("Save Changes")
         self.class_code_le.setText(cls.class_code)
         self.class_code_le.setReadOnly(True)
@@ -111,11 +191,12 @@ class AddNewClassWindow(QWidget):
 
         # Roster edits are handled separately (add/remove individual students);
         # this dialog only edits schedule/policy fields when editing a class.
-        self.spreadsheet_lbl.setVisible(False)
-        self.spreadsheet_file_btn.setVisible(False)
+        self.spreadsheet_row_widget.setVisible(False)
 
     def _prefill_for_duplicate(self, cls):
-        self.setWindowTitle(f"Duplicate Class - Based on {cls.class_code}")
+        title = f"Duplicate Class - Based on {cls.class_code}"
+        self.setWindowTitle(title)
+        self.wizard_title_lbl.setText(title)
         self._prefill_fields(cls)
         # class_code_le is left blank/editable: the copy needs its own unique code.
 

@@ -6,495 +6,408 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1046</width>
-    <height>532</height>
+    <width>760</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Create New Class</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="leftMargin"><number>24</number></property>
+   <property name="leftMargin"><number>28</number></property>
    <property name="topMargin"><number>24</number></property>
-   <property name="rightMargin"><number>24</number></property>
+   <property name="rightMargin"><number>28</number></property>
    <property name="bottomMargin"><number>24</number></property>
-   <property name="spacing"><number>16</number></property>
+   <property name="spacing"><number>18</number></property>
    <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="horizontalSpacing"><number>16</number></property>
-      <property name="verticalSpacing"><number>16</number></property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="class_name_lbl">
-        <property name="minimumSize">
-         <size>
-          <width>120</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Class Name:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="class_name_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="Line" name="line_12">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="number_of_weeks_lbl">
-        <property name="text">
-         <string>Number of Weeks:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLineEdit" name="number_of_weeks_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="class_section_lbl">
-        <property name="minimumSize">
-         <size>
-          <width>120</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Class Section:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="class_section_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="Line" name="line_13">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="weekly_hours_lbl">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Weekly Hours:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLineEdit" name="weekly_hours_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="class_code_lbl">
-        <property name="minimumSize">
-         <size>
-          <width>120</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Class Code:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="class_code_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="Line" name="line_14">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="total_hours_lbl">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Total Hours:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QLineEdit" name="total_hours_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QLabel" name="attendance_policy_lbl">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Attendance Policy (%):</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QLineEdit" name="attendance_policy_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="Line" name="line_15">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2" colspan="2">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="late_threshold_lbl">
-        <property name="text">
-         <string>Late Threshold</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="late_threshold_le">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
+    <widget class="QLabel" name="wizard_title_lbl">
+     <property name="text"><string>Create New Class</string></property>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line_16">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item alignment="Qt::AlignHCenter|Qt::AlignTop">
-    <widget class="QWidget" name="scheduleSelection" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetNoConstraint</enum>
-      </property>
-      <item>
-       <widget class="QLabel" name="schedule_selection_lbl">
-        <property name="text">
-         <string>Schedule Selection </string>
-        </property>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignTop">
-       <widget class="QGroupBox" name="mondayGroupBox">
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item alignment="Qt::AlignTop">
-          <widget class="QCheckBox" name="monday_cb">
-           <property name="text">
-            <string>Monday</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="add_slot_monday_btn">
-           <property name="text">
-            <string>Add Time Slot</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="remove_slot_monday_btn">
-           <property name="text">
-            <string>Remove Time Slot</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignTop">
-       <widget class="QGroupBox" name="tuesdayGroupBox">
-        <layout class="QVBoxLayout" name="tuesdayLayout">
-         <item alignment="Qt::AlignTop">
-          <widget class="QCheckBox" name="tuesday_cb">
-           <property name="text">
-            <string>Tuesday</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="add_slot_tuesday_btn">
-           <property name="text">
-            <string>Add Time Slot</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="remove_slot_tuesday_btn">
-           <property name="text">
-            <string>Remove Time Slot</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignTop">
-       <widget class="QGroupBox" name="wednesdayGroupBox">
-        <layout class="QVBoxLayout" name="wednesdayLayout">
-         <item alignment="Qt::AlignLeft|Qt::AlignTop">
-          <widget class="QCheckBox" name="wednesday_cb">
-           <property name="text">
-            <string>Wednesday</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="add_slot_wednesday_btn">
-           <property name="text">
-            <string>Add Time Slot</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="remove_slot_wednesday_btn">
-           <property name="text">
-            <string>Remove Time Slot</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignTop">
-       <widget class="QGroupBox" name="thursdayGroupBox">
-        <layout class="QVBoxLayout" name="thursdayLayout">
-         <item alignment="Qt::AlignTop">
-          <widget class="QCheckBox" name="thursday_cb">
-           <property name="text">
-            <string>Thursday</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="add_slot_thursday_btn">
-           <property name="text">
-            <string>Add Time Slot</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="remove_slot_thursday_btn">
-           <property name="text">
-            <string>Remove Time Slot</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignTop">
-       <widget class="QGroupBox" name="fridayGroupBox">
-        <layout class="QVBoxLayout" name="fridayLayout">
-         <item alignment="Qt::AlignTop">
-          <widget class="QCheckBox" name="friday_cb">
-           <property name="text">
-            <string>Friday</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="add_slot_friday_btn">
-           <property name="text">
-            <string>Add Time Slot</string>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="remove_slot_friday_btn">
-           <property name="text">
-            <string>Remove Time Slot</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line_17">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-   </spacer>
-   </item>
-   <item alignment="Qt::AlignTop">
-    <widget class="QWidget" name="color_row_widget" native="true">
-     <layout class="QHBoxLayout" name="color_row_layout">
-      <item>
-       <widget class="QLabel" name="class_color_lbl">
-        <property name="text"><string>Class Color:</string></property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="choose_color_btn">
-        <property name="text"><string>Choose Color</string></property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="reset_color_btn">
-        <property name="text"><string>Use Default</string></property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="color_row_spacer">
-        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <layout class="QHBoxLayout" name="step_dots_layout">
+     <item>
+      <widget class="QLabel" name="step_dot_1_lbl">
+       <property name="text"><string>1  Class Info</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="step_dot_2_lbl">
+       <property name="text"><string>2  Schedule</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="step_dot_3_lbl">
+       <property name="text"><string>3  Color &amp; Confirm</string></property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="step_dots_spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
     <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
    </spacer>
-      </item>
-     </layout>
-    </widget>
+     </item>
+    </layout>
    </item>
-   <item alignment="Qt::AlignTop">
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="spreadsheet_lbl">
-        <property name="text">
-         <string>Student List / Upload your SpreadSheet</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_5">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
+   <item>
+    <widget class="QStackedWidget" name="wizard_stack">
+     <widget class="QWidget" name="class_info_page">
+      <layout class="QVBoxLayout" name="class_info_page_layout">
+       <item>
+        <widget class="QFrame" name="class_info_card">
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin"><number>20</number></property>
+          <property name="topMargin"><number>20</number></property>
+          <property name="rightMargin"><number>20</number></property>
+          <property name="bottomMargin"><number>20</number></property>
+          <property name="horizontalSpacing"><number>16</number></property>
+          <property name="verticalSpacing"><number>14</number></property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="class_name_lbl">
+            <property name="text"><string>Class Name</string></property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="class_name_le"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="class_code_lbl">
+            <property name="text"><string>Class Code</string></property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="class_code_le"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="class_section_lbl">
+            <property name="text"><string>Class Section</string></property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLineEdit" name="class_section_le"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="number_of_weeks_lbl">
+            <property name="text"><string>Number of Weeks</string></property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="number_of_weeks_le"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="weekly_hours_lbl">
+            <property name="text"><string>Weekly Hours</string></property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLineEdit" name="weekly_hours_le"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="total_hours_lbl">
+            <property name="text"><string>Total Hours</string></property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="total_hours_le"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="attendance_policy_lbl">
+            <property name="text"><string>Attendance Policy (%)</string></property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLineEdit" name="attendance_policy_le"/>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="late_threshold_lbl">
+            <property name="text"><string>Late Threshold (min)</string></property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLineEdit" name="late_threshold_le"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="class_info_page_spacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
    </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="spreadsheet_file_btn">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Choose SpreadSheet File</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="schedule_page">
+      <layout class="QVBoxLayout" name="schedule_page_layout">
+       <item>
+        <widget class="QLabel" name="schedule_selection_lbl">
+         <property name="text"><string>Pick the days this class meets</string></property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="weekday_cards_layout">
+         <item>
+          <widget class="QFrame" name="mondayGroupBox">
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item alignment="Qt::AlignTop">
+             <widget class="QCheckBox" name="monday_cb">
+              <property name="text"><string>Monday</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="add_slot_monday_btn">
+              <property name="text"><string>Add Time Slot</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="remove_slot_monday_btn">
+              <property name="text"><string>Remove Time Slot</string></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="tuesdayGroupBox">
+           <layout class="QVBoxLayout" name="tuesdayLayout">
+            <item alignment="Qt::AlignTop">
+             <widget class="QCheckBox" name="tuesday_cb">
+              <property name="text"><string>Tuesday</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="add_slot_tuesday_btn">
+              <property name="text"><string>Add Time Slot</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="remove_slot_tuesday_btn">
+              <property name="text"><string>Remove Time Slot</string></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="wednesdayGroupBox">
+           <layout class="QVBoxLayout" name="wednesdayLayout">
+            <item alignment="Qt::AlignLeft|Qt::AlignTop">
+             <widget class="QCheckBox" name="wednesday_cb">
+              <property name="text"><string>Wednesday</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="add_slot_wednesday_btn">
+              <property name="text"><string>Add Time Slot</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="remove_slot_wednesday_btn">
+              <property name="text"><string>Remove Time Slot</string></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="thursdayGroupBox">
+           <layout class="QVBoxLayout" name="thursdayLayout">
+            <item alignment="Qt::AlignTop">
+             <widget class="QCheckBox" name="thursday_cb">
+              <property name="text"><string>Thursday</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="add_slot_thursday_btn">
+              <property name="text"><string>Add Time Slot</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="remove_slot_thursday_btn">
+              <property name="text"><string>Remove Time Slot</string></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="fridayGroupBox">
+           <layout class="QVBoxLayout" name="fridayLayout">
+            <item alignment="Qt::AlignTop">
+             <widget class="QCheckBox" name="friday_cb">
+              <property name="text"><string>Friday</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="add_slot_friday_btn">
+              <property name="text"><string>Add Time Slot</string></property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignTop">
+             <widget class="QPushButton" name="remove_slot_friday_btn">
+              <property name="text"><string>Remove Time Slot</string></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QWidget" name="spreadsheet_row_widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="spreadsheet_lbl">
+            <property name="text"><string>Student List / Upload your SpreadSheet</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="spreadsheet_file_btn">
+            <property name="text"><string>Choose SpreadSheet File</string></property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="schedule_page_spacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+   </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="color_confirm_page">
+      <layout class="QVBoxLayout" name="color_confirm_page_layout">
+       <item>
+        <widget class="QFrame" name="color_row_widget">
+         <layout class="QHBoxLayout" name="color_row_layout">
+          <property name="leftMargin"><number>20</number></property>
+          <property name="topMargin"><number>20</number></property>
+          <property name="rightMargin"><number>20</number></property>
+          <property name="bottomMargin"><number>20</number></property>
+          <item>
+           <widget class="QLabel" name="class_color_lbl">
+            <property name="text"><string>Class Color</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="class_color_swatch">
+            <property name="minimumSize"><size><width>28</width><height>28</height></size></property>
+            <property name="maximumSize"><size><width>28</width><height>28</height></size></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="choose_color_btn">
+            <property name="text"><string>Choose Color</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reset_color_btn">
+            <property name="text"><string>Use Default</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="color_row_spacer">
+            <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="danger_zone_card">
+         <layout class="QVBoxLayout" name="danger_zone_layout">
+          <property name="leftMargin"><number>20</number></property>
+          <property name="topMargin"><number>20</number></property>
+          <property name="rightMargin"><number>20</number></property>
+          <property name="bottomMargin"><number>20</number></property>
+          <item>
+           <widget class="QLabel" name="danger_zone_lbl">
+            <property name="text"><string>Danger Zone</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="danger_zone_caption_lbl">
+            <property name="text">
+             <string>Archiving hides this class from your active list without deleting its data. Deleting is permanent.</string>
+            </property>
+            <property name="wordWrap"><bool>true</bool></property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="danger_zone_actions_layout">
+            <item>
+             <widget class="QPushButton" name="archive_class_btn">
+              <property name="text"><string>Archive Class</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="delete_class_btn">
+              <property name="text"><string>Delete Class Permanently</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="danger_zone_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="color_confirm_page_spacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+   </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="create_class_btn">
-     <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-     <property name="text">
-      <string>Create New Class</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="wizard_footer_layout">
+     <item>
+      <widget class="QPushButton" name="wizard_back_btn">
+       <property name="text"><string>Back</string></property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="wizard_footer_spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="wizard_next_btn">
+       <property name="text"><string>Next</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="create_class_btn">
+       <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+       <property name="text"><string>Create New Class</string></property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

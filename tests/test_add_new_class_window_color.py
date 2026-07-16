@@ -56,7 +56,7 @@ def test_choosing_a_color_sets_selected_color(qtbot, monkeypatch):
     window.choose_class_color()
 
     assert window.selected_color == "#ff0000"
-    assert "ff0000" in window.choose_color_btn.styleSheet().lower()
+    assert "ff0000" in window.class_color_swatch.styleSheet().lower()
 
 
 def test_cancelling_the_color_dialog_leaves_color_unset(qtbot, monkeypatch):
@@ -75,7 +75,7 @@ def test_reset_color_clears_selection(qtbot, monkeypatch):
     window.reset_class_color()
 
     assert window.selected_color is None
-    assert window.choose_color_btn.styleSheet() == ""
+    assert "ff0000" not in window.class_color_swatch.styleSheet().lower()
 
 
 def test_editing_a_class_prefills_its_existing_color(qtbot, monkeypatch):

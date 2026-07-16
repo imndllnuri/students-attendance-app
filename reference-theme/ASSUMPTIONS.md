@@ -127,16 +127,31 @@ don't like and I'll adjust.
   Qt's default (light) palette showed through as a jarring light strip around the cards in dark
   mode, with page titles rendered in a light dark-mode text color on top of it (nearly unreadable).
   Added `QWidget#ClassWindow, QWidget#TakeAttendanceWindow { background-color: {{bg_app}}; }` to fix
-  both. Screens that fill edge-to-edge (Login, Dashboard, My Classes, Add/Edit Class) don't have
-  this problem since a themed child widget already covers the full window.
+  both. Screens that fill edge-to-edge (Login, Dashboard, My Classes) don't have this problem since a
+  themed child widget already covers the full window. The Add/Edit Class wizard (§8 below) has the
+  same margin-around-cards shape, so its root got the same `background-color: {{bg_app}}` treatment
+  proactively, before it ever showed up as a screenshot bug.
 
 ## 8. Add/Edit Class — wizard dialog
 
 Rebuilt as a real 3-step `QDialog` wizard (`QStackedWidget` of 3 pages + step-dot indicator +
-Back/Next/Submit footer) matching §14, replacing the old single dense-form page. Edit mode reuses
-the same dialog with fields prefilled and a "Danger Zone" (Archive/Delete) added inside Step 3,
-collapsed by default, per §14's "Edit mode" note. Delete requires typing the class name to confirm,
-per spec.
+Back/Next/Submit footer) matching §14, replacing the old single dense-form page:
+
+- **Step 1 (Class Info):** name/code/section/weeks/hours/policy/threshold, in a 2-column card.
+- **Step 2 (Schedule):** the 5 weekday selectors, restyled from `QGroupBox` to plain `QFrame` cards
+  (objectNames unchanged - `mondayGroupBox` etc - so the existing `add_time_slot`/`remove_time_slot`
+  logic needed zero changes), plus the spreadsheet-upload row (create/duplicate mode only, hidden
+  when editing - unchanged from before).
+- **Step 3 (Color & Confirm):** the color picker, plus - in edit mode only - a "Danger Zone" card
+  (Archive/Delete), always-visible rather than collapsed once you're on this step (a 3-step wizard
+  page is already a deliberate, low-traffic destination, so an extra expand/collapse click felt like
+  friction rather than protection). Archive asks a plain Yes/No; Delete requires typing the exact
+  class name to confirm, per spec. Both call `ClassManager.archive_class`/`delete_class` directly
+  (already-existing model methods, reused from the My Classes card menu's implementation) and reuse
+  the `class_created` signal to tell the caller to reload, same as a normal save.
+- Stepping forward/back does **not** validate - the existing `validate_inputs()` still runs once,
+  only on the final Create/Save click, to avoid duplicating field-validation logic per step for a
+  3-page form that's small enough to fill in a few seconds either way.
 
 ## 9. Data model — no schema changes
 

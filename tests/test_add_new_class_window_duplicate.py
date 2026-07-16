@@ -55,6 +55,7 @@ def test_prefills_schedule_and_policy_but_leaves_class_code_blank(qtbot, monkeyp
     assert window.create_class_btn.text() == "Create New Class"  # unchanged from create-mode default
     assert window.monday_cb.isChecked()
     assert window.time_slots["Monday"][0][0].time() == QTime(9, 0)
+    window.go_to_next_step()  # Schedule step, where the spreadsheet upload lives
     assert window.spreadsheet_file_btn.isVisible()
 
 
