@@ -1,4 +1,4 @@
-# Smart Attendance Automation System
+# TapIn
 
 A desktop + server app for instructors to manage classes and record student
 attendance, originally built for the COMP413 Internet of Things course at

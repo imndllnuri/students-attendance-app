@@ -371,3 +371,27 @@ Schedule → Roster → Color & Confirm.
   (matching the original Class Detail behavior - there's no "unsaved roster changes" concept),
   `ClassWindow._reload_after_edit` now also calls `load_student_list()` after the wizard closes, so
   the roster table reflects any additions/removals made during that Settings session.
+
+## 18. App renamed to "TapIn", with a generated icon
+
+Per your request - a real product name, deliberately not AGU-branded. "TapIn" fits the app's
+actual mechanic (an RFID card *tap* to check in), which is why the generated icon is a contactless/
+NFC-style radiating-arcs symbol (not a generic checkmark or calendar glyph) - it reads as "tap a
+card" rather than just "attendance app #4327."
+
+- `resources/images/app_icon.png` - a 512x512 rounded-square icon, drawn with QPainter (no external
+  asset/API needed): the app's own accent gradient (`#7C6EF7` → `#6D8CFA`, the same one every
+  primary button already uses) behind three white concentric arcs + a dot, anchored bottom-left.
+- Wired in three places: `main.py`'s `QApplication.setWindowIcon()` (title bar / taskbar, covers
+  every window since Qt inherits the app-level icon by default), the sidebar's wordmark row
+  (`sidebar_icon_lbl`, new), and the auth screens' left-panel wordmark row (`auth_icon_lbl`, new) -
+  both scaled down from the one master PNG rather than separate assets.
+- Text wordmark changed from "AttendU" to "TapIn" in both of those rows, and both windows'
+  `windowTitle` (previously "Student Attendance Tracking" / "...App") is now just "TapIn".
+- Left `shared/palette.py`/`views/main_window.py`/`views/class_window.py`'s **code comments** that
+  say "AttendU" alone - those refer to the named design-system phase this redesign pass followed
+  (like "Kintsugi" was the name of the phase before it), not the live app's displayed brand, so
+  they're accurate as historical/internal context and don't need to track the product name.
+- `README.md`'s title is now "TapIn" too; left the "originally built for the COMP413 IoT course at
+  Abdullah Gül University" line alone - that's true project provenance/history, not branding, and
+  erasing it would just be inaccurate.

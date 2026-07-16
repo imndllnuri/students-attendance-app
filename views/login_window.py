@@ -2,6 +2,8 @@ from pathlib import Path
 
 import qtawesome as qta
 from PyQt5 import uic
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QWidget
 
 from models.accounts import Account, AccountManager
@@ -30,6 +32,11 @@ class LoginWindow(QWidget):
         self._reset_email = None
 
         set_auth_headline(self.auth_headline_lbl, "Track every session.", "Never miss a beat.")
+        self.auth_icon_lbl.setPixmap(
+            QPixmap("resources/images/app_icon.png").scaled(
+                28, 28, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+        )
 
         self._setup_sign_in_page()
         self._setup_sign_up_page()

@@ -361,6 +361,11 @@ class MainWindow(QMainWindow):
         )
 
     def _setup_icons(self):
+        self.sidebar_icon_lbl.setPixmap(
+            QPixmap("resources/images/app_icon.png").scaled(
+                26, 26, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+        )
         self.dashboard_btn.setIcon(qta.icon("fa5s.th-large", color="#767D91"))
         self.my_classes_btn.setIcon(qta.icon("fa5s.book-open", color="#767D91"))
         self.statistics_btn.setIcon(qta.icon("fa5s.chart-bar", color="#767D91"))
