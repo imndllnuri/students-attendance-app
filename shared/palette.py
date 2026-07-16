@@ -199,12 +199,17 @@ def active_palette() -> dict:
 
 
 def qcolor(token: str):
-    """Return a QColor for a palette token. Imports PyQt5 lazily so this
-    module stays importable from non-GUI code (e.g. scripts, tests) without
-    requiring a display."""
+    """Return a QColor for a palette token, following the active theme.
+
+    Used to color QTableWidgetItem backgrounds/foregrounds, which are set
+    programmatically and never touched by the app's QSS stylesheet - so
+    unlike widgets, these need to read active_palette() themselves or they
+    stay stuck on light-mode colors (e.g. a pale tint cell) even in dark
+    mode. Imports PyQt5 lazily so this module stays importable from
+    non-GUI code (e.g. scripts, tests) without requiring a display."""
     from PyQt5.QtGui import QColor
 
-    return QColor(PALETTE[token])
+    return QColor(active_palette()[token])
 
 
 def attendance_tier(percent: float, minimum: float) -> str:

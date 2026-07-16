@@ -121,6 +121,7 @@ class MainWindow(QMainWindow):
         self.import_classes_btn.clicked.connect(self.import_classes_from_spreadsheet)
         set_dynamic_property(self.add_class_dashboard_btn, "variant", "primary")
         set_dynamic_property(self.create_new_class_btn, "variant", "primary")
+        set_dynamic_property(self.import_classes_btn, "variant", "secondary")
         self._dashboard_filter_group = QButtonGroup(self)
         self._dashboard_filter_group.setExclusive(True)
         for tab_btn in (

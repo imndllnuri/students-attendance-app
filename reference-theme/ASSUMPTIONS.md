@@ -297,3 +297,28 @@ floating surface (cards, dialogs) which are themed. Added one generic `QMenu`/`Q
 `QMenu::separator` rule set (rounded corners, card background, hover highlight, muted color for
 disabled/header items) that styles both menus - and any future one - at once, rather than a
 per-screen fix.
+
+## 15. Dark-mode color bugs found from real screenshots (Dashboard/My Classes/Class Detail)
+
+Two concrete "text/background is the wrong color in dark mode" bugs, found from your screenshots
+rather than my own testing:
+
+- **`shared/palette.py`'s `qcolor()` helper was hardcoded to the light `PALETTE`, always**,
+  regardless of the active theme. `QTableWidgetItem` background/foreground colors are set directly
+  in Python (`item.setBackground(qcolor(...))`) rather than through the QSS stylesheet, so unlike
+  every other widget, they never picked up dark mode at all - this is exactly the class of bug
+  `active_palette()` exists to prevent (it already covers matplotlib charts), but `qcolor()` itself
+  was never routed through it. Fixed by having `qcolor()` read `active_palette()[token]` instead of
+  `PALETTE[token]`. This was a **single fix affecting two real, screenshotted bugs at once**: the
+  Class Detail roster table's "Not Attended Hours" severity-tint cells (shown as a jarring pale
+  green/red rectangle in the middle of an otherwise dark table) and Take Attendance's staged-row
+  tinting (same root cause, not yet screenshotted but would have shown the identical bug).
+- **`import_classes_btn` ("Import Classes From Spreadsheet") had no styling at all** - same bare-
+  native-button bug pattern found several times already this pass (Export/Import Settings,
+  Download My Data) - rendering as a stark white bar at the bottom of My Classes in dark mode.
+  Wired up with `variant="secondary"`.
+
+The PDF export chart's `PALETTE["success"/"warning"/"error"]` (main_window.py, `export_statistics_
+pdf`) is the one intentional exception left as-is - it always uses the light palette on purpose so
+exported reports stay print-friendly regardless of the app's current theme (documented back in
+this file's `render_statistics` note).
