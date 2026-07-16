@@ -1,7 +1,11 @@
-/* Shared theme TEMPLATE for the whole app - "Kintsugi" direction: mostly
-   white/black chrome, one sparing blue accent, fully-rounded pill controls,
-   softer/larger shadows (see shared/shadow.py), generous whitespace, and a
-   soft lavender-blue gradient canvas behind the centered auth cards.
+/* Shared theme TEMPLATE for the whole app - "AttendU" direction (see
+   reference-theme/student-attendance-app-redesign-prompt.md and
+   reference-theme/ASSUMPTIONS.md): a dark-first look with a purple-to-blue
+   gradient on every primary CTA, 16px card radius, fully-rounded pill
+   controls, and a sidebar / auth-left-panel that stay fixed-dark chrome
+   regardless of the light/dark toggle (confirmed from the reference
+   screenshots). Replaces the earlier "Kintsugi" white/black-chrome
+   direction.
 
    This file is NOT consumed directly by the app - it's rendered into the
    real resources/styles/theme.qss (light) and resources/styles/theme_dark.qss
@@ -14,26 +18,24 @@
    Each placeholder is substituted by NAME, not by matching a hex value, so
    two rules that happen to want the same light-mode color but different
    dark-mode colors (or vice versa) can't collide the way a blind
-   hex-substitution generator would (this replaced an earlier generator that
-   had exactly that class of bug - see git history).
+   hex-substitution generator would.
 
    Some literal `#FFFFFF`-style colors below are intentionally NOT
    tokenized: they're "always white text on a colored control" (primary-
    button labels, the notification badge, active sidebar-nav text) that
    should stay pure white in both themes, not resolve through the bg_card
-   token (which does change between themes) - tokenizing those by mistake
-   was a real, previously-unnoticed dark-mode bug this rework fixes.
+   token (which does change between themes).
 
    Card/control radius: card={{radius_card}}px  control_sm={{radius_control_sm}}px
    pill/avatar controls use `border-radius: {{radius_pill}}px` (999) on a
    widget with a fixed/min height, so it renders as a true pill.
 
    Buttons use a `variant` dynamic Qt property (button.setProperty("variant",
-   "primary"/"secondary"/"destructive")) matched via `QPushButton[variant="..."]`
-   selectors - this is the new, screen-agnostic way to style a button.
-   Screens not yet migrated to the redesign still use the older
-   objectName-chain selectors further down this file; both coexist during
-   the phased rollout and the old ones are removed as each screen migrates.
+   "primary"/"secondary"/"destructive"/"ghost")) matched via
+   `QPushButton[variant="..."]` selectors - this is the screen-agnostic way
+   to style a button. A few screens out of scope for this redesign pass
+   (Settings/Statistics/Search/Profile - see ASSUMPTIONS.md) still use older
+   objectName-chain selectors further down this file; both coexist.
 
    Error/active/state on widgets is driven by dynamic Qt properties set in
    Python: widget.setProperty("error"/"active"/"state", value);
@@ -41,19 +43,104 @@
    which is what makes the [error="true"], [active="true"], [state="..."]
    selectors below take effect. */
 
+* {
+    font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+
 QWidget#background {
-    background: qlineargradient(
-        x1:0, y1:0, x2:0, y2:1,
-        stop:0 {{bg_app_gradient_start}}, stop:1 {{bg_app_gradient_end}}
-    );
+    background-color: {{bg_app}};
 }
 
 QStackedWidget#stackedWidget {
     background-color: {{bg_app}};
 }
 
+/* Sidebar (and the auth screens' left brand panel, styled separately by
+   objectName as each screen is built) are fixed-dark chrome in BOTH
+   themes - see shared/palette.py's bg_sidebar token, which is identical
+   in PALETTE and DARK_PALETTE on purpose. */
 QWidget#sidebar_widget {
     background-color: {{bg_sidebar}};
+    border-right: 1px solid #1F2333;
+}
+
+/* --- Auth screens (Login / Create Account / Reset Password) ---
+   Left brand panel is the same fixed-dark chrome as the sidebar, with a
+   soft purple glow anchored near the top-left corner (qradialgradient is
+   the closest QSS equivalent to the reference's radial CSS glow). Right
+   panel is the theme-reactive form surface. */
+
+QWidget#auth_left_panel {
+    background: qradialgradient(cx:0.18, cy:0.15, radius:1.1, fx:0.18, fy:0.15,
+                 stop:0 #241B4A, stop:0.55 {{bg_sidebar}}, stop:1 {{bg_sidebar}});
+}
+
+QWidget#auth_right_panel {
+    background-color: {{bg_app}};
+}
+
+QLabel#auth_eyebrow_lbl {
+    color: #9D90FA;
+    font-size: 9pt;
+    font-weight: 700;
+}
+
+QLabel#auth_headline_lbl {
+    font-size: 26pt;
+    font-weight: 700;
+}
+
+QLabel#auth_supporting_lbl {
+    color: {{text_sidebar_muted}};
+    font-size: 10pt;
+    padding-top: 10px;
+}
+
+QLabel#auth_stat_1_lbl,
+QLabel#auth_stat_2_lbl,
+QLabel#auth_stat_3_lbl {
+    background-color: #1B202C;
+    color: #C7CCDA;
+    font-size: 8pt;
+    font-weight: 600;
+    border: 1px solid #2A2F40;
+    border-radius: {{radius_pill}}px;
+    padding: 6px 8px;
+}
+
+QLabel#auth_footer_lbl {
+    color: #565D70;
+    font-size: 8.5pt;
+}
+
+QPushButton#theme_toggle_btn {
+    background-color: {{bg_card}};
+    border: 1px solid {{border}};
+    border-radius: 18px;
+}
+
+QPushButton#theme_toggle_btn:hover {
+    background-color: {{bg_hover}};
+}
+
+QLabel#email_field_lbl,
+QLabel#password_field_lbl,
+QLabel#name_field_lbl,
+QLabel#surname_field_lbl,
+QLabel#confirm_password_field_lbl,
+QLabel#security_question_field_lbl,
+QLabel#security_question_2_field_lbl,
+QLabel#new_password_field_lbl,
+QLabel#confirm_new_password_field_lbl,
+QLabel#create_account_prompt_lbl,
+QLabel#sign_in_prompt_lbl {
+    color: {{text_secondary}};
+    font-size: 9.5pt;
+}
+
+QPushButton#back_to_signin_btn {
+    text-align: left;
+    padding-left: 0;
 }
 
 QWidget#top_bar_widget,
@@ -127,6 +214,13 @@ QFrame#statistics_card {
     border: 1px solid {{border}};
 }
 
+/* --- Class color swatch (Add/Edit Class) --- */
+
+QFrame#class_color_swatch {
+    border: 1px solid {{border_strong}};
+    border-radius: 6px;
+}
+
 /* --- Typography --- */
 
 /* Fallback for every QLabel with no more specific #id rule below - without
@@ -152,7 +246,6 @@ QLabel#login_error_lbl,
 QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
 QLabel#roster_status_lbl,
-QLabel#attendance_progress_lbl,
 QLabel#sidebar_user_email_lbl,
 QLabel#class_breadcrumb_lbl {
     font-size: 9pt;
@@ -165,7 +258,20 @@ QLabel#sidebar_user_name_lbl {
     color: {{text_primary}};
 }
 
+/* --- Progress/session badges (Take Attendance) --- */
+
 QLabel#attendance_progress_lbl {
+    background-color: {{accent_subtle}};
+    color: {{accent}};
+    font-size: 9pt;
+    font-weight: 600;
+    border-radius: {{radius_pill}}px;
+    padding: 4px 12px;
+}
+
+QLabel#session_countdown_lbl {
+    color: {{accent}};
+    font-size: 9pt;
     font-weight: 600;
 }
 
@@ -377,7 +483,8 @@ QComboBox:focus {
    relying on an objectName chain. */
 
 QPushButton[variant="primary"] {
-    background-color: {{accent}};
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                 stop:0 {{accent}}, stop:1 {{accent_end}});
     color: #FFFFFF;
     border: none;
     border-radius: {{radius_pill}}px;
@@ -387,15 +494,16 @@ QPushButton[variant="primary"] {
 }
 
 QPushButton[variant="primary"]:hover {
-    background-color: {{accent_hover}};
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                 stop:0 {{accent_hover}}, stop:1 {{accent_end}});
 }
 
 QPushButton[variant="primary"]:pressed {
-    background-color: {{accent_pressed}};
+    background: {{accent_pressed}};
 }
 
 QPushButton[variant="primary"]:disabled {
-    background-color: {{accent_subtle}};
+    background: {{accent_subtle}};
     color: {{text_disabled}};
 }
 
@@ -447,7 +555,6 @@ QPushButton#save_profile_btn,
 QPushButton#change_password_btn,
 QPushButton#update_security_question_btn,
 QPushButton#create_new_class_btn,
-QPushButton#create_class_btn,
 QPushButton#start_attendance_btn,
 QPushButton#submit_attendance_btn {
     background-color: {{accent}};
@@ -463,7 +570,6 @@ QPushButton#save_profile_btn:hover,
 QPushButton#change_password_btn:hover,
 QPushButton#update_security_question_btn:hover,
 QPushButton#create_new_class_btn:hover,
-QPushButton#create_class_btn:hover,
 QPushButton#start_attendance_btn:hover,
 QPushButton#submit_attendance_btn:hover {
     background-color: {{accent_hover}};
@@ -473,13 +579,11 @@ QPushButton#save_profile_btn:pressed,
 QPushButton#change_password_btn:pressed,
 QPushButton#update_security_question_btn:pressed,
 QPushButton#create_new_class_btn:pressed,
-QPushButton#create_class_btn:pressed,
 QPushButton#start_attendance_btn:pressed,
 QPushButton#submit_attendance_btn:pressed {
     background-color: {{accent_pressed}};
 }
 
-QPushButton#create_class_btn:disabled,
 QPushButton#start_attendance_btn:disabled,
 QPushButton#submit_attendance_btn:disabled {
     background-color: {{accent_subtle}};
@@ -489,13 +593,7 @@ QPushButton#submit_attendance_btn:disabled {
 /* --- Secondary outline buttons (blue) - legacy objectName chain --- */
 
 QPushButton#edit_profile_btn,
-QPushButton#export_to_excel_btn,
-QPushButton#spreadsheet_file_btn,
-QPushButton#add_slot_monday_btn,
-QPushButton#add_slot_tuesday_btn,
-QPushButton#add_slot_wednesday_btn,
-QPushButton#add_slot_thursday_btn,
-QPushButton#add_slot_friday_btn {
+QPushButton#export_to_excel_btn {
     background-color: transparent;
     color: {{accent}};
     border: 1px solid {{accent}};
@@ -505,20 +603,13 @@ QPushButton#add_slot_friday_btn {
 }
 
 QPushButton#edit_profile_btn:hover,
-QPushButton#export_to_excel_btn:hover,
-QPushButton#spreadsheet_file_btn:hover,
-QPushButton#add_slot_monday_btn:hover,
-QPushButton#add_slot_tuesday_btn:hover,
-QPushButton#add_slot_wednesday_btn:hover,
-QPushButton#add_slot_thursday_btn:hover,
-QPushButton#add_slot_friday_btn:hover {
+QPushButton#export_to_excel_btn:hover {
     background-color: {{accent_subtle}};
 }
 
 /* --- Destructive buttons - legacy objectName chain ---
    delete_account_btn stays a stronger (tinted, not solid) warning since it's
-   the highest-stakes action in the app; class_delete_btn/remove_slot_* are
-   lower-stakes, frequent, in-line actions and get a lighter tint. */
+   the highest-stakes action in the app. --- */
 
 QPushButton#delete_account_btn {
     background-color: {{error_tint}};
@@ -536,27 +627,6 @@ QPushButton#delete_account_btn:hover {
 
 QPushButton#delete_account_btn:pressed {
     background-color: {{error}};
-}
-
-QPushButton#remove_slot_monday_btn,
-QPushButton#remove_slot_tuesday_btn,
-QPushButton#remove_slot_wednesday_btn,
-QPushButton#remove_slot_thursday_btn,
-QPushButton#remove_slot_friday_btn {
-    background-color: transparent;
-    color: {{error}};
-    border: 1px solid {{error_border}};
-    border-radius: {{radius_control_sm}}px;
-    padding: 8px 14px;
-    font-size: 10pt;
-}
-
-QPushButton#remove_slot_monday_btn:hover,
-QPushButton#remove_slot_tuesday_btn:hover,
-QPushButton#remove_slot_wednesday_btn:hover,
-QPushButton#remove_slot_thursday_btn:hover,
-QPushButton#remove_slot_friday_btn:hover {
-    background-color: {{error_tint}};
 }
 
 QLabel#danger_zone_lbl {
@@ -851,6 +921,7 @@ QCalendarWidget QWidget#qt_calendar_navigationbar {
 /* --- Group boxes (Add New Class day selectors) --- */
 
 QGroupBox {
+    background-color: {{bg_hover}};
     border: 1px solid {{border}};
     border-radius: {{radius_control_sm}}px;
     margin-top: 8px;

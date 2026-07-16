@@ -10,41 +10,58 @@ attendance-status coloring in table widgets, which QSS can't express since
 it's driven by cell content, not a static widget state) must import from
 here rather than hardcoding a QColor/hex value, so both places stay in sync
 by construction.
+
+Token set below matches the "AttendU" reference redesign (see
+reference-theme/student-attendance-app-redesign-prompt.md and
+reference-theme/ASSUMPTIONS.md) - a dark-first purple/blue-gradient look,
+replacing the earlier "Kintsugi" white/black-chrome direction. The internal
+key name `error` is kept (not renamed to the spec's "danger") purely for
+call-site continuity - every existing `qcolor("error_tint")`-style call
+across the app keeps working; it's the same semantic color the spec calls
+"danger."
 """
 
 PALETTE = {
-    # Background layers - Kintsugi direction (see .claude/plans/wild-jingling-unicorn.md):
-    # mostly-white/black chrome with a sparing blue accent, replacing the
-    # earlier "Enterprise Dense" navy-sidebar look.
-    "bg_app": "#EEF0FA",
-    "bg_app_gradient_start": "#E7E9FA",
-    "bg_app_gradient_end": "#EFEFF7",
+    # Background layers - AttendU direction: a cool light-gray page behind
+    # white cards, NOT theme-reactive chrome (see bg_sidebar below).
+    "bg_app": "#EEF0F5",
     "bg_card": "#FFFFFF",
     "bg_elevated": "#FFFFFF",
-    "bg_sidebar": "#FFFFFF",
-    "bg_hover": "#F4F4F8",
-    "bg_nav_active_pill": "#F1F1F5",
+    "bg_hover": "#F4F5F9",
+    "bg_nav_active_pill": "#EEEBFC",
+
+    # Sidebar + the auth screens' left brand panel are ALWAYS dark,
+    # regardless of the light/dark toggle - confirmed directly from the
+    # reference screenshots (the light-mode Dashboard/Settings shots still
+    # show a dark sidebar). These are fixed values, not swapped by theme.
+    "bg_sidebar": "#12141C",
+    "bg_sidebar_hover": "#1B202C",
+    "bg_sidebar_active": "#1F2333",
+    "text_sidebar": "#C7CCDA",
+    "text_sidebar_muted": "#767D91",
 
     # Text
-    "text_primary": "#111114",
-    "text_secondary": "#6B6B76",
-    "text_disabled": "#C7C7D1",
+    "text_primary": "#1B1E2B",
+    "text_secondary": "#8A93A7",
+    "text_disabled": "#C2C7D4",
 
-    # Accent / brand
-    "accent": "#2F5CF0",
-    "accent_hover": "#254BC7",
-    "accent_pressed": "#1D3D9E",
-    "accent_subtle": "#EAF0FE",
+    # Accent / brand - primary CTAs use a purple-to-blue gradient
+    # (accent -> accent_end), everything else (links, focus rings, active
+    # nav, selected calendar day) uses the flat accent color.
+    "accent": "#7C6EF7",
+    "accent_end": "#6D8CFA",
+    "accent_hover": "#6C5CE1",
+    "accent_pressed": "#5B4FD1",
+    "accent_subtle": "#EEECFE",
 
-    # Semantic status colors (Present/Pass, Late, Absent/Fail) - kept in the
-    # same hue families as before; these are load-bearing for attendance
-    # status coding throughout roster tables and charts.
+    # Semantic status colors (Present/Pass, Late, Absent/Fail) - load-bearing
+    # for attendance status coding throughout roster tables and charts.
     "success": "#16A34A",
     "success_tint": "#DCFCE7",
     "success_border": "#86EFAC",
     "success_text": "#166534",
 
-    "warning": "#D97706",
+    "warning": "#B45309",
     "warning_tint": "#FEF3C7",
     "warning_border": "#FCD34D",
     "warning_text": "#92400E",
@@ -54,9 +71,13 @@ PALETTE = {
     "error_border": "#FCA5A5",
     "error_text": "#991B1B",
 
+    # Neutral pill (inactive/tag chips)
+    "neutral_pill_bg": "#F1F2F6",
+    "neutral_pill_text": "#6B7280",
+
     # Borders
-    "border": "#E7E7EE",
-    "border_strong": "#D6D6E0",
+    "border": "#E4E7ED",
+    "border_strong": "#D4D8E2",
 }
 
 # Dark-mode counterpart to PALETTE, same keys - resources/styles/theme_dark.qss
@@ -65,82 +86,89 @@ PALETTE = {
 # uses the light PALETTE in both themes - only the static QSS chrome and
 # matplotlib charts (via active_palette()) are dark-mode aware.
 DARK_PALETTE = {
-    "bg_app": "#14141B",
-    "bg_app_gradient_start": "#14141B",
-    "bg_app_gradient_end": "#1B1B24",
-    "bg_card": "#1E1E27",
-    "bg_elevated": "#1E1E27",
-    "bg_sidebar": "#17171F",
-    "bg_hover": "#24242E",
-    "bg_nav_active_pill": "#24242E",
+    "bg_app": "#0B0E14",
+    "bg_card": "#161A24",
+    "bg_elevated": "#1B202C",
+    "bg_hover": "#1E2330",
+    "bg_nav_active_pill": "#262040",
 
-    "text_primary": "#F1F1F5",
-    "text_secondary": "#A0A0AC",
-    "text_disabled": "#54545F",
+    # Sidebar stays the same fixed dark values in both themes - see PALETTE.
+    "bg_sidebar": "#12141C",
+    "bg_sidebar_hover": "#1B202C",
+    "bg_sidebar_active": "#1F2333",
+    "text_sidebar": "#C7CCDA",
+    "text_sidebar_muted": "#767D91",
 
-    "accent": "#5B7FF5",
-    "accent_hover": "#7C99F7",
-    "accent_pressed": "#2F5CF0",
-    "accent_subtle": "#22315E",
+    "text_primary": "#F1F2F6",
+    "text_secondary": "#8790A6",
+    "text_disabled": "#4B5162",
 
-    "success": "#22C55E",
-    "success_tint": "#14532D",
+    "accent": "#8B7CF9",
+    "accent_end": "#6EA8FE",
+    "accent_hover": "#9D90FA",
+    "accent_pressed": "#7C6EF7",
+    "accent_subtle": "#262040",
+
+    "success": "#4ADE80",
+    "success_tint": "#123722",
     "success_border": "#16A34A",
     "success_text": "#BBF7D0",
 
-    "warning": "#F59E0B",
-    "warning_tint": "#78350F",
-    "warning_border": "#D97706",
+    "warning": "#FBBF24",
+    "warning_tint": "#3A2E0F",
+    "warning_border": "#B45309",
     "warning_text": "#FDE68A",
 
-    "error": "#EF4444",
-    "error_tint": "#7F1D1D",
+    "error": "#F87171",
+    "error_tint": "#3A1414",
     "error_border": "#DC2626",
     "error_text": "#FECACA",
 
-    "border": "#2E2E38",
-    "border_strong": "#3D3D49",
+    "neutral_pill_bg": "#232838",
+    "neutral_pill_text": "#9AA1B4",
+
+    "border": "#262B38",
+    "border_strong": "#333A4A",
 }
 
 # Class-card color tags: a small, hand-picked set of distinct hues (not an
-# arbitrary hash-to-RGB, which tends to produce muddy colors).
+# arbitrary hash-to-RGB, which tends to produce muddy colors). Matches the
+# 9-swatch "Class Color" picker shown in the Add/Edit Class wizard's
+# Color & Confirm step.
 CLASS_TAG_COLORS = [
-    "#4F46E5", "#0EA5E9", "#16A34A", "#D97706",
-    "#DC2626", "#DB2777", "#7C3AED", "#0D9488",
+    "#7C6EF7", "#3B82F6", "#22C55E", "#F59E0B",
+    "#F87171", "#A78BFA", "#FB923C", "#38BDF8", "#34D399",
 ]
 
-# Spacing scale (px) for the Kintsugi-direction redesign (see the plan at
-# .claude/plans/wild-jingling-unicorn.md) - wider than the Enterprise Dense
-# scale to match Kintsugi's generous whitespace. Consumed by
-# resources/styles/theme.qss.tmpl (via scripts/generate_theme.py) and by
-# Python code that builds widgets programmatically.
+# Spacing scale (px): base unit 4px on the spec's 4/8/12/16/20/24/32 ramp.
 SPACING = {
     "xs": 4,
     "sm": 8,
-    "md": 16,
-    "lg": 24,
-    "xl": 32,
-    "xxl": 48,
+    "md": 12,
+    "lg": 16,
+    "xl": 20,
+    "xxl": 24,
+    "xxxl": 32,
 }
 
-# Radius scale (px) for the same redesign. "pill" is meant to be passed to
-# QSS as `border-radius: 999px` on a widget with a fixed/min height, so it
-# always renders as a true pill rather than a rounded rectangle.
+# Radius scale (px). "pill" is meant to be passed to QSS as
+# `border-radius: 999px` on a widget with a fixed/min height, so it always
+# renders as a true pill rather than a rounded rectangle.
 RADIUS = {
-    "card": 20,
+    "card": 16,
     "control_sm": 10,
     "pill": 999,
     "avatar": 999,
 }
 
-# Tag-chip colors for the new redesign: each entry is a (dot, tint) pair -
-# "dot" is the small colored-circle color, "tint" is the pill's light
-# background fill. Additive alongside CLASS_TAG_COLORS (which class_tag_color()
-# depends on and keeps working unchanged) rather than a replacement, since tag
-# chips are a distinct, richer concept (dot + tinted pill) from a single flat
+# Tag-chip colors: each entry is a (dot, tint) pair - "dot" is the small
+# colored-circle color, "tint" is the pill's light background fill.
+# Additive alongside CLASS_TAG_COLORS (which class_tag_color() depends on
+# and keeps working unchanged) rather than a replacement, since tag chips
+# are a distinct, richer concept (dot + tinted pill) from a single flat
 # tag-strip color.
 TAG_COLORS = {
-    "indigo": {"dot": "#6366F1", "tint": "#EEF0FE"},
+    "indigo": {"dot": "#7C6EF7", "tint": "#EEECFE"},
     "sky": {"dot": "#38BDF8", "tint": "#E8F7FE"},
     "green": {"dot": "#22C55E", "tint": "#E9FBEF"},
     "amber": {"dot": "#F59E0B", "tint": "#FEF3DE"},
@@ -151,7 +179,7 @@ TAG_COLORS = {
 }
 
 DARK_TAG_COLORS = {
-    "indigo": {"dot": "#818CF8", "tint": "#2A2A5C"},
+    "indigo": {"dot": "#8B7CF9", "tint": "#262040"},
     "sky": {"dot": "#5FCBFB", "tint": "#173A4A"},
     "green": {"dot": "#4ADE80", "tint": "#173A26"},
     "amber": {"dot": "#FBBF24", "tint": "#3D2E0E"},
@@ -179,6 +207,18 @@ def qcolor(token: str):
     from PyQt5.QtGui import QColor
 
     return QColor(PALETTE[token])
+
+
+def attendance_tier(percent: float, minimum: float) -> str:
+    """The spec's tier-coloring rule, used everywhere a percentage or a bar
+    needs a success/warning/error classification: danger below the class's
+    configured minimum, warning within 10 points above it, success 10+
+    points above it."""
+    if percent < minimum:
+        return "error"
+    if percent < minimum + 10:
+        return "warning"
+    return "success"
 
 
 def class_tag_color(class_code: str) -> str:

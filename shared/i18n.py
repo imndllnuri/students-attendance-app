@@ -14,14 +14,19 @@ LANGUAGE_PREFERENCE_PATH = Path(".language_preference")
 LANGUAGES = {"en": "English", "tr": "Türkçe"}
 
 STRINGS = {
-    "welcome_back": {"en": "Welcome back", "tr": "Tekrar hoş geldiniz"},
+    "welcome_back": {"en": "Welcome back.", "tr": "Tekrar hoş geldiniz."},
     "sign_in_subtitle": {
-        "en": "Sign in to manage your classes and attendance",
-        "tr": "Sınıflarınızı ve yoklamalarınızı yönetmek için giriş yapın",
+        "en": "Sign in to your account",
+        "tr": "Hesabınıza giriş yapın",
     },
     "forgot_password": {"en": "Forgot password?", "tr": "Şifremi unuttum?"},
-    "log_in": {"en": "Log in", "tr": "Giriş yap"},
+    "log_in": {"en": "Sign In", "tr": "Giriş Yap"},
     "create_account": {"en": "Create Account", "tr": "Hesap Oluştur"},
+    "create_one": {"en": "Create one", "tr": "Hesap oluşturun"},
+    "dont_have_account": {"en": "Don't have an account?", "tr": "Hesabınız yok mu?"},
+    "remember_me": {"en": "Remember me for 30 days", "tr": "30 gün boyunca beni hatırla"},
+    "email_address": {"en": "Email Address", "tr": "E-posta Adresi"},
+    "password": {"en": "Password", "tr": "Şifre"},
 
     "my_classes": {"en": "My Classes", "tr": "Sınıflarım"},
     "settings": {"en": "Settings", "tr": "Ayarlar"},

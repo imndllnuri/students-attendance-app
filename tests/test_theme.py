@@ -64,16 +64,14 @@ def test_specific_known_substitutions_are_correct():
     # was a real, previously-unnoticed dark-mode bug the template-based
     # (substitute-by-name, not by-hex-value) generator fixes.
     assert "QLabel#notifications_badge_lbl {\n    background-color: #DC2626;\n    color: #FFFFFF;" in light_qss
-    assert "QLabel#notifications_badge_lbl {\n    background-color: #EF4444;\n    color: #FFFFFF;" in dark_qss
+    assert "QLabel#notifications_badge_lbl {\n    background-color: #F87171;\n    color: #FFFFFF;" in dark_qss
 
-    assert 'QPushButton[variant="primary"] {\n    background-color: #2F5CF0;\n    color: #FFFFFF;' in light_qss
-    assert 'QPushButton[variant="primary"] {\n    background-color: #5B7FF5;\n    color: #FFFFFF;' in dark_qss
-
-    # Sidebar flips from white (light) to dark (dark mode) - the biggest
-    # single token change in the Kintsugi redesign vs. the old dark-navy-
-    # always sidebar.
-    assert "QWidget#sidebar_widget {\n    background-color: #FFFFFF;" in light_qss
-    assert "QWidget#sidebar_widget {\n    background-color: #17171F;" in dark_qss
+    # AttendU redesign: sidebar and the auth left panel are fixed-dark
+    # chrome in BOTH themes (confirmed from the reference screenshots -
+    # the light-mode shots still show a dark sidebar), unlike the earlier
+    # Kintsugi redesign where the sidebar flipped with the theme.
+    assert "QWidget#sidebar_widget {\n    background-color: #12141C;" in light_qss
+    assert "QWidget#sidebar_widget {\n    background-color: #12141C;" in dark_qss
 
     # Pill radius (999px) renders identically regardless of theme, since
     # radius/spacing tokens aren't color tokens.
@@ -99,4 +97,4 @@ def test_render_fills_radius_and_spacing_tokens():
 
     result = render("border-radius: {{radius_pill}}px; margin: {{spacing_md}}px;", PALETTE)
 
-    assert result == "border-radius: 999px; margin: 16px;"
+    assert result == "border-radius: 999px; margin: 12px;"

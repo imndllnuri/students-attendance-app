@@ -1,10 +1,12 @@
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QMessageBox
 
 from shared.qt_style import set_dynamic_property
-from shared.shadow import apply_card_shadow
+from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.validation import MIN_PASSWORD_LENGTH, is_valid_password, password_strength
+from shared.widgets import set_auth_headline
+from resources.images import qrc
 
 
 class ResetPasswordWindow(QDialog):
@@ -18,21 +20,37 @@ class ResetPasswordWindow(QDialog):
         set_dynamic_property(self.cancel_btn, "variant", "secondary")
         set_dynamic_property(self.back_btn, "variant", "secondary")
         set_dynamic_property(self.reset_btn, "variant", "primary")
+        set_dynamic_property(self.back_to_signin_btn, "variant", "ghost")
 
         self.next_btn.clicked.connect(self.fetch_question)
         self.cancel_btn.clicked.connect(self.reject)
         self.back_btn.clicked.connect(lambda: self.steps_stack.setCurrentIndex(0))
+        self.back_to_signin_btn.clicked.connect(self.reject)
         self.reset_btn.clicked.connect(self.submit_reset)
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
         self.new_password_le.textChanged.connect(self._update_password_strength)
 
         self._password_toggle = self.new_password_le.addAction(
-            qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
+            qta.icon("fa5s.eye", color="#8A93A7"), QLineEdit.TrailingPosition
         )
         self._password_toggle.setCheckable(True)
         self._password_toggle.setToolTip("Show password")
         self._password_toggle.toggled.connect(self.toggle_password_visibility)
 
-        apply_card_shadow(self.card_frame, strength="lg")
+        set_auth_headline(self.auth_headline_lbl, "Track every session.", "Never miss a beat.")
+        self._update_theme_icon()
+
+    def toggle_theme(self):
+        new_theme = "light" if load_theme_preference() == "dark" else "dark"
+        save_theme_preference(new_theme)
+        with open(stylesheet_path(new_theme)) as f:
+            QApplication.instance().setStyleSheet(f.read())
+        self._update_theme_icon()
+
+    def _update_theme_icon(self):
+        is_dark = load_theme_preference() == "dark"
+        icon_name = "fa5s.sun" if is_dark else "fa5s.moon"
+        self.theme_toggle_btn.setIcon(qta.icon(icon_name, color="#8A93A7"))
 
     def fetch_question(self):
         email = self.email_le.text().strip()
@@ -94,7 +112,7 @@ class ResetPasswordWindow(QDialog):
         mode = QLineEdit.Normal if checked else QLineEdit.Password
         self.new_password_le.setEchoMode(mode)
         self.confirm_password_le.setEchoMode(mode)
-        self._password_toggle.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#6B6B76"))
+        self._password_toggle.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#8A93A7"))
         self._password_toggle.setToolTip("Hide password" if checked else "Show password")
 
     def _show_error(self, label, message):

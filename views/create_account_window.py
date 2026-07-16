@@ -1,10 +1,10 @@
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QMessageBox
 
 from models.accounts import Account
 from shared.qt_style import set_dynamic_property
-from shared.shadow import apply_card_shadow
+from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -12,6 +12,8 @@ from shared.validation import (
     is_valid_password,
     password_strength,
 )
+from shared.widgets import set_auth_headline
+from resources.images import qrc
 
 
 class CreateAccountWindow(QDialog):
@@ -21,9 +23,12 @@ class CreateAccountWindow(QDialog):
         self.account_manager = account_manager
 
         set_dynamic_property(self.sign_up_btn, "variant", "primary")
+        set_dynamic_property(self.sign_in_btn, "variant", "ghost")
         self.sign_up_btn.clicked.connect(self.create_account)
+        self.sign_in_btn.clicked.connect(self.close)
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
 
-        self.email_le.addAction(qta.icon("fa5s.envelope", color="#C7C7D1"), QLineEdit.LeadingPosition)
+        self.email_le.addAction(qta.icon("fa5s.envelope", color="#8A93A7"), QLineEdit.LeadingPosition)
         self._password_toggle = self._add_password_toggle(self.password_le)
         self._password_again_toggle = self._add_password_toggle(self.password_again_le)
 
@@ -37,12 +42,25 @@ class CreateAccountWindow(QDialog):
         if len(SECURITY_QUESTIONS) > 1:
             self.security_question_2_ComboBox.setCurrentIndex(1)
 
-        apply_card_shadow(self.card_frame, strength="lg")
+        set_auth_headline(self.auth_headline_lbl, "Track every session.", "Never miss a beat.")
+        self._update_theme_icon()
 
         self.show()
 
+    def toggle_theme(self):
+        new_theme = "light" if load_theme_preference() == "dark" else "dark"
+        save_theme_preference(new_theme)
+        with open(stylesheet_path(new_theme)) as f:
+            QApplication.instance().setStyleSheet(f.read())
+        self._update_theme_icon()
+
+    def _update_theme_icon(self):
+        is_dark = load_theme_preference() == "dark"
+        icon_name = "fa5s.sun" if is_dark else "fa5s.moon"
+        self.theme_toggle_btn.setIcon(qta.icon(icon_name, color="#8A93A7"))
+
     def _add_password_toggle(self, line_edit):
-        action = line_edit.addAction(qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition)
+        action = line_edit.addAction(qta.icon("fa5s.eye", color="#8A93A7"), QLineEdit.TrailingPosition)
         action.setCheckable(True)
         action.setToolTip("Show password")
         action.toggled.connect(lambda checked: self._toggle_echo(line_edit, action, checked))
@@ -50,7 +68,7 @@ class CreateAccountWindow(QDialog):
 
     def _toggle_echo(self, line_edit, action, checked):
         line_edit.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
-        action.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#6B6B76"))
+        action.setIcon(qta.icon("fa5s.eye-slash" if checked else "fa5s.eye", color="#8A93A7"))
         action.setToolTip("Hide password" if checked else "Show password")
 
     def validate_email(self):

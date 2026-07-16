@@ -1,7 +1,11 @@
-/* Shared theme TEMPLATE for the whole app - "Kintsugi" direction: mostly
-   white/black chrome, one sparing blue accent, fully-rounded pill controls,
-   softer/larger shadows (see shared/shadow.py), generous whitespace, and a
-   soft lavender-blue gradient canvas behind the centered auth cards.
+/* Shared theme TEMPLATE for the whole app - "AttendU" direction (see
+   reference-theme/student-attendance-app-redesign-prompt.md and
+   reference-theme/ASSUMPTIONS.md): a dark-first look with a purple-to-blue
+   gradient on every primary CTA, 16px card radius, fully-rounded pill
+   controls, and a sidebar / auth-left-panel that stay fixed-dark chrome
+   regardless of the light/dark toggle (confirmed from the reference
+   screenshots). Replaces the earlier "Kintsugi" white/black-chrome
+   direction.
 
    This file is NOT consumed directly by the app - it's rendered into the
    real resources/styles/theme.qss (light) and resources/styles/theme_dark.qss
@@ -14,26 +18,24 @@
    Each placeholder is substituted by NAME, not by matching a hex value, so
    two rules that happen to want the same light-mode color but different
    dark-mode colors (or vice versa) can't collide the way a blind
-   hex-substitution generator would (this replaced an earlier generator that
-   had exactly that class of bug - see git history).
+   hex-substitution generator would.
 
    Some literal `#FFFFFF`-style colors below are intentionally NOT
    tokenized: they're "always white text on a colored control" (primary-
    button labels, the notification badge, active sidebar-nav text) that
    should stay pure white in both themes, not resolve through the bg_card
-   token (which does change between themes) - tokenizing those by mistake
-   was a real, previously-unnoticed dark-mode bug this rework fixes.
+   token (which does change between themes).
 
-   Card/control radius: card=20px  control_sm=10px
+   Card/control radius: card=16px  control_sm=10px
    pill/avatar controls use `border-radius: 999px` (999) on a
    widget with a fixed/min height, so it renders as a true pill.
 
    Buttons use a `variant` dynamic Qt property (button.setProperty("variant",
-   "primary"/"secondary"/"destructive")) matched via `QPushButton[variant="..."]`
-   selectors - this is the new, screen-agnostic way to style a button.
-   Screens not yet migrated to the redesign still use the older
-   objectName-chain selectors further down this file; both coexist during
-   the phased rollout and the old ones are removed as each screen migrates.
+   "primary"/"secondary"/"destructive"/"ghost")) matched via
+   `QPushButton[variant="..."]` selectors - this is the screen-agnostic way
+   to style a button. A few screens out of scope for this redesign pass
+   (Settings/Statistics/Search/Profile - see ASSUMPTIONS.md) still use older
+   objectName-chain selectors further down this file; both coexist.
 
    Error/active/state on widgets is driven by dynamic Qt properties set in
    Python: widget.setProperty("error"/"active"/"state", value);
@@ -41,25 +43,110 @@
    which is what makes the [error="true"], [active="true"], [state="..."]
    selectors below take effect. */
 
+* {
+    font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+
 QWidget#background {
-    background: qlineargradient(
-        x1:0, y1:0, x2:0, y2:1,
-        stop:0 #E7E9FA, stop:1 #EFEFF7
-    );
+    background-color: #EEF0F5;
 }
 
 QStackedWidget#stackedWidget {
-    background-color: #EEF0FA;
+    background-color: #EEF0F5;
 }
 
+/* Sidebar (and the auth screens' left brand panel, styled separately by
+   objectName as each screen is built) are fixed-dark chrome in BOTH
+   themes - see shared/palette.py's bg_sidebar token, which is identical
+   in PALETTE and DARK_PALETTE on purpose. */
 QWidget#sidebar_widget {
+    background-color: #12141C;
+    border-right: 1px solid #1F2333;
+}
+
+/* --- Auth screens (Login / Create Account / Reset Password) ---
+   Left brand panel is the same fixed-dark chrome as the sidebar, with a
+   soft purple glow anchored near the top-left corner (qradialgradient is
+   the closest QSS equivalent to the reference's radial CSS glow). Right
+   panel is the theme-reactive form surface. */
+
+QWidget#auth_left_panel {
+    background: qradialgradient(cx:0.18, cy:0.15, radius:1.1, fx:0.18, fy:0.15,
+                 stop:0 #241B4A, stop:0.55 #12141C, stop:1 #12141C);
+}
+
+QWidget#auth_right_panel {
+    background-color: #EEF0F5;
+}
+
+QLabel#auth_eyebrow_lbl {
+    color: #9D90FA;
+    font-size: 9pt;
+    font-weight: 700;
+}
+
+QLabel#auth_headline_lbl {
+    font-size: 26pt;
+    font-weight: 700;
+}
+
+QLabel#auth_supporting_lbl {
+    color: #767D91;
+    font-size: 10pt;
+    padding-top: 10px;
+}
+
+QLabel#auth_stat_1_lbl,
+QLabel#auth_stat_2_lbl,
+QLabel#auth_stat_3_lbl {
+    background-color: #1B202C;
+    color: #C7CCDA;
+    font-size: 8pt;
+    font-weight: 600;
+    border: 1px solid #2A2F40;
+    border-radius: 999px;
+    padding: 6px 8px;
+}
+
+QLabel#auth_footer_lbl {
+    color: #565D70;
+    font-size: 8.5pt;
+}
+
+QPushButton#theme_toggle_btn {
     background-color: #FFFFFF;
+    border: 1px solid #E4E7ED;
+    border-radius: 18px;
+}
+
+QPushButton#theme_toggle_btn:hover {
+    background-color: #F4F5F9;
+}
+
+QLabel#email_field_lbl,
+QLabel#password_field_lbl,
+QLabel#name_field_lbl,
+QLabel#surname_field_lbl,
+QLabel#confirm_password_field_lbl,
+QLabel#security_question_field_lbl,
+QLabel#security_question_2_field_lbl,
+QLabel#new_password_field_lbl,
+QLabel#confirm_new_password_field_lbl,
+QLabel#create_account_prompt_lbl,
+QLabel#sign_in_prompt_lbl {
+    color: #8A93A7;
+    font-size: 9.5pt;
+}
+
+QPushButton#back_to_signin_btn {
+    text-align: left;
+    padding-left: 0;
 }
 
 QWidget#top_bar_widget,
 QWidget#class_header_widget {
     background-color: #FFFFFF;
-    border-bottom: 1px solid #E7E7EE;
+    border-bottom: 1px solid #E4E7ED;
 }
 
 QWidget#topSideWidget {
@@ -67,13 +154,13 @@ QWidget#topSideWidget {
 }
 
 QWidget#info_panel_widget {
-    background-color: #F4F4F8;
-    border-left: 1px solid #E7E7EE;
+    background-color: #F4F5F9;
+    border-left: 1px solid #E4E7ED;
 }
 
 QPushButton#info_panel_collapse_btn {
     background-color: transparent;
-    color: #6B6B76;
+    color: #8A93A7;
     border: none;
     border-radius: 10px;
     font-size: 11pt;
@@ -81,13 +168,13 @@ QPushButton#info_panel_collapse_btn {
 
 QPushButton#info_panel_collapse_btn:hover {
     background-color: #FFFFFF;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QPushButton#info_panel_pinned_btn,
 QPushButton#info_panel_activity_btn {
     background-color: transparent;
-    color: #6B6B76;
+    color: #8A93A7;
     text-align: left;
     border: none;
     border-radius: 10px;
@@ -98,7 +185,7 @@ QPushButton#info_panel_activity_btn {
 QPushButton#info_panel_pinned_btn:hover,
 QPushButton#info_panel_activity_btn:hover {
     background-color: #FFFFFF;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QWidget#addNewClass {
@@ -123,8 +210,15 @@ QFrame#class_details_card,
 QFrame#roster_section_card,
 QFrame#statistics_card {
     background-color: #FFFFFF;
-    border-radius: 20px;
-    border: 1px solid #E7E7EE;
+    border-radius: 16px;
+    border: 1px solid #E4E7ED;
+}
+
+/* --- Class color swatch (Add/Edit Class) --- */
+
+QFrame#class_color_swatch {
+    border: 1px solid #D4D8E2;
+    border-radius: 6px;
 }
 
 /* --- Typography --- */
@@ -133,7 +227,7 @@ QFrame#statistics_card {
    this, unstyled labels inherit Qt's default (near-black) text color,
    which is invisible against a dark-mode background. */
 QLabel {
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QLabel#title_lbl,
@@ -142,7 +236,7 @@ QLabel#statistics_title_lbl,
 QLabel#my_classes_title_lbl {
     font-size: 20pt;
     font-weight: 700;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QLabel#subtitle_lbl,
@@ -152,20 +246,32 @@ QLabel#login_error_lbl,
 QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
 QLabel#roster_status_lbl,
-QLabel#attendance_progress_lbl,
 QLabel#sidebar_user_email_lbl,
 QLabel#class_breadcrumb_lbl {
     font-size: 9pt;
-    color: #6B6B76;
+    color: #8A93A7;
 }
 
 QLabel#sidebar_user_name_lbl {
     font-size: 9.5pt;
     font-weight: 600;
-    color: #111114;
+    color: #1B1E2B;
 }
 
+/* --- Progress/session badges (Take Attendance) --- */
+
 QLabel#attendance_progress_lbl {
+    background-color: #EEECFE;
+    color: #7C6EF7;
+    font-size: 9pt;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 4px 12px;
+}
+
+QLabel#session_countdown_lbl {
+    color: #7C6EF7;
+    font-size: 9pt;
     font-weight: 600;
 }
 
@@ -198,8 +304,8 @@ QLabel#schedule_day_header_lbl {
 }
 
 QLabel#schedule_slot_chip_lbl {
-    background-color: #EAF0FE;
-    color: #2F5CF0;
+    background-color: #EEECFE;
+    color: #7C6EF7;
     border-radius: 999px;
     padding: 4px 10px;
     margin: 2px;
@@ -208,16 +314,16 @@ QLabel#schedule_slot_chip_lbl {
 /* --- Notes (Class Window) --- */
 
 QTextEdit#class_notes_edit {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
     border: 1.5px solid transparent;
     border-radius: 10px;
     padding: 10px 14px;
     font-size: 10pt;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QTextEdit#class_notes_edit:focus {
-    border: 1.5px solid #2F5CF0;
+    border: 1.5px solid #7C6EF7;
     background-color: #FFFFFF;
 }
 
@@ -301,47 +407,47 @@ QLabel#security_question_2_lbl,
 QLabel#info_panel_title_lbl {
     font-size: 12pt;
     font-weight: 600;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QLabel#info_panel_properties_title_lbl,
 QLabel#info_panel_tags_title_lbl {
     font-size: 10pt;
     font-weight: 600;
-    color: #111114;
+    color: #1B1E2B;
     padding-top: 4px;
 }
 
 QLabel#class_name_header_lbl {
     font-size: 20pt;
     font-weight: 700;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QLabel[fieldLabel="true"] {
     font-size: 10pt;
-    color: #6B6B76;
+    color: #8A93A7;
 }
 
 QLabel[fieldValue="true"] {
     font-size: 10pt;
     font-weight: 600;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 /* --- Inputs - filled pill style (replaces the old underline-only look) --- */
 
 QLineEdit {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
     border: 1.5px solid transparent;
     border-radius: 999px;
     padding: 6px 16px;
     font-size: 10.5pt;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QLineEdit:focus {
-    border: 1.5px solid #2F5CF0;
+    border: 1.5px solid #7C6EF7;
     background-color: #FFFFFF;
 }
 
@@ -350,7 +456,7 @@ QLineEdit[error="true"] {
 }
 
 QLineEdit:read-only {
-    color: #6B6B76;
+    color: #8A93A7;
     background-color: transparent;
 }
 
@@ -360,7 +466,7 @@ QLabel[error="true"] {
 }
 
 QComboBox {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
     border: 1.5px solid transparent;
     border-radius: 999px;
     padding: 6px 16px;
@@ -368,7 +474,7 @@ QComboBox {
 }
 
 QComboBox:focus {
-    border: 1.5px solid #2F5CF0;
+    border: 1.5px solid #7C6EF7;
     background-color: #FFFFFF;
 }
 
@@ -377,7 +483,8 @@ QComboBox:focus {
    relying on an objectName chain. */
 
 QPushButton[variant="primary"] {
-    background-color: #2F5CF0;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                 stop:0 #7C6EF7, stop:1 #6D8CFA);
     color: #FFFFFF;
     border: none;
     border-radius: 999px;
@@ -387,34 +494,35 @@ QPushButton[variant="primary"] {
 }
 
 QPushButton[variant="primary"]:hover {
-    background-color: #254BC7;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                 stop:0 #6C5CE1, stop:1 #6D8CFA);
 }
 
 QPushButton[variant="primary"]:pressed {
-    background-color: #1D3D9E;
+    background: #5B4FD1;
 }
 
 QPushButton[variant="primary"]:disabled {
-    background-color: #EAF0FE;
-    color: #C7C7D1;
+    background: #EEECFE;
+    color: #C2C7D4;
 }
 
 QPushButton[variant="secondary"] {
     background-color: transparent;
-    color: #2F5CF0;
-    border: 1.5px solid #2F5CF0;
+    color: #7C6EF7;
+    border: 1.5px solid #7C6EF7;
     border-radius: 999px;
     padding: 10px 22px;
     font-size: 10.5pt;
 }
 
 QPushButton[variant="secondary"]:hover {
-    background-color: #EAF0FE;
+    background-color: #EEECFE;
 }
 
 QPushButton[variant="ghost"] {
     background-color: transparent;
-    color: #6B6B76;
+    color: #8A93A7;
     border: none;
     border-radius: 999px;
     padding: 8px 14px;
@@ -422,8 +530,8 @@ QPushButton[variant="ghost"] {
 }
 
 QPushButton[variant="ghost"]:hover {
-    background-color: #F4F4F8;
-    color: #111114;
+    background-color: #F4F5F9;
+    color: #1B1E2B;
 }
 
 QPushButton[variant="destructive"] {
@@ -447,10 +555,9 @@ QPushButton#save_profile_btn,
 QPushButton#change_password_btn,
 QPushButton#update_security_question_btn,
 QPushButton#create_new_class_btn,
-QPushButton#create_class_btn,
 QPushButton#start_attendance_btn,
 QPushButton#submit_attendance_btn {
-    background-color: #2F5CF0;
+    background-color: #7C6EF7;
     color: #FFFFFF;
     border: none;
     border-radius: 10px;
@@ -463,62 +570,46 @@ QPushButton#save_profile_btn:hover,
 QPushButton#change_password_btn:hover,
 QPushButton#update_security_question_btn:hover,
 QPushButton#create_new_class_btn:hover,
-QPushButton#create_class_btn:hover,
 QPushButton#start_attendance_btn:hover,
 QPushButton#submit_attendance_btn:hover {
-    background-color: #254BC7;
+    background-color: #6C5CE1;
 }
 
 QPushButton#save_profile_btn:pressed,
 QPushButton#change_password_btn:pressed,
 QPushButton#update_security_question_btn:pressed,
 QPushButton#create_new_class_btn:pressed,
-QPushButton#create_class_btn:pressed,
 QPushButton#start_attendance_btn:pressed,
 QPushButton#submit_attendance_btn:pressed {
-    background-color: #1D3D9E;
+    background-color: #5B4FD1;
 }
 
-QPushButton#create_class_btn:disabled,
 QPushButton#start_attendance_btn:disabled,
 QPushButton#submit_attendance_btn:disabled {
-    background-color: #EAF0FE;
-    color: #C7C7D1;
+    background-color: #EEECFE;
+    color: #C2C7D4;
 }
 
 /* --- Secondary outline buttons (blue) - legacy objectName chain --- */
 
 QPushButton#edit_profile_btn,
-QPushButton#export_to_excel_btn,
-QPushButton#spreadsheet_file_btn,
-QPushButton#add_slot_monday_btn,
-QPushButton#add_slot_tuesday_btn,
-QPushButton#add_slot_wednesday_btn,
-QPushButton#add_slot_thursday_btn,
-QPushButton#add_slot_friday_btn {
+QPushButton#export_to_excel_btn {
     background-color: transparent;
-    color: #2F5CF0;
-    border: 1px solid #2F5CF0;
+    color: #7C6EF7;
+    border: 1px solid #7C6EF7;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 10pt;
 }
 
 QPushButton#edit_profile_btn:hover,
-QPushButton#export_to_excel_btn:hover,
-QPushButton#spreadsheet_file_btn:hover,
-QPushButton#add_slot_monday_btn:hover,
-QPushButton#add_slot_tuesday_btn:hover,
-QPushButton#add_slot_wednesday_btn:hover,
-QPushButton#add_slot_thursday_btn:hover,
-QPushButton#add_slot_friday_btn:hover {
-    background-color: #EAF0FE;
+QPushButton#export_to_excel_btn:hover {
+    background-color: #EEECFE;
 }
 
 /* --- Destructive buttons - legacy objectName chain ---
    delete_account_btn stays a stronger (tinted, not solid) warning since it's
-   the highest-stakes action in the app; class_delete_btn/remove_slot_* are
-   lower-stakes, frequent, in-line actions and get a lighter tint. */
+   the highest-stakes action in the app. --- */
 
 QPushButton#delete_account_btn {
     background-color: #FEE2E2;
@@ -536,27 +627,6 @@ QPushButton#delete_account_btn:hover {
 
 QPushButton#delete_account_btn:pressed {
     background-color: #DC2626;
-}
-
-QPushButton#remove_slot_monday_btn,
-QPushButton#remove_slot_tuesday_btn,
-QPushButton#remove_slot_wednesday_btn,
-QPushButton#remove_slot_thursday_btn,
-QPushButton#remove_slot_friday_btn {
-    background-color: transparent;
-    color: #DC2626;
-    border: 1px solid #FCA5A5;
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-size: 10pt;
-}
-
-QPushButton#remove_slot_monday_btn:hover,
-QPushButton#remove_slot_tuesday_btn:hover,
-QPushButton#remove_slot_wednesday_btn:hover,
-QPushButton#remove_slot_thursday_btn:hover,
-QPushButton#remove_slot_friday_btn:hover {
-    background-color: #FEE2E2;
 }
 
 QLabel#danger_zone_lbl {
@@ -583,13 +653,13 @@ QPushButton#class_delete_btn:hover {
 QPushButton#forgot_password_btn {
     background-color: transparent;
     border: none;
-    color: #2F5CF0;
+    color: #7C6EF7;
     font-size: 9pt;
     text-align: left;
 }
 
 QPushButton#forgot_password_btn:hover {
-    color: #254BC7;
+    color: #6C5CE1;
     text-decoration: underline;
 }
 
@@ -606,87 +676,87 @@ QPushButton#close_window_btn:hover {
 QToolButton {
     background-color: transparent;
     border: none;
-    color: #2F5CF0;
+    color: #7C6EF7;
     font-size: 8pt;
 }
 
 QToolButton:hover {
-    color: #254BC7;
+    color: #6C5CE1;
 }
 
 QCheckBox {
     spacing: 6px;
     font-size: 9pt;
-    color: #6B6B76;
+    color: #8A93A7;
 }
 
 QCheckBox::indicator {
     width: 16px;
     height: 16px;
     border-radius: 5px;
-    border: 1.5px solid #D6D6E0;
+    border: 1.5px solid #D4D8E2;
     background: #FFFFFF;
 }
 
 QCheckBox::indicator:hover {
-    border: 1.5px solid #2F5CF0;
+    border: 1.5px solid #7C6EF7;
 }
 
 QCheckBox::indicator:checked {
-    background: #2F5CF0;
-    border: 1.5px solid #2F5CF0;
+    background: #7C6EF7;
+    border: 1.5px solid #7C6EF7;
 }
 
 /* --- Class row card (My Classes / Search) --- */
 
 QWidget#class_row_widget {
     background-color: #FFFFFF;
-    border: 1px solid #E7E7EE;
+    border: 1px solid #E4E7ED;
     border-radius: 10px;
 }
 
 QWidget#class_row_widget:hover {
-    border: 1px solid #EAF0FE;
+    border: 1px solid #EEECFE;
 }
 
 QPushButton#class_row_name_btn {
     background-color: transparent;
     border: none;
     text-align: left;
-    color: #111114;
+    color: #1B1E2B;
     font-size: 10pt;
     font-weight: 600;
     padding: 8px 10px;
 }
 
 QPushButton#class_row_name_btn:hover {
-    color: #2F5CF0;
+    color: #7C6EF7;
 }
 
 /* --- Class card grid (My Classes / Search) --- */
 
 QFrame#class_card_widget {
     background-color: #FFFFFF;
-    border: 1px solid #E7E7EE;
-    border-radius: 20px;
+    border: 1px solid #E4E7ED;
+    border-radius: 16px;
 }
 
 QFrame#class_card_widget:hover {
-    border: 1px solid #EAF0FE;
+    border: 1px solid #EEECFE;
 }
 
 QPushButton#class_card_title_btn {
     background-color: transparent;
     border: none;
     text-align: left;
-    color: #111114;
+    color: #1B1E2B;
     font-size: 10.5pt;
     font-weight: 700;
     padding: 0;
 }
 
 QPushButton#class_card_title_btn:hover {
-    color: #2F5CF0;
+    color: #7C6EF7;
 }
 
 QPushButton#class_card_illustration_btn {
@@ -706,14 +776,14 @@ QPushButton#refresh_student_list_btn {
 QPushButton#card_icon_btn:hover,
 QPushButton#back_to_my_classes_btn:hover,
 QPushButton#refresh_student_list_btn:hover {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
 }
 
 /* --- RFID scan status card (Take Attendance) --- */
 
 QFrame#scan_status_card {
-    background-color: #F4F4F8;
-    border: 1px solid #E7E7EE;
+    background-color: #F4F5F9;
+    border: 1px solid #E4E7ED;
     border-radius: 10px;
 }
 
@@ -734,7 +804,7 @@ QFrame#scan_status_card[state="error"] {
 
 QLabel#scan_status_text_lbl {
     font-size: 10pt;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QLabel#scan_status_icon_lbl {
@@ -748,7 +818,7 @@ QPushButton#settings_btn,
 QPushButton#statistics_btn,
 QPushButton#log_out_btn {
     background-color: transparent;
-    color: #6B6B76;
+    color: #8A93A7;
     text-align: left;
     border: none;
     border-radius: 10px;
@@ -760,22 +830,22 @@ QPushButton#my_classes_btn:hover,
 QPushButton#settings_btn:hover,
 QPushButton#statistics_btn:hover,
 QPushButton#log_out_btn:hover {
-    background-color: #F4F4F8;
-    color: #111114;
+    background-color: #F4F5F9;
+    color: #1B1E2B;
 }
 
 QPushButton#my_classes_btn:pressed,
 QPushButton#settings_btn:pressed,
 QPushButton#statistics_btn:pressed,
 QPushButton#log_out_btn:pressed {
-    background-color: #F1F1F5;
+    background-color: #EEEBFC;
 }
 
 QPushButton#my_classes_btn[active="true"],
 QPushButton#settings_btn[active="true"],
 QPushButton#statistics_btn[active="true"] {
-    background-color: #F1F1F5;
-    color: #111114;
+    background-color: #EEEBFC;
+    color: #1B1E2B;
     font-weight: 600;
 }
 
@@ -789,17 +859,17 @@ QPushButton#profile_btn {
 
 QPushButton#search_btn:hover,
 QPushButton#profile_btn:hover {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
 }
 
 /* --- Tables --- */
 
 QTableWidget {
     background-color: #FFFFFF;
-    border: 1px solid #E7E7EE;
+    border: 1px solid #E4E7ED;
     border-radius: 10px;
-    gridline-color: #E7E7EE;
-    alternate-background-color: #F4F4F8;
+    gridline-color: #E4E7ED;
+    alternate-background-color: #F4F5F9;
     font-size: 10pt;
 }
 
@@ -808,20 +878,20 @@ QTableWidget::item {
 }
 
 QTableWidget::item:hover {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
 }
 
 QTableWidget::item:selected {
-    background-color: #EAF0FE;
-    color: #111114;
+    background-color: #EEECFE;
+    color: #1B1E2B;
 }
 
 QHeaderView::section {
-    background-color: #F4F4F8;
-    color: #6B6B76;
+    background-color: #F4F5F9;
+    color: #8A93A7;
     padding: 6px;
     border: none;
-    border-bottom: 2px solid #E7E7EE;
+    border-bottom: 2px solid #E4E7ED;
     font-weight: 600;
     font-size: 10pt;
 }
@@ -830,51 +900,52 @@ QHeaderView::section {
 
 QCalendarWidget QToolButton {
     background-color: transparent;
-    color: #111114;
+    color: #1B1E2B;
     border-radius: 6px;
     padding: 4px;
 }
 
 QCalendarWidget QToolButton:hover {
-    background-color: #EAF0FE;
+    background-color: #EEECFE;
 }
 
 QCalendarWidget QAbstractItemView:enabled {
-    selection-background-color: #2F5CF0;
+    selection-background-color: #7C6EF7;
     selection-color: #FFFFFF;
 }
 
 QCalendarWidget QWidget#qt_calendar_navigationbar {
-    background-color: #F4F4F8;
+    background-color: #F4F5F9;
 }
 
 /* --- Group boxes (Add New Class day selectors) --- */
 
 QGroupBox {
-    border: 1px solid #E7E7EE;
+    background-color: #F4F5F9;
+    border: 1px solid #E4E7ED;
     border-radius: 10px;
     margin-top: 8px;
     padding-top: 10px;
     font-weight: 600;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 QGroupBox::title {
     subcontrol-origin: margin;
     left: 10px;
     padding: 0 4px;
-    color: #111114;
+    color: #1B1E2B;
 }
 
 /* --- Message boxes --- */
 
 QMessageBox {
     background-color: #FFFFFF;
-    border-radius: 20px;
+    border-radius: 16px;
 }
 
 QMessageBox QPushButton {
-    background-color: #2F5CF0;
+    background-color: #7C6EF7;
     color: #FFFFFF;
     border: none;
     border-radius: 999px;
@@ -883,26 +954,26 @@ QMessageBox QPushButton {
 }
 
 QMessageBox QPushButton:hover {
-    background-color: #254BC7;
+    background-color: #6C5CE1;
 }
 
 /* --- Scrollbars --- */
 
 QScrollBar:vertical {
-    background: #F4F4F8;
+    background: #F4F5F9;
     width: 10px;
     margin: 2px;
     border-radius: 5px;
 }
 
 QScrollBar::handle:vertical {
-    background: #D6D6E0;
+    background: #D4D8E2;
     border-radius: 5px;
     min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background: #C7C7D1;
+    background: #C2C7D4;
 }
 
 QScrollBar::add-line:vertical,
@@ -911,14 +982,14 @@ QScrollBar::sub-line:vertical {
 }
 
 QScrollBar:horizontal {
-    background: #F4F4F8;
+    background: #F4F5F9;
     height: 10px;
     margin: 2px;
     border-radius: 5px;
 }
 
 QScrollBar::handle:horizontal {
-    background: #D6D6E0;
+    background: #D4D8E2;
     border-radius: 5px;
     min-width: 24px;
 }

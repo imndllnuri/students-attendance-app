@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from shared.palette import RADIUS, TAG_COLORS, DARK_TAG_COLORS, active_palette
+from shared.palette import DARK_PALETTE, RADIUS, TAG_COLORS, DARK_TAG_COLORS, active_palette
 
 
 def clear_layout(layout) -> None:
@@ -77,6 +77,19 @@ def make_stat_card(label: str, value: str, percent: int, fill_color: str = None)
     layout.addWidget(bar)
 
     return card
+
+
+def set_auth_headline(label: QLabel, first_line: str, second_line: str) -> None:
+    """The two-tone headline on every auth screen's fixed-dark left panel
+    (e.g. "Track every session." / "Never miss a beat.") - white first
+    line, accent-colored second line. Always uses DARK_PALETTE regardless
+    of the app's light/dark setting, since the left panel itself is fixed
+    dark chrome (see shared/palette.py's bg_sidebar token)."""
+    label.setTextFormat(Qt.RichText)
+    label.setText(
+        f'<span style="color:#FFFFFF;">{first_line}</span><br>'
+        f'<span style="color:{DARK_PALETTE["accent"]};">{second_line}</span>'
+    )
 
 
 def make_tag_pill(text: str, color_key: str = "indigo") -> QWidget:
