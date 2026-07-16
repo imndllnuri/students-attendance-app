@@ -42,13 +42,10 @@
          <number>9</number>
         </property>
         <item>
-         <widget class="QLabel" name="server_health_lbl">
-          <property name="text">
-           <string>● Checking server...</string>
-          </property>
-          <property name="toolTip">
-           <string>Server connectivity status</string>
-          </property>
+         <widget class="QLineEdit" name="search_bar_le">
+          <property name="minimumSize"><size><width>0</width><height>38</height></size></property>
+          <property name="maximumSize"><size><width>360</width><height>16777215</height></size></property>
+          <property name="placeholderText"><string> Search classes, instructors...</string></property>
          </widget>
         </item>
         <item>
@@ -57,7 +54,7 @@
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
+           <enum>QSizePolicy::Expanding</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -68,22 +65,26 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="search_bar_le">
-          <property name="placeholderText"><string> Search classes...</string></property>
+         <widget class="QLabel" name="server_health_lbl">
+          <property name="text">
+           <string>● Checking server...</string>
+          </property>
+          <property name="toolTip">
+           <string>Server connectivity status</string>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="search_btn">
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
+         <widget class="QPushButton" name="theme_toggle_btn">
+          <property name="minimumSize"><size><width>34</width><height>34</height></size></property>
+          <property name="maximumSize"><size><width>34</width><height>34</height></size></property>
+          <property name="text"><string/></property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="notifications_btn">
+          <property name="minimumSize"><size><width>34</width><height>34</height></size></property>
+          <property name="maximumSize"><size><width>34</width><height>34</height></size></property>
           <property name="text">
            <string/>
           </property>
@@ -102,12 +103,18 @@
          <widget class="QPushButton" name="profile_btn">
           <property name="minimumSize">
            <size>
-            <width>0</width>
-            <height>0</height>
+            <width>34</width>
+            <height>34</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>34</width>
+            <height>34</height>
            </size>
           </property>
           <property name="text">
-           <string>Profile</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -125,45 +132,190 @@
         <property name="midLineWidth">
          <number>4</number>
         </property>
+        <widget class="QWidget" name="dashboardPage">
+         <layout class="QVBoxLayout" name="dashboardLayout">
+          <item>
+           <layout class="QHBoxLayout" name="dashboard_header_row">
+            <item>
+             <layout class="QVBoxLayout" name="dashboard_greeting_layout">
+              <property name="spacing"><number>0</number></property>
+              <item>
+               <widget class="QLabel" name="dashboard_greeting_lbl">
+                <property name="text"><string>Good morning</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="dashboard_date_lbl">
+                <property name="text"><string/></property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="dashboard_header_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="add_class_dashboard_btn">
+              <property name="text"><string>+ Add Class</string></property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="dashboard_stats_row">
+            <property name="topMargin"><number>16</number></property>
+            <property name="spacing"><number>14</number></property>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="today_classes_title_lbl">
+            <property name="text"><string>Today's Classes</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="no_classes_today_lbl">
+            <property name="visible"><bool>false</bool></property>
+            <property name="text"><string>No classes scheduled for today.</string></property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="today_classes_layout"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="recently_viewed_title_lbl">
+            <property name="text"><string>Recently Viewed</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="no_recently_viewed_lbl">
+            <property name="visible"><bool>false</bool></property>
+            <property name="text"><string>Open a class to see it here.</string></property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="recently_viewed_layout"/>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="dashboard_filter_tabs_row">
+            <property name="topMargin"><number>10</number></property>
+            <item>
+             <widget class="QPushButton" name="dashboard_filter_all_btn">
+              <property name="checkable"><bool>true</bool></property>
+              <property name="checked"><bool>true</bool></property>
+              <property name="text"><string>All Classes</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="dashboard_filter_active_btn">
+              <property name="checkable"><bool>true</bool></property>
+              <property name="text"><string>Active</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="dashboard_filter_pinned_btn">
+              <property name="checkable"><bool>true</bool></property>
+              <property name="text"><string>Pinned</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="dashboard_filter_tabs_spacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="dashboard_empty_state_lbl">
+            <property name="visible"><bool>false</bool></property>
+            <property name="text"><string>You haven't created any classes yet. Use &quot;+ Add Class&quot; above to get started.</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="dashboard_pinned_title_lbl">
+            <property name="visible"><bool>false</bool></property>
+            <property name="text"><string>📌 PINNED</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="dashboard_pinned_grid_widget" native="true">
+            <layout class="QGridLayout" name="dashboard_pinned_grid"/>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="dashboard_active_title_lbl">
+            <property name="visible"><bool>false</bool></property>
+            <property name="text"><string>● ACTIVE CLASSES</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="dashboard_active_grid_widget" native="true">
+            <layout class="QGridLayout" name="dashboard_active_grid"/>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="dashboard_inactive_title_lbl">
+            <property name="visible"><bool>false</bool></property>
+            <property name="text"><string>INACTIVE</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="dashboard_inactive_grid_widget" native="true">
+            <layout class="QGridLayout" name="dashboard_inactive_grid"/>
+           </widget>
+          </item>
+          <item>
+           <spacer name="dashboard_bottom_spacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+   </spacer>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="myClassesPage">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <layout class="QVBoxLayout" name="myClassesLayout">
             <item>
-             <widget class="QLabel" name="my_classes_title_lbl">
-              <property name="text"><string>My Classes</string></property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="today_classes_title_lbl">
-              <property name="text"><string>Today's Classes</string></property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="no_classes_today_lbl">
-              <property name="visible"><bool>false</bool></property>
-              <property name="text"><string>No classes scheduled for today.</string></property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="today_classes_layout"/>
-            </item>
-            <item>
-             <widget class="QLabel" name="recently_viewed_title_lbl">
-              <property name="text"><string>Recently Viewed</string></property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="no_recently_viewed_lbl">
-              <property name="visible"><bool>false</bool></property>
-              <property name="text"><string>Open a class to see it here.</string></property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="recently_viewed_layout"/>
+             <layout class="QHBoxLayout" name="my_classes_header_row">
+              <item>
+               <layout class="QVBoxLayout" name="my_classes_header_text_layout">
+                <property name="spacing"><number>0</number></property>
+                <item>
+                 <widget class="QLabel" name="my_classes_title_lbl">
+                  <property name="text"><string>My Classes</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="my_classes_count_lbl">
+                  <property name="text"><string/></property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="my_classes_header_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="create_new_class_btn">
+                <property name="text"><string>+ Create New Class</string></property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="class_sort_row">
+              <property name="topMargin"><number>10</number></property>
               <item>
                <widget class="QLabel" name="class_sort_lbl">
                 <property name="text"><string>Sort by:</string></property>
@@ -209,12 +361,12 @@
             <item>
              <widget class="QLabel" name="empty_state_lbl">
               <property name="visible"><bool>false</bool></property>
-              <property name="text"><string>You haven't created any classes yet. Use &quot;Create New Class&quot; below to get started.</string></property>
+              <property name="text"><string>You haven't created any classes yet. Use &quot;+ Create New Class&quot; above to get started.</string></property>
              </widget>
             </item>
             <item>
              <widget class="QWidget" name="class_grid_widget" native="true">
-              <layout class="QGridLayout" name="class_btns_layout"/>
+              <layout class="QVBoxLayout" name="class_btns_layout"/>
              </widget>
             </item>
             <item>
@@ -236,25 +388,6 @@
               </property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
    </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="create_new_class_btn">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>100</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Create New Class</string>
-              </property>
-             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="import_classes_btn">
@@ -506,7 +639,7 @@
            </widget>
           </item>
           <item>
-           <layout class="QGridLayout" name="search_results_layout"/>
+           <layout class="QVBoxLayout" name="search_results_layout"/>
           </item>
           <item>
            <spacer name="verticalSpacer_3">
@@ -748,62 +881,91 @@
        <number>9</number>
       </property>
       <item>
-       <widget class="QLabel" name="agu_logo_lbl">
-        <property name="maximumSize">
-         <size>
-          <width>200</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources/images/qrc.qrc">:/images/abdullah_gul-universitesi-logo.png</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
+       <layout class="QHBoxLayout" name="sidebar_logo_row">
+        <property name="leftMargin"><number>4</number></property>
+        <property name="bottomMargin"><number>4</number></property>
+        <item>
+         <widget class="QLabel" name="agu_logo_lbl">
+          <property name="maximumSize">
+           <size>
+            <width>170</width>
+            <height>44</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../resources/images/qrc.qrc">:/images/abdullah_gul-universitesi-logo.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QWidget" name="sidebar_top_user_widget" native="true">
+        <layout class="QHBoxLayout" name="sidebarTopUserLayout">
+         <property name="leftMargin"><number>4</number></property>
+         <property name="topMargin"><number>4</number></property>
+         <property name="rightMargin"><number>4</number></property>
+         <property name="bottomMargin"><number>14</number></property>
+         <property name="spacing"><number>8</number></property>
+         <item>
+          <widget class="QLabel" name="sidebar_top_avatar_lbl">
+           <property name="minimumSize"><size><width>36</width><height>36</height></size></property>
+           <property name="maximumSize"><size><width>36</width><height>36</height></size></property>
+           <property name="text"><string/></property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="sidebarTopUserTextLayout">
+           <property name="spacing"><number>0</number></property>
+           <item>
+            <widget class="QLabel" name="sidebar_top_name_lbl">
+             <property name="text"><string/></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="sidebar_role_lbl">
+             <property name="text"><string>Instructor</string></property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QPushButton" name="dashboard_btn">
+        <property name="text">
+         <string>  Dashboard</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="my_classes_btn">
         <property name="text">
-         <string>My Classes</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="settings_btn">
-        <property name="text">
-         <string>Settings</string>
+         <string>  My Classes</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="statistics_btn">
         <property name="text">
-         <string>Statistics</string>
+         <string>  Statistics</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QPushButton" name="settings_btn">
+        <property name="text">
+         <string>  Settings</string>
         </property>
        </widget>
       </item>
@@ -864,94 +1026,12 @@
       <item>
        <widget class="QPushButton" name="log_out_btn">
         <property name="text">
-         <string>Log Out</string>
+         <string>  Sign Out</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QWidget" name="info_panel_widget" native="true">
-      <property name="minimumSize">
-       <size><width>230</width><height>0</height></size>
-      </property>
-      <property name="maximumSize">
-       <size><width>230</width><height>16777215</height></size>
-      </property>
-      <layout class="QVBoxLayout" name="infoPanelLayout">
-       <property name="leftMargin"><number>16</number></property>
-       <property name="topMargin"><number>16</number></property>
-       <property name="rightMargin"><number>16</number></property>
-       <property name="bottomMargin"><number>16</number></property>
-       <property name="spacing"><number>10</number></property>
-       <item>
-        <layout class="QHBoxLayout" name="infoPanelHeaderLayout">
-         <item>
-          <widget class="QLabel" name="info_panel_title_lbl">
-           <property name="text"><string>Info</string></property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="infoPanelHeaderSpacer">
-           <property name="orientation"><enum>Qt::Horizontal</enum></property>
-           <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="info_panel_collapse_btn">
-           <property name="maximumSize"><size><width>28</width><height>28</height></size></property>
-           <property name="text"><string>»</string></property>
-           <property name="toolTip"><string>Collapse info panel</string></property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="info_panel_stats_layout">
-         <property name="spacing"><number>10</number></property>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="info_panel_properties_title_lbl">
-         <property name="text"><string>Properties</string></property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="info_panel_properties_layout">
-         <property name="spacing"><number>6</number></property>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="info_panel_tags_title_lbl">
-         <property name="text"><string>Tags</string></property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="info_panel_tags_layout">
-         <property name="spacing"><number>6</number></property>
-        </layout>
-       </item>
-       <item>
-        <spacer name="infoPanelBottomSpacer">
-         <property name="orientation"><enum>Qt::Vertical</enum></property>
-         <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-         <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="info_panel_pinned_btn">
-         <property name="text"><string>📌  Pinned items</string></property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="info_panel_activity_btn">
-         <property name="text"><string>✉  Activity</string></property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </item>
    </layout>
   </widget>

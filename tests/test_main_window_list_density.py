@@ -13,6 +13,9 @@ class FakeClassManager:
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 
+    def get_statistics(self, class_id):
+        return {"present": 0, "late": 0, "absent": 0}
+
     def load_classes_for_instructor(self, user_id, include_archived=False):
         return [make_class()]
 
@@ -46,14 +49,18 @@ def build_window(qtbot, monkeypatch):
     window = mw.MainWindow(user)
     qtbot.addWidget(window)
     window._inactivity_timer.stop()
+    window.show_my_classes()
     from PyQt5.QtWidgets import QApplication
     QApplication.instance().removeEventFilter(window)
     return window
 
 
 def test_defaults_to_comfortable_with_visible_caption(qtbot, monkeypatch):
+    from PyQt5.QtWidgets import QApplication
+
     window = build_window(qtbot, monkeypatch)
     window.show()
+    QApplication.processEvents()
     assert window.compact_view_cb.isChecked() is False
 
     row = window.class_btns_layout.itemAt(0).widget()

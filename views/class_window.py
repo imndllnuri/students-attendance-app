@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from services.api_client import ApiError
-from shared.palette import PALETTE, class_tag_color_key, qcolor
+from shared.palette import qcolor
 from shared.qt_style import set_dynamic_property
 from shared.widgets import clear_layout
 
@@ -80,11 +80,9 @@ class ClassWindow(QWidget):
         if df.shape[0] == 0:
             self._show_roster_status("No students in this class's roster yet.", show_retry=False)
             self.at_risk_widget.setVisible(False)
-            self._update_info_panel(df, at_risk_count=0)
             return
 
-        at_risk_count = self._render_at_risk_list(df)
-        self._update_info_panel(df, at_risk_count)
+        self._render_at_risk_list(df)
 
         self.roster_status_widget.setVisible(False)
         self.student_list_tableWidget.setVisible(True)
@@ -175,7 +173,6 @@ class ClassWindow(QWidget):
         self.weekly_hours_lbl.setText(str(self.class_obj.weekly_hours))
         self.render_schedule_grid(self.class_obj.schedule)
         self.class_notes_edit.setPlainText(self.class_obj.notes)
-        self._update_info_panel(self._last_roster_df)
 
     def save_class_notes(self):
         notes = self.class_notes_edit.toPlainText()
@@ -583,55 +580,3 @@ class ClassWindow(QWidget):
         self.main_window.show_my_classes()
         self.close()
 
-    def refresh_info_panel(self):
-        """Re-pushes this class's Info panel content - called by MainWindow
-        whenever this already-open tab becomes the current page again,
-        since another class's tab may have overwritten the shared panel
-        with its own content in the meantime."""
-        self._update_info_panel(self._last_roster_df)
-
-    def _update_info_panel(self, df, at_risk_count=None):
-        """Pushes this class's stats/properties/tags into MainWindow's
-        Info panel (see wild-jingling-unicorn.md Phase 3). `df` is the
-        last-loaded roster table (or None before the first load); when
-        `at_risk_count` isn't already known (i.e. this is a refresh rather
-        than a fresh load), it's recomputed from `df` without re-rendering
-        the at-risk callout itself."""
-        rate = 0
-        if df is not None and "Attended Hours" in df.columns and "Not Attended Hours" in df.columns:
-            attended = pd.to_numeric(df["Attended Hours"], errors="coerce").fillna(0).sum()
-            not_attended = pd.to_numeric(df["Not Attended Hours"], errors="coerce").fillna(0).sum()
-            total = attended + not_attended
-            rate = int(attended / total * 100) if total else 0
-
-        if at_risk_count is None:
-            if df is not None and "Not Attended Hours" in df.columns:
-                not_attended_col = pd.to_numeric(df["Not Attended Hours"], errors="coerce")
-                at_risk_count = int((not_attended_col >= self.safe).sum())
-            else:
-                at_risk_count = 0
-
-        stats = [
-            ("Attendance Rate", f"{rate}%", rate, None),
-            (
-                "At-Risk Students", str(at_risk_count), min(100, at_risk_count * 20),
-                PALETTE["warning"] if at_risk_count else None,
-            ),
-        ]
-        properties = [
-            ("Section", self.class_obj.section),
-            ("Weekly Hours", str(self.class_obj.weekly_hours)),
-            ("Total Weeks", str(self.class_obj.total_weeks)),
-            ("Late Threshold", f"{self.class_obj.late_threshold} min"),
-        ]
-        tags = [(self.class_obj.class_code, class_tag_color_key(self.class_obj.class_code))]
-        if self.class_obj.archived:
-            tags.append(("Archived", "slate"))
-
-        self.main_window.set_info_panel_content(
-            stats=stats, properties=properties, tags=tags,
-            footer_actions=[
-                ("📊  View Full Statistics", lambda: self.main_window.show_statistics_for_class(self.class_obj)),
-                ("✉  Activity", lambda: self.main_window.show_notifications_menu()),
-            ],
-        )

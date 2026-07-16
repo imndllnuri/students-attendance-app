@@ -12,6 +12,9 @@ class FakeClassManager:
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 
+    def get_statistics(self, class_id):
+        return {"present": 0, "late": 0, "absent": 0}
+
     def load_classes_for_instructor(self, user_id, include_archived=False):
         return []
 
@@ -36,6 +39,7 @@ def build_window(qtbot, monkeypatch):
 
 def test_nav_and_titles_translate_to_saved_language(qtbot, monkeypatch):
     turkish = {
+        "dashboard": "Panel",
         "my_classes": "Sınıflarım",
         "settings": "Ayarlar",
         "statistics": "İstatistikler",

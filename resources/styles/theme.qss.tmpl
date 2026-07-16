@@ -153,41 +153,6 @@ QWidget#topSideWidget {
     background-color: {{bg_card}};
 }
 
-QWidget#info_panel_widget {
-    background-color: {{bg_hover}};
-    border-left: 1px solid {{border}};
-}
-
-QPushButton#info_panel_collapse_btn {
-    background-color: transparent;
-    color: {{text_secondary}};
-    border: none;
-    border-radius: {{radius_control_sm}}px;
-    font-size: 11pt;
-}
-
-QPushButton#info_panel_collapse_btn:hover {
-    background-color: {{bg_card}};
-    color: {{text_primary}};
-}
-
-QPushButton#info_panel_pinned_btn,
-QPushButton#info_panel_activity_btn {
-    background-color: transparent;
-    color: {{text_secondary}};
-    text-align: left;
-    border: none;
-    border-radius: {{radius_control_sm}}px;
-    padding: 6px 8px;
-    font-size: 9.5pt;
-}
-
-QPushButton#info_panel_pinned_btn:hover,
-QPushButton#info_panel_activity_btn:hover {
-    background-color: {{bg_card}};
-    color: {{text_primary}};
-}
-
 QWidget#addNewClass {
     background-color: {{bg_card}};
 }
@@ -208,10 +173,69 @@ QFrame#settings_card_frame,
 QFrame#profile_card_frame,
 QFrame#class_details_card,
 QFrame#roster_section_card,
-QFrame#statistics_card {
+QFrame#statistics_card,
+QFrame#dashboard_stat_card {
     background-color: {{bg_card}};
     border-radius: {{radius_card}}px;
     border: 1px solid {{border}};
+}
+
+/* --- Dashboard --- */
+
+QLabel#dashboard_greeting_lbl {
+    font-size: 20pt;
+    font-weight: 700;
+    color: {{text_primary}};
+}
+
+QLabel#dashboard_date_lbl {
+    font-size: 9.5pt;
+    color: {{text_secondary}};
+}
+
+QLabel#dashboard_stat_value_lbl {
+    font-size: 20pt;
+    font-weight: 700;
+    color: {{text_primary}};
+}
+
+QLabel#dashboard_pinned_title_lbl,
+QLabel#dashboard_active_title_lbl,
+QLabel#dashboard_inactive_title_lbl {
+    font-size: 9pt;
+    font-weight: 700;
+    color: {{text_secondary}};
+    padding-top: 8px;
+}
+
+QLabel#dashboard_empty_state_lbl {
+    font-size: 10pt;
+    color: {{text_secondary}};
+    padding: 24px;
+    qproperty-alignment: AlignCenter;
+}
+
+QLabel#my_classes_count_lbl {
+    font-size: 9.5pt;
+    color: {{text_secondary}};
+}
+
+/* --- Segmented filter tabs (Dashboard) --- */
+
+QPushButton[variant="segmented"] {
+    background-color: {{bg_card}};
+    color: {{text_secondary}};
+    border: 1px solid {{border}};
+    border-radius: {{radius_pill}}px;
+    padding: 7px 16px;
+    font-size: 9.5pt;
+}
+
+QPushButton[variant="segmented"]:checked {
+    background-color: {{accent_subtle}};
+    color: {{accent}};
+    border: 1px solid {{accent}};
+    font-weight: 600;
 }
 
 /* --- Class color swatch (Add/Edit Class) --- */
@@ -246,16 +270,25 @@ QLabel#login_error_lbl,
 QLabel#empty_state_lbl,
 QLabel#statistics_empty_lbl,
 QLabel#roster_status_lbl,
-QLabel#sidebar_user_email_lbl,
 QLabel#class_breadcrumb_lbl {
     font-size: 9pt;
     color: {{text_secondary}};
 }
 
-QLabel#sidebar_user_name_lbl {
+/* Sidebar user-identity labels are fixed-dark chrome (like the sidebar
+   itself, see bg_sidebar) - text_primary/text_secondary are theme-reactive
+   and would go near-invisible (dark-on-dark) once the sidebar stopped
+   flipping to white in light mode. */
+QLabel#sidebar_user_name_lbl,
+QLabel#sidebar_top_name_lbl {
     font-size: 9.5pt;
     font-weight: 600;
-    color: {{text_primary}};
+    color: {{text_sidebar}};
+}
+
+QLabel#sidebar_user_email_lbl {
+    font-size: 9pt;
+    color: {{text_sidebar_muted}};
 }
 
 /* --- Progress/session badges (Take Attendance) --- */
@@ -403,19 +436,10 @@ QLabel#statistics_filter_lbl,
 QLabel#search_status_lbl,
 QLabel#title_lbl_2,
 QLabel#security_question_lbl,
-QLabel#security_question_2_lbl,
-QLabel#info_panel_title_lbl {
+QLabel#security_question_2_lbl {
     font-size: 12pt;
     font-weight: 600;
     color: {{text_primary}};
-}
-
-QLabel#info_panel_properties_title_lbl,
-QLabel#info_panel_tags_title_lbl {
-    font-size: 10pt;
-    font-weight: 600;
-    color: {{text_primary}};
-    padding-top: 4px;
 }
 
 QLabel#class_name_header_lbl {
@@ -707,15 +731,15 @@ QCheckBox::indicator:checked {
     border: 1.5px solid {{accent}};
 }
 
-/* --- Class row card (My Classes / Search) --- */
+/* --- Class row (My Classes / Search) --- */
 
-QWidget#class_row_widget {
+QFrame#class_row_widget {
     background-color: {{bg_card}};
     border: 1px solid {{border}};
     border-radius: {{radius_control_sm}}px;
 }
 
-QWidget#class_row_widget:hover {
+QFrame#class_row_widget:hover {
     border: 1px solid {{accent_subtle}};
 }
 
@@ -724,24 +748,24 @@ QPushButton#class_row_name_btn {
     border: none;
     text-align: left;
     color: {{text_primary}};
-    font-size: 10pt;
+    font-size: 10.5pt;
     font-weight: 600;
-    padding: 8px 10px;
+    padding: 0;
 }
 
 QPushButton#class_row_name_btn:hover {
     color: {{accent}};
 }
 
-/* --- Class card grid (My Classes / Search) --- */
+/* --- Dashboard class card + shared expandable Properties panel --- */
 
-QFrame#class_card_widget {
+QFrame#dashboard_class_card {
     background-color: {{bg_card}};
     border: 1px solid {{border}};
     border-radius: {{radius_card}}px;
 }
 
-QFrame#class_card_widget:hover {
+QFrame#dashboard_class_card:hover {
     border: 1px solid {{accent_subtle}};
 }
 
@@ -759,9 +783,31 @@ QPushButton#class_card_title_btn:hover {
     color: {{accent}};
 }
 
-QPushButton#class_card_illustration_btn {
+QFrame#class_detail_panel {
+    background-color: {{bg_hover}};
     border: none;
+    border-bottom-left-radius: {{radius_control_sm}}px;
+    border-bottom-right-radius: {{radius_control_sm}}px;
 }
+
+QLabel#class_card_percent_lbl {
+    font-size: 10pt;
+    font-weight: 700;
+}
+
+QLabel#class_card_percent_lbl[tier="success"] { color: {{success}}; }
+QLabel#class_card_percent_lbl[tier="warning"] { color: {{warning}}; }
+QLabel#class_card_percent_lbl[tier="error"] { color: {{error}}; }
+
+QProgressBar#class_card_progress_bar {
+    background-color: {{bg_hover}};
+    border: none;
+    border-radius: 3px;
+}
+
+QProgressBar#class_card_progress_bar::chunk[tier="success"] { background-color: {{success}}; border-radius: 3px; }
+QProgressBar#class_card_progress_bar::chunk[tier="warning"] { background-color: {{warning}}; border-radius: 3px; }
+QProgressBar#class_card_progress_bar::chunk[tier="error"] { background-color: {{error}}; border-radius: 3px; }
 
 QPushButton#card_icon_btn,
 QPushButton#back_to_my_classes_btn,
@@ -811,55 +857,90 @@ QLabel#scan_status_icon_lbl {
     font-size: 14pt;
 }
 
-/* --- Sidebar navigation --- */
+/* --- Sidebar navigation - fixed-dark chrome, same in both themes --- */
 
+QPushButton#dashboard_btn,
 QPushButton#my_classes_btn,
-QPushButton#settings_btn,
 QPushButton#statistics_btn,
+QPushButton#settings_btn,
 QPushButton#log_out_btn {
     background-color: transparent;
-    color: {{text_secondary}};
+    color: {{text_sidebar_muted}};
     text-align: left;
     border: none;
     border-radius: {{radius_control_sm}}px;
-    padding: 8px 12px;
+    padding: 9px 12px;
     font-size: 10.5pt;
 }
 
+QPushButton#dashboard_btn:hover,
 QPushButton#my_classes_btn:hover,
-QPushButton#settings_btn:hover,
 QPushButton#statistics_btn:hover,
+QPushButton#settings_btn:hover,
 QPushButton#log_out_btn:hover {
-    background-color: {{bg_hover}};
-    color: {{text_primary}};
+    background-color: {{bg_sidebar_hover}};
+    color: {{text_sidebar}};
 }
 
+QPushButton#dashboard_btn:pressed,
 QPushButton#my_classes_btn:pressed,
-QPushButton#settings_btn:pressed,
 QPushButton#statistics_btn:pressed,
+QPushButton#settings_btn:pressed,
 QPushButton#log_out_btn:pressed {
-    background-color: {{bg_nav_active_pill}};
+    background-color: {{bg_sidebar_active}};
 }
 
+QPushButton#dashboard_btn[active="true"],
 QPushButton#my_classes_btn[active="true"],
-QPushButton#settings_btn[active="true"],
-QPushButton#statistics_btn[active="true"] {
-    background-color: {{bg_nav_active_pill}};
-    color: {{text_primary}};
+QPushButton#statistics_btn[active="true"],
+QPushButton#settings_btn[active="true"] {
+    background-color: {{bg_sidebar_active}};
+    color: #FFFFFF;
     font-weight: 600;
 }
 
-QPushButton#search_btn,
+QLabel#sidebar_role_lbl {
+    color: {{text_sidebar_muted}};
+    font-size: 8.5pt;
+}
+
 QPushButton#profile_btn {
     background-color: transparent;
     border: none;
-    border-radius: 16px;
-    padding: 5px;
+    border-radius: 17px;
+    padding: 0;
 }
 
-QPushButton#search_btn:hover,
 QPushButton#profile_btn:hover {
     background-color: {{bg_hover}};
+}
+
+QPushButton#notifications_btn {
+    background-color: transparent;
+    border: none;
+    border-radius: 17px;
+}
+
+QPushButton#notifications_btn:hover {
+    background-color: {{bg_hover}};
+}
+
+QPushButton#theme_toggle_btn {
+    background-color: transparent;
+    border: 1px solid {{border}};
+    border-radius: 17px;
+}
+
+QPushButton#theme_toggle_btn:hover {
+    background-color: {{bg_hover}};
+}
+
+QLabel#server_health_lbl {
+    background-color: {{bg_hover}};
+    border-radius: {{radius_pill}}px;
+    padding: 6px 14px;
+    font-size: 9pt;
+    font-weight: 600;
 }
 
 /* --- Tables --- */

@@ -14,6 +14,9 @@ class FakeClassManager:
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 
+    def get_statistics(self, class_id):
+        return {"present": 0, "late": 0, "absent": 0}
+
     def load_classes_for_instructor(self, user_id, include_archived=False):
         return []
 
@@ -48,26 +51,30 @@ def build_window(qtbot, monkeypatch):
     window = mw.MainWindow(user)
     qtbot.addWidget(window)
     window._inactivity_timer.stop()
+    window.show_my_classes()
     from PyQt5.QtWidgets import QApplication
     QApplication.instance().removeEventFilter(window)
     return window
 
 
-def test_card_illustration_uses_manual_color_override_when_set(qtbot, monkeypatch):
-    from PyQt5.QtGui import QColor
-    from PyQt5.QtWidgets import QPushButton
+def test_row_accent_bar_uses_manual_color_override_when_set(qtbot, monkeypatch):
+    from PyQt5.QtWidgets import QFrame
     window = build_window(qtbot, monkeypatch)
-    card = window._make_class_card_widget(make_class(color="#123456"))
-    illustration = card.findChild(QPushButton, "class_card_illustration_btn")
-    expected_tint = QColor("#123456").lighter(175).name()
-    assert expected_tint in illustration.styleSheet()
+    row = window._make_class_list_row_widget(make_class(color="#123456"))
+    accent_bars = [
+        w for w in row.findChildren(QFrame)
+        if "background-color: #123456" in w.styleSheet()
+    ]
+    assert accent_bars
 
 
-def test_card_illustration_falls_back_to_auto_color_when_unset(qtbot, monkeypatch):
-    from PyQt5.QtGui import QColor
-    from PyQt5.QtWidgets import QPushButton
+def test_row_accent_bar_falls_back_to_auto_color_when_unset(qtbot, monkeypatch):
+    from PyQt5.QtWidgets import QFrame
     window = build_window(qtbot, monkeypatch)
-    card = window._make_class_card_widget(make_class(color=None))
-    illustration = card.findChild(QPushButton, "class_card_illustration_btn")
-    expected_tint = QColor(class_tag_color("COMP101")).lighter(175).name()
-    assert expected_tint in illustration.styleSheet()
+    row = window._make_class_list_row_widget(make_class(color=None))
+    expected_color = class_tag_color("COMP101")
+    accent_bars = [
+        w for w in row.findChildren(QFrame)
+        if f"background-color: {expected_color}" in w.styleSheet()
+    ]
+    assert accent_bars

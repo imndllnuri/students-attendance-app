@@ -15,6 +15,9 @@ class FakeClassManager:
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 
+    def get_statistics(self, class_id):
+        return {"present": 0, "late": 0, "absent": 0}
+
     def __init__(self, classes):
         self._classes = classes
 

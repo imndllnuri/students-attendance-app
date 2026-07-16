@@ -28,7 +28,6 @@ PALETTE = {
     "bg_card": "#FFFFFF",
     "bg_elevated": "#FFFFFF",
     "bg_hover": "#F4F5F9",
-    "bg_nav_active_pill": "#EEEBFC",
 
     # Sidebar + the auth screens' left brand panel are ALWAYS dark,
     # regardless of the light/dark toggle - confirmed directly from the
@@ -90,7 +89,6 @@ DARK_PALETTE = {
     "bg_card": "#161A24",
     "bg_elevated": "#1B202C",
     "bg_hover": "#1E2330",
-    "bg_nav_active_pill": "#262040",
 
     # Sidebar stays the same fixed dark values in both themes - see PALETTE.
     "bg_sidebar": "#12141C",

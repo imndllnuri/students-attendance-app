@@ -28,6 +28,7 @@ STRINGS = {
     "email_address": {"en": "Email Address", "tr": "E-posta Adresi"},
     "password": {"en": "Password", "tr": "Şifre"},
 
+    "dashboard": {"en": "Dashboard", "tr": "Panel"},
     "my_classes": {"en": "My Classes", "tr": "Sınıflarım"},
     "settings": {"en": "Settings", "tr": "Ayarlar"},
     "statistics": {"en": "Statistics", "tr": "İstatistikler"},

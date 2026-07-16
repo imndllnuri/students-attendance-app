@@ -9,13 +9,15 @@ import pandas as pd
 import qtawesome as qta
 from PyQt5 import uic
 from PyQt5.QtCore import QEasingCurve, QEvent, QPropertyAnimation, Qt, QSize, QTimer
-from PyQt5.QtGui import QColor, QFont, QKeySequence, QPainter, QPixmap
+from PyQt5.QtGui import QColor, QFont, QIcon, QKeySequence, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
+    QButtonGroup,
     QCheckBox,
     QFileDialog,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QInputDialog,
     QLabel,
@@ -24,6 +26,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QMenu,
     QMessageBox,
+    QProgressBar,
     QPushButton,
     QShortcut,
     QVBoxLayout,
@@ -38,7 +41,14 @@ from shared.class_order import load_class_order, save_class_order
 from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
-from shared.palette import PALETTE, RADIUS, active_palette, class_tag_color, class_tag_color_key
+from shared.palette import (
+    PALETTE,
+    RADIUS,
+    active_palette,
+    attendance_tier,
+    class_tag_color,
+    class_tag_color_key,
+)
 from shared.qt_style import set_dynamic_property
 from shared.shadow import apply_card_shadow
 from shared.session_timeout import (
@@ -47,7 +57,7 @@ from shared.session_timeout import (
     save_session_timeout_minutes,
 )
 from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
-from shared.widgets import clear_layout, make_stat_card, make_tag_pill
+from shared.widgets import clear_layout, make_tag_pill
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -65,7 +75,7 @@ from views.add_new_class_window import AddNewClassWindow
 from models.accounts import AccountManager
 from models.classes import Class, ClassManager
 
-MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(5)
+DASHBOARD_PAGE, MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(6)
 
 _ACTIVITY_EVENTS = (QEvent.MouseMove, QEvent.MouseButtonPress, QEvent.KeyPress, QEvent.Wheel)
 
@@ -81,7 +91,6 @@ class MainWindow(QMainWindow):
         uic.loadUi("ui/main_window.ui", self)
         self.gridLayout.setColumnStretch(0, 0)
         self.gridLayout.setColumnStretch(1, 1)
-        self.gridLayout.setColumnStretch(2, 0)
 
         self.user = user
         self.user_id = user.user_id
@@ -96,18 +105,32 @@ class MainWindow(QMainWindow):
         self.sidebar_user_name_lbl.setText(f"{user.name} {user.surname}")
         self.sidebar_user_email_lbl.setText(getattr(user, "email", ""))
         self.sidebar_avatar_lbl.setPixmap(self._make_initials_avatar(user.name, user.surname, size=36))
+        self.sidebar_top_name_lbl.setText(f"{user.name} {user.surname}")
+        self.sidebar_top_avatar_lbl.setPixmap(self._make_initials_avatar(user.name, user.surname, size=36))
 
-        self.profile_btn.clicked.connect(self.show_profile)
+        self.profile_btn.clicked.connect(self.show_profile_menu)
+        self.dashboard_btn.clicked.connect(self.show_dashboard)
         self.my_classes_btn.clicked.connect(self.show_my_classes)
         self.settings_btn.clicked.connect(self.show_settings)
         self.statistics_btn.clicked.connect(self.show_statistics)
         self.log_out_btn.clicked.connect(self.confirm_logout)
         self.create_new_class_btn.clicked.connect(self.open_add_new_class_window)
+        self.add_class_dashboard_btn.clicked.connect(self.open_add_new_class_window)
         self.import_classes_btn.clicked.connect(self.import_classes_from_spreadsheet)
-        self.search_btn.clicked.connect(self.show_search)
+        set_dynamic_property(self.add_class_dashboard_btn, "variant", "primary")
+        set_dynamic_property(self.create_new_class_btn, "variant", "primary")
+        self._dashboard_filter_group = QButtonGroup(self)
+        self._dashboard_filter_group.setExclusive(True)
+        for tab_btn in (
+            self.dashboard_filter_all_btn, self.dashboard_filter_active_btn, self.dashboard_filter_pinned_btn,
+        ):
+            set_dynamic_property(tab_btn, "variant", "segmented")
+            self._dashboard_filter_group.addButton(tab_btn)
+            tab_btn.clicked.connect(self.render_dashboard)
         self.search_bar_le.addAction(qta.icon("fa5s.search", color="#C7C7D1"), QLineEdit.LeadingPosition)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.notifications_btn.clicked.connect(self.show_notifications_menu)
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme_button)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.compare_classes_btn.clicked.connect(self.show_class_comparison)
@@ -161,14 +184,9 @@ class MainWindow(QMainWindow):
         self.new_password_le.textChanged.connect(self._update_settings_password_strength)
         self.confirm_new_password_le.textChanged.connect(self.validate_new_password_match)
 
-        self._info_panel_expanded = True
-        self._info_panel_animation = None
-        self.info_panel_collapse_btn.clicked.connect(self.toggle_info_panel)
-
-        self._nav_buttons = (self.my_classes_btn, self.settings_btn, self.statistics_btn)
+        self._nav_buttons = (self.dashboard_btn, self.my_classes_btn, self.statistics_btn, self.settings_btn)
         self._setup_icons()
         self._apply_card_shadows()
-        self._set_active_nav(self.my_classes_btn)
         self._setup_shortcuts()
         self._setup_session_timeout()
         self._setup_session_timeout_combo()
@@ -177,6 +195,7 @@ class MainWindow(QMainWindow):
 
         self.load_classes()
         self._flush_offline_queue_on_startup()
+        self.show_dashboard()
         self.show()
 
     # --- Session timeout ---
@@ -343,33 +362,35 @@ class MainWindow(QMainWindow):
         )
 
     def _setup_icons(self):
-        self.my_classes_btn.setIcon(qta.icon("fa5s.th-large", color="#6B6B76"))
-        self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#6B6B76"))
-        self.statistics_btn.setIcon(qta.icon("fa5s.chart-bar", color="#6B6B76"))
-        self.log_out_btn.setIcon(qta.icon("fa5s.sign-out-alt", color="#6B6B76"))
-        for btn in (self.my_classes_btn, self.settings_btn, self.statistics_btn, self.log_out_btn):
+        self.dashboard_btn.setIcon(qta.icon("fa5s.th-large", color="#767D91"))
+        self.my_classes_btn.setIcon(qta.icon("fa5s.book-open", color="#767D91"))
+        self.statistics_btn.setIcon(qta.icon("fa5s.chart-bar", color="#767D91"))
+        self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#767D91"))
+        self.log_out_btn.setIcon(qta.icon("fa5s.sign-out-alt", color="#767D91"))
+        for btn in (self.dashboard_btn, self.my_classes_btn, self.statistics_btn, self.settings_btn, self.log_out_btn):
             btn.setIconSize(QSize(16, 16))
 
-        self.profile_btn.setIcon(qta.icon("fa5s.user-circle", color="#2F5CF0"))
-        self.search_btn.setIcon(qta.icon("fa5s.search", color="#2F5CF0"))
-        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#2F5CF0"))
-        self.profile_btn.setIconSize(QSize(18, 18))
-        self.search_btn.setIconSize(QSize(16, 16))
+        avatar_pixmap = self._make_initials_avatar(self.user.name, self.user.surname, size=34)
+        self.profile_btn.setIcon(QIcon(avatar_pixmap))
+        self.profile_btn.setIconSize(QSize(34, 34))
+        self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#8A93A7"))
         self.notifications_btn.setIconSize(QSize(16, 16))
+        self._update_theme_toggle_icon()
 
-        self.my_classes_btn.setToolTip("My Classes (Ctrl+1)")
-        self.settings_btn.setToolTip("Settings (Ctrl+2)")
+        self.dashboard_btn.setToolTip("Dashboard (Ctrl+1)")
+        self.my_classes_btn.setToolTip("My Classes (Ctrl+2)")
         self.statistics_btn.setToolTip("Statistics (Ctrl+3)")
-        self.search_btn.setToolTip("Search (Ctrl+F)")
+        self.settings_btn.setToolTip("Settings (Ctrl+4)")
         self.create_new_class_btn.setToolTip("Create New Class (Ctrl+N)")
         self.create_new_class_btn.setIcon(qta.icon("fa5s.plus", color="white"))
 
     def _setup_shortcuts(self):
         QShortcut(QKeySequence("Ctrl+N"), self, self.open_add_new_class_window)
         QShortcut(QKeySequence("Ctrl+F"), self, self._focus_search)
-        QShortcut(QKeySequence("Ctrl+1"), self, self.show_my_classes)
-        QShortcut(QKeySequence("Ctrl+2"), self, self.show_settings)
+        QShortcut(QKeySequence("Ctrl+1"), self, self.show_dashboard)
+        QShortcut(QKeySequence("Ctrl+2"), self, self.show_my_classes)
         QShortcut(QKeySequence("Ctrl+3"), self, self.show_statistics)
+        QShortcut(QKeySequence("Ctrl+4"), self, self.show_settings)
         QShortcut(QKeySequence("Ctrl+K"), self, self.jump_to_class)
 
     def _focus_search(self):
@@ -400,102 +421,6 @@ class MainWindow(QMainWindow):
         for frame in (self.profile_card_frame, self.settings_card_frame):
             apply_card_shadow(frame, strength="md")
 
-    # --- Info panel (right-hand collapsible panel: My Classes/Class
-    # Detail/Statistics) ---
-
-    def toggle_info_panel(self):
-        """Animates info_panel_widget's maximumWidth between its full
-        width and 0, then hides it outright once collapsed so it stops
-        receiving layout/paint passes - the same QPropertyAnimation idiom
-        already used for Take Attendance's scan-status pulse."""
-        expanding = not self._info_panel_expanded
-        self._info_panel_expanded = expanding
-
-        if expanding:
-            self.info_panel_widget.setVisible(True)
-
-        animation = QPropertyAnimation(self.info_panel_widget, b"maximumWidth", self)
-        animation.setDuration(180)
-        animation.setEasingCurve(QEasingCurve.OutCubic)
-        animation.setStartValue(self.info_panel_widget.width())
-        animation.setEndValue(230 if expanding else 0)
-        if not expanding:
-            animation.finished.connect(lambda: self.info_panel_widget.setVisible(False))
-        animation.start(QPropertyAnimation.DeleteWhenStopped)
-        self._info_panel_animation = animation
-
-        self.info_panel_collapse_btn.setText("»" if expanding else "«")
-        self.info_panel_collapse_btn.setToolTip(
-            "Collapse info panel" if expanding else "Expand info panel"
-        )
-
-    def _sync_info_panel_visibility(self):
-        """The Info panel only applies to My Classes, Class Detail, and
-        Statistics - Settings/Profile/Search keep the 3rd grid column
-        hidden entirely, per the redesign's scope decision that the panel
-        is not a global chrome element."""
-        from views.class_window import ClassWindow
-
-        current = self.stackedWidget.currentWidget()
-        applicable = (
-            self.stackedWidget.currentIndex() in (MY_CLASSES_PAGE, STATISTICS_PAGE)
-            or isinstance(current, ClassWindow)
-        )
-        self.info_panel_widget.setVisible(applicable and self._info_panel_expanded)
-
-    def set_info_panel_content(self, stats=(), properties=(), tags=(), footer_actions=()):
-        """Repopulates the Info panel's 3 dynamic sections plus its bottom
-        action row.
-        `stats`: iterable of (label, value, percent, fill_color_or_None) tuples.
-        `properties`: iterable of (label, value) tuples.
-        `tags`: iterable of (text, color_key) tuples.
-        `footer_actions`: iterable of up to 2 (label, callback) tuples,
-        rendered onto the panel's 2 fixed bottom buttons - callers always
-        pass their own actions explicitly rather than relying on a shared
-        default, since the same 2 buttons are reused across every screen
-        that shows this panel (My Classes, Class Detail, ...)."""
-        for layout in (
-            self.info_panel_stats_layout,
-            self.info_panel_properties_layout,
-            self.info_panel_tags_layout,
-        ):
-            clear_layout(layout)
-
-        for label, value, percent, fill_color in stats:
-            self.info_panel_stats_layout.addWidget(
-                make_stat_card(label, value, percent, fill_color)
-            )
-
-        for label, value in properties:
-            row = QWidget()
-            row_layout = QHBoxLayout(row)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            label_lbl = QLabel(label)
-            label_lbl.setProperty("fieldLabel", True)
-            value_lbl = QLabel(value)
-            value_lbl.setProperty("fieldValue", True)
-            row_layout.addWidget(label_lbl)
-            row_layout.addStretch(1)
-            row_layout.addWidget(value_lbl)
-            self.info_panel_properties_layout.addWidget(row)
-
-        for text, color_key in tags:
-            self.info_panel_tags_layout.addWidget(make_tag_pill(text, color_key))
-        self.info_panel_tags_layout.addStretch(1)
-
-        footer_buttons = (self.info_panel_pinned_btn, self.info_panel_activity_btn)
-        for button in footer_buttons:
-            try:
-                button.clicked.disconnect()
-            except TypeError:
-                pass  # nothing connected yet
-        for button, (label, callback) in zip(footer_buttons, footer_actions):
-            button.setText(label)
-            button.setVisible(True)
-            button.clicked.connect(callback)
-        for button in footer_buttons[len(footer_actions):]:
-            button.setVisible(False)
-
     def _set_active_nav(self, active_btn):
         for btn in self._nav_buttons:
             btn.setProperty("active", btn is active_btn)
@@ -505,25 +430,174 @@ class MainWindow(QMainWindow):
     def show_profile(self):
         self.populate_profile_fields()
         self.stackedWidget.setCurrentIndex(PROFILE_PAGE)
-        self._sync_info_panel_visibility()
+
+    def show_profile_menu(self):
+        """Avatar button in the topbar opens a small QMenu (name/email
+        header + Edit Profile / Settings / Sign Out), per the AttendU
+        reference - the avatar itself no longer navigates directly."""
+        menu = QMenu(self)
+        header = menu.addAction(f"{self.user.name} {self.user.surname}")
+        header.setEnabled(False)
+        email_action = menu.addAction(getattr(self.user, "email", ""))
+        email_action.setEnabled(False)
+        menu.addSeparator()
+        menu.addAction("Edit Profile", self.show_profile)
+        menu.addAction("Settings", self.show_settings)
+        menu.addSeparator()
+        menu.addAction("Sign Out", self.confirm_logout)
+        menu.exec_(self.profile_btn.mapToGlobal(self.profile_btn.rect().bottomRight()))
+
+    def toggle_theme_button(self):
+        """The topbar's sun/moon icon button - same mechanism as the
+        Settings page's Dark Mode checkbox (toggle_dark_mode), just
+        triggered from a plain button instead of a checked state."""
+        self.toggle_dark_mode(load_theme_preference() != "dark")
+        self.dark_mode_cb.blockSignals(True)
+        self.dark_mode_cb.setChecked(load_theme_preference() == "dark")
+        self.dark_mode_cb.blockSignals(False)
+        self._update_theme_toggle_icon()
+
+    def _update_theme_toggle_icon(self):
+        is_dark = load_theme_preference() == "dark"
+        icon_name = "fa5s.sun" if is_dark else "fa5s.moon"
+        self.theme_toggle_btn.setIcon(qta.icon(icon_name, color="#8A93A7"))
+
+    def show_dashboard(self):
+        self._set_active_nav(self.dashboard_btn)
+        self.stackedWidget.setCurrentIndex(DASHBOARD_PAGE)
+        self.render_dashboard()
+
+    def _render_dashboard_greeting(self):
+        hour = datetime.now().hour
+        if hour < 12:
+            greeting = "Good morning"
+        elif hour < 18:
+            greeting = "Good afternoon"
+        else:
+            greeting = "Good evening"
+        self.dashboard_greeting_lbl.setText(f"{greeting}, {self.user.name} \U0001F44B")
+        self.dashboard_date_lbl.setText(datetime.now().strftime("%A, %B %-d, %Y"))
+
+    def _make_dashboard_stat_card(self, label, value, caption, icon_name=None, icon_color=None):
+        palette = active_palette()
+        card = QFrame()
+        card.setObjectName("dashboard_stat_card")
+        apply_card_shadow(card, strength="sm")
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(16, 14, 16, 14)
+        layout.setSpacing(4)
+
+        header_row = QHBoxLayout()
+        label_lbl = QLabel(label)
+        label_lbl.setObjectName("class_row_caption_lbl")
+        header_row.addWidget(label_lbl)
+        header_row.addStretch(1)
+        if icon_name:
+            icon_lbl = QLabel()
+            icon_lbl.setPixmap(qta.icon(icon_name, color=icon_color or palette["accent"]).pixmap(16, 16))
+            header_row.addWidget(icon_lbl)
+        layout.addLayout(header_row)
+
+        value_lbl = QLabel(value)
+        value_lbl.setObjectName("dashboard_stat_value_lbl")
+        layout.addWidget(value_lbl)
+
+        caption_lbl = QLabel(caption)
+        caption_lbl.setObjectName("class_row_caption_lbl")
+        layout.addWidget(caption_lbl)
+
+        return card
+
+    def _current_dashboard_filter(self):
+        if self.dashboard_filter_pinned_btn.isChecked():
+            return "pinned"
+        if self.dashboard_filter_active_btn.isChecked():
+            return "active"
+        return "all"
+
+    def render_dashboard(self):
+        self._render_dashboard_greeting()
+        self.load_classes()  # keeps My Classes' row-list in sync while we're at it
+
+        try:
+            all_classes = self.class_manager.load_classes_for_instructor(self.user_id, include_archived=True)
+        except ApiError:
+            all_classes = []
+
+        active_classes = [c for c in all_classes if not c.archived]
+        self._populate_today_classes(active_classes)
+        self._populate_recently_viewed(active_classes)
+
+        total = len(all_classes)
+        archived = len(all_classes) - len(active_classes)
+        pinned = [c for c in all_classes if c.pinned and not c.archived]
+        non_pinned_active = [c for c in active_classes if not c.pinned]
+
+        total_present = 0
+        total_records = 0
+        for cls in active_classes:
+            try:
+                stats = self.class_manager.get_statistics(cls.class_id)
+            except ApiError:
+                continue
+            attended = stats.get("present", 0) + stats.get("late", 0)
+            total_present += attended
+            total_records += attended + stats.get("absent", 0)
+        overall_rate = int(total_present / total_records * 100) if total_records else 0
+
+        clear_layout(self.dashboard_stats_row)
+        for label, value, caption, icon_name in (
+            ("Active Classes", str(len(active_classes)), "Currently enrolled", "fa5s.th-large"),
+            ("Pinned Classes", str(len(pinned)), "Quick access", "fa5s.thumbtack"),
+            ("Total Classes", str(total), "All sessions logged", "fa5s.layer-group"),
+            ("Attended", str(total_present), f"{overall_rate}% overall rate", "fa5s.check-circle"),
+            ("Archived", str(archived), "Past sessions", "fa5s.archive"),
+        ):
+            self.dashboard_stats_row.addWidget(self._make_dashboard_stat_card(label, value, caption, icon_name))
+
+        self.dashboard_filter_all_btn.setText(f"All Classes ({total})")
+        self.dashboard_filter_active_btn.setText(f"Active ({len(active_classes)})")
+        self.dashboard_filter_pinned_btn.setText(f"Pinned ({len(pinned)})")
+
+        dashboard_filter = self._current_dashboard_filter()
+        show_pinned = dashboard_filter in ("all", "pinned") and bool(pinned)
+        show_active = dashboard_filter in ("all", "active")
+        show_inactive = dashboard_filter == "all" and archived > 0
+
+        self.dashboard_empty_state_lbl.setVisible(total == 0)
+
+        self.dashboard_pinned_title_lbl.setVisible(show_pinned)
+        self.dashboard_pinned_grid_widget.setVisible(show_pinned)
+        clear_layout(self.dashboard_pinned_grid)
+        if show_pinned:
+            self._add_class_cards_to_grid(self.dashboard_pinned_grid, pinned, self.dashboard_pinned_grid_widget)
+
+        self.dashboard_active_title_lbl.setVisible(show_active and bool(non_pinned_active))
+        self.dashboard_active_grid_widget.setVisible(show_active)
+        clear_layout(self.dashboard_active_grid)
+        if show_active:
+            self._add_class_cards_to_grid(
+                self.dashboard_active_grid, non_pinned_active, self.dashboard_active_grid_widget
+            )
+
+        archived_classes = [c for c in all_classes if c.archived]
+        self.dashboard_inactive_title_lbl.setVisible(show_inactive)
+        self.dashboard_inactive_grid_widget.setVisible(show_inactive)
+        clear_layout(self.dashboard_inactive_grid)
+        if show_inactive:
+            self._add_class_cards_to_grid(
+                self.dashboard_inactive_grid, archived_classes, self.dashboard_inactive_grid_widget
+            )
 
     def show_my_classes(self):
         self._set_active_nav(self.my_classes_btn)
         self.stackedWidget.setCurrentIndex(MY_CLASSES_PAGE)
         self.load_classes()
-        self._sync_info_panel_visibility()
-
-    def show_pinned_classes(self):
-        """Info panel's "Pinned items" row - pinned classes already sort
-        first in every My Classes sort mode, so this is just a shortcut
-        back to that page rather than a separate filtered view."""
-        self.show_my_classes()
 
     def show_settings(self):
         self._set_active_nav(self.settings_btn)
         self._clear_settings_form()
         self.stackedWidget.setCurrentIndex(SETTINGS_PAGE)
-        self._sync_info_panel_visibility()
 
     def fetch_classes(self):
         showing_archived = self.show_archived_cb.isChecked()
@@ -588,7 +662,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "Success", f"Class list exported to:\n{file_path}")
 
     def load_classes(self):
-        """Load class buttons into class_btns_layout"""
+        """Load class rows into class_btns_layout (My Classes' row-list)."""
         clear_layout(self.class_btns_layout)
 
         self.selected_class_ids = set()
@@ -599,69 +673,23 @@ class MainWindow(QMainWindow):
         classes = sorted(self.fetch_classes(), key=self._class_sort_key)
         self.empty_state_lbl.setText(
             "No archived classes." if showing_archived
-            else "You haven't created any classes yet. Use \"Create New Class\" below to get started."
+            else "You haven't created any classes yet. Use \"+ Create New Class\" above to get started."
         )
         self.empty_state_lbl.setVisible(not classes)
+        self.my_classes_count_lbl.setText(
+            f"{len(classes)} archived" if showing_archived else f"{len(classes)} enrolled"
+        )
 
         self.class_grid_widget.setVisible(not custom_order_mode)
         self.custom_order_listWidget.setVisible(custom_order_mode)
         if custom_order_mode:
             self._populate_custom_order_list(classes)
         elif showing_archived:
-            for row, cls in enumerate(classes):
-                self.class_btns_layout.addWidget(self._make_archived_class_row_widget(cls), row, 0)
+            for cls in classes:
+                self.class_btns_layout.addWidget(self._make_archived_class_row_widget(cls))
         else:
-            self._add_class_cards_to_grid(self.class_btns_layout, classes)
-
-        self.today_classes_title_lbl.setVisible(not showing_archived)
-        self.recently_viewed_title_lbl.setVisible(not showing_archived)
-        if showing_archived:
-            self._populate_today_classes([])
-            self.no_classes_today_lbl.setVisible(False)
-            self._populate_recently_viewed([])
-            self.no_recently_viewed_lbl.setVisible(False)
-        else:
-            self._populate_today_classes(classes)
-            self._populate_recently_viewed(classes)
-
-        self._update_info_panel_for_my_classes()
-
-    def _update_info_panel_for_my_classes(self):
-        """My Classes' Info panel shows an at-a-glance overview rather than
-        a single class's detail: unlike Kintsugi's file browser, clicking a
-        class here navigates away to Class Window (which has its own Info
-        panel of per-class detail, see ClassWindow._update_info_panel)
-        rather than selecting it in place, so there's no single "currently
-        selected" class to show here."""
-        try:
-            all_classes = self.class_manager.load_classes_for_instructor(self.user_id, include_archived=True)
-        except ApiError:
-            all_classes = []
-
-        total = len(all_classes)
-        archived = sum(1 for c in all_classes if c.archived)
-        active = total - archived
-        pinned = sum(1 for c in all_classes if c.pinned)
-
-        stats = [
-            ("Active Classes", str(active), int(active / total * 100) if total else 0, None),
-            (
-                "Pinned", str(pinned), int(pinned / total * 100) if total else 0,
-                PALETTE["warning"],
-            ),
-        ]
-        properties = [
-            ("Instructor", f"{self.user.name} {self.user.surname}"),
-            ("Total Classes", str(total)),
-            ("Archived", str(archived)),
-        ]
-        self.set_info_panel_content(
-            stats=stats, properties=properties, tags=[],
-            footer_actions=[
-                ("📌  Pinned items", self.show_pinned_classes),
-                ("✉  Activity", self.show_notifications_menu),
-            ],
-        )
+            for cls in classes:
+                self.class_btns_layout.addWidget(self._make_class_list_row_widget(cls))
 
     def _populate_custom_order_list(self, classes):
         self.custom_order_listWidget.clear()
@@ -750,41 +778,255 @@ class MainWindow(QMainWindow):
 
     MIN_CARD_WIDTH = 220
 
-    def _num_class_grid_columns(self):
-        width = self.class_grid_widget.width()
+    _DAY_ABBREV = {
+        "Monday": "Mon", "Tuesday": "Tue", "Wednesday": "Wed", "Thursday": "Thu",
+        "Friday": "Fri", "Saturday": "Sat", "Sunday": "Sun",
+    }
+
+    def _format_schedule_caption(self, schedule):
+        """Compact "Mon / Wed 09:00"-style caption, matching the reference's
+        ClassCard/ClassListRow schedule line."""
+        days = [day for day in _WEEKDAY_ORDER if any(s.selected for s in schedule.get(day, []))]
+        if not days:
+            return "No schedule set"
+        first_slots = [s for s in schedule[days[0]] if s.selected]
+        time_str = first_slots[0].start_time.toString("HH:mm") if first_slots else ""
+        return f"{' / '.join(self._DAY_ABBREV[d] for d in days)} {time_str}".strip()
+
+    def _get_class_stats(self, cls):
+        """(attended, missed, total, percent) for one class - present+late
+        both count as "attended" per the same convention the roster table
+        and PDF report already use elsewhere."""
+        try:
+            stats = self.class_manager.get_statistics(cls.class_id)
+        except ApiError:
+            return 0, 0, 0, 0
+        attended = stats.get("present", 0) + stats.get("late", 0)
+        missed = stats.get("absent", 0)
+        total = attended + missed
+        percent = int(attended / total * 100) if total else 0
+        return attended, missed, total, percent
+
+    def _num_grid_columns(self, container):
+        width = container.width()
         if width <= 0:
             return 3
         return max(1, width // self.MIN_CARD_WIDTH)
 
-    def _add_class_cards_to_grid(self, layout, classes):
-        columns = self._num_class_grid_columns()
+    def _add_class_cards_to_grid(self, layout, classes, container):
+        columns = self._num_grid_columns(container)
         for index, cls in enumerate(classes):
             row, col = divmod(index, columns)
-            layout.addWidget(self._make_class_card_widget(cls), row, col)
+            layout.addWidget(self._make_dashboard_class_card_widget(cls), row, col)
 
-    def _make_class_card_widget(self, cls):
-        """A Kintsugi-style card: a select checkbox + pin toggle up top, a
-        tinted "folder" illustration, the class name/code, and a bottom row
-        of secondary actions - replaces the old flat class_row_widget."""
-        compact = self.compact_view_cb.isChecked()
+    def _make_class_detail_panel(self, cls, attended, missed, total):
+        """Expandable "Properties" detail - a compact label/value grid plus
+        Duplicate/Archive actions, shared by the Dashboard card and the My
+        Classes row so both "expand for more" affordances look the same."""
+        panel = QFrame()
+        panel.setObjectName("class_detail_panel")
+        grid = QGridLayout(panel)
+        grid.setContentsMargins(14, 10, 14, 10)
+        grid.setHorizontalSpacing(24)
+        grid.setVerticalSpacing(6)
+
+        entries = [
+            ("Section", cls.section),
+            ("Schedule", self._format_schedule_caption(cls.schedule)),
+            ("Total Sessions", str(total)),
+            ("Attended", str(attended)),
+            ("Missed", str(missed)),
+            ("Archived", "Yes" if cls.archived else "No"),
+        ]
+        for index, (label, value) in enumerate(entries):
+            row, col = divmod(index, 2)
+            cell = QVBoxLayout()
+            cell.setSpacing(0)
+            key_lbl = QLabel(label)
+            key_lbl.setProperty("fieldLabel", True)
+            value_lbl = QLabel(value)
+            value_lbl.setProperty("fieldValue", True)
+            cell.addWidget(key_lbl)
+            cell.addWidget(value_lbl)
+            grid.addLayout(cell, row, col)
+
+        actions_row = QHBoxLayout()
+        duplicate_btn = QPushButton("Duplicate")
+        set_dynamic_property(duplicate_btn, "variant", "ghost")
+        duplicate_btn.setCursor(Qt.PointingHandCursor)
+        duplicate_btn.setToolTip("Create a new class with the same schedule and policy")
+        duplicate_btn.clicked.connect(lambda _, c=cls: self.open_duplicate_class_window(c))
+        actions_row.addWidget(duplicate_btn)
+        actions_row.addStretch(1)
+
+        archive_btn = QPushButton("Unarchive" if cls.archived else "Archive")
+        set_dynamic_property(archive_btn, "variant", "secondary" if cls.archived else "destructive")
+        archive_btn.setCursor(Qt.PointingHandCursor)
+        if cls.archived:
+            archive_btn.clicked.connect(lambda _, c=cls: self.unarchive_class(c))
+        else:
+            archive_btn.clicked.connect(lambda _, c=cls: self.archive_class(c))
+        actions_row.addWidget(archive_btn)
+        grid.addLayout(actions_row, (len(entries) + 1) // 2, 0, 1, 2)
+
+        return panel
+
+    def _make_expand_toggle(self, detail_panel, collapsed_text, expanded_text):
+        toggle_btn = QPushButton(collapsed_text)
+        set_dynamic_property(toggle_btn, "variant", "ghost")
+        toggle_btn.setCheckable(True)
+        toggle_btn.setCursor(Qt.PointingHandCursor)
+        detail_panel.setVisible(False)
+
+        def on_toggled(checked):
+            detail_panel.setVisible(checked)
+            toggle_btn.setText(expanded_text if checked else collapsed_text)
+
+        toggle_btn.toggled.connect(on_toggled)
+        return toggle_btn
+
+    def _make_dashboard_class_card_widget(self, cls):
+        """AttendU-style ClassCard: a colored top accent bar, name, pin,
+        schedule caption, an attendance-rate progress bar, an ACTIVE/
+        INACTIVE status pill, and an expandable Properties panel."""
+        attended, missed, total, percent = self._get_class_stats(cls)
         color = cls.color or class_tag_color(cls.class_code)
-        tint = QColor(color).lighter(175).name()
+        tier = attendance_tier(percent, cls.attendance_policy)
+
+        outer = QWidget()
+        outer_layout = QVBoxLayout(outer)
+        outer_layout.setContentsMargins(0, 0, 0, 0)
+        outer_layout.setSpacing(0)
 
         card = QFrame()
-        card.setObjectName("class_card_widget")
+        card.setObjectName("dashboard_class_card")
         card.setFixedWidth(self.MIN_CARD_WIDTH - 10)
-        card_layout = QVBoxLayout(card)
-        card_layout.setContentsMargins(12, 12, 12, 12)
-        card_layout.setSpacing(6)
         apply_card_shadow(card, strength="sm")
+        card_layout = QVBoxLayout(card)
+        card_layout.setContentsMargins(14, 4, 14, 14)
+        card_layout.setSpacing(6)
+
+        accent_bar = QFrame()
+        accent_bar.setFixedHeight(4)
+        accent_bar.setStyleSheet(f"background-color: {color}; border: none; border-radius: 2px;")
+        card_layout.addWidget(accent_bar)
 
         top_row = QHBoxLayout()
+        top_row.setContentsMargins(0, 6, 0, 0)
+        title_btn = QPushButton()
+        title_btn.setObjectName("class_card_title_btn")
+        available_width = self.MIN_CARD_WIDTH - 10 - 28 - 30  # card width minus margins minus pin button
+        elided = title_btn.fontMetrics().elidedText(cls.class_name, Qt.ElideRight, available_width)
+        title_btn.setText(elided)
+        title_btn.setCursor(Qt.PointingHandCursor)
+        title_btn.setToolTip(f"{cls.class_name} ({cls.class_code})")
+        title_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
+        top_row.addWidget(title_btn, 1)
+
+        pin_btn = QPushButton("★" if cls.pinned else "☆")
+        pin_btn.setObjectName("card_icon_btn")
+        pin_btn.setFixedSize(22, 22)
+        pin_btn.setCursor(Qt.PointingHandCursor)
+        pin_btn.setToolTip("Unpin class" if cls.pinned else "Pin class to the top")
+        pin_btn.clicked.connect(lambda _, c=cls: self.toggle_pin_class(c))
+        top_row.addWidget(pin_btn)
+        card_layout.addLayout(top_row)
+
+        caption_lbl = QLabel(f"{cls.class_code} · {self._format_schedule_caption(cls.schedule)}")
+        caption_lbl.setObjectName("class_row_caption_lbl")
+        card_layout.addWidget(caption_lbl)
+
+        attendance_row = QHBoxLayout()
+        attendance_lbl = QLabel("Attendance")
+        attendance_lbl.setObjectName("class_row_caption_lbl")
+        attendance_row.addWidget(attendance_lbl)
+        attendance_row.addStretch(1)
+        percent_lbl = QLabel(f"{percent}%")
+        percent_lbl.setObjectName("class_card_percent_lbl")
+        percent_lbl.setProperty("tier", tier)
+        attendance_row.addWidget(percent_lbl)
+        card_layout.addLayout(attendance_row)
+
+        bar = QProgressBar()
+        bar.setObjectName("class_card_progress_bar")
+        bar.setRange(0, 100)
+        bar.setValue(max(0, min(100, percent)))
+        bar.setTextVisible(False)
+        bar.setFixedHeight(6)
+        bar.setProperty("tier", tier)
+        card_layout.addWidget(bar)
+
+        status_row = QHBoxLayout()
+        status_row.addWidget(make_tag_pill("INACTIVE" if cls.archived else "ACTIVE", "slate" if cls.archived else "green"))
+        status_row.addStretch(1)
+        card_layout.addLayout(status_row)
+
+        detail = self._make_class_detail_panel(cls, attended, missed, total)
+        card_layout.addWidget(self._make_expand_toggle(detail, "›  Properties", "⌄  Less"))
+
+        outer_layout.addWidget(card)
+        outer_layout.addWidget(detail)
+        return outer
+
+    def _make_class_list_row_widget(self, cls):
+        """AttendU-style ClassListRow: a colored left accent bar, name and
+        schedule caption, a class-code tag pill, attendance fraction + %,
+        pin toggle, and an expandable Properties panel (My Classes page)."""
+        compact = self.compact_view_cb.isChecked()
+        attended, missed, total, percent = self._get_class_stats(cls)
+        color = cls.color or class_tag_color(cls.class_code)
+        tier = attendance_tier(percent, cls.attendance_policy)
+
+        outer = QWidget()
+        outer_layout = QVBoxLayout(outer)
+        outer_layout.setContentsMargins(0, 0, 0, 4)
+        outer_layout.setSpacing(0)
+
+        row = QFrame()
+        row.setObjectName("class_row_widget")
+        row_layout = QHBoxLayout(row)
+        row_layout.setContentsMargins(0, 8, 14, 8)
+        row_layout.setSpacing(12)
+
+        accent_bar = QFrame()
+        accent_bar.setFixedWidth(4)
+        accent_bar.setStyleSheet(f"background-color: {color}; border: none;")
+        row_layout.addWidget(accent_bar)
+
         select_cb = QCheckBox()
         select_cb.setToolTip("Select for bulk actions")
         select_cb.setChecked(cls.class_id in self.selected_class_ids)
         select_cb.toggled.connect(lambda checked, c=cls: self.toggle_class_selection(c, checked))
-        top_row.addWidget(select_cb)
-        top_row.addStretch(1)
+        row_layout.addWidget(select_cb)
+
+        text_layout = QVBoxLayout()
+        text_layout.setSpacing(0)
+        title_btn = QPushButton(cls.class_name)
+        title_btn.setObjectName("class_row_name_btn")
+        title_btn.setCursor(Qt.PointingHandCursor)
+        title_btn.setToolTip(f"{cls.class_name} ({cls.class_code})")
+        title_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
+        text_layout.addWidget(title_btn)
+        caption_lbl = QLabel(f"{cls.class_code} · {self._format_schedule_caption(cls.schedule)}")
+        caption_lbl.setObjectName("class_row_caption_lbl")
+        caption_lbl.setVisible(not compact)
+        text_layout.addWidget(caption_lbl)
+        row_layout.addLayout(text_layout, 1)
+
+        row_layout.addWidget(make_tag_pill(cls.class_code, class_tag_color_key(cls.class_code)))
+
+        stats_layout = QVBoxLayout()
+        stats_layout.setSpacing(0)
+        percent_lbl = QLabel(f"{percent}%")
+        percent_lbl.setObjectName("class_card_percent_lbl")
+        percent_lbl.setProperty("tier", tier)
+        percent_lbl.setAlignment(Qt.AlignRight)
+        stats_layout.addWidget(percent_lbl)
+        fraction_lbl = QLabel(f"{attended}/{total}")
+        fraction_lbl.setObjectName("class_row_caption_lbl")
+        fraction_lbl.setAlignment(Qt.AlignRight)
+        stats_layout.addWidget(fraction_lbl)
+        row_layout.addLayout(stats_layout)
 
         pin_btn = QPushButton("★" if cls.pinned else "☆")
         pin_btn.setObjectName("card_icon_btn")
@@ -792,54 +1034,16 @@ class MainWindow(QMainWindow):
         pin_btn.setCursor(Qt.PointingHandCursor)
         pin_btn.setToolTip("Unpin class" if cls.pinned else "Pin class to the top")
         pin_btn.clicked.connect(lambda _, c=cls: self.toggle_pin_class(c))
-        top_row.addWidget(pin_btn)
-        card_layout.addLayout(top_row)
+        row_layout.addWidget(pin_btn)
 
-        illustration_btn = QPushButton()
-        illustration_btn.setObjectName("class_card_illustration_btn")
-        illustration_btn.setFixedHeight(40 if compact else 64)
-        illustration_btn.setCursor(Qt.PointingHandCursor)
-        illustration_btn.setIcon(qta.icon("fa5s.folder", color=color))
-        illustration_btn.setIconSize(QSize(26, 26))
-        illustration_btn.setStyleSheet(
-            f"background-color: {tint}; border-radius: {RADIUS['control_sm']}px; border: none;"
-        )
-        illustration_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
-        card_layout.addWidget(illustration_btn)
+        detail = self._make_class_detail_panel(cls, attended, missed, total)
+        expand_btn = self._make_expand_toggle(detail, "›", "⌄")
+        expand_btn.setFixedSize(24, 24)
+        row_layout.addWidget(expand_btn)
 
-        title_btn = QPushButton(cls.class_name)
-        title_btn.setObjectName("class_card_title_btn")
-        title_btn.setCursor(Qt.PointingHandCursor)
-        title_btn.setToolTip(f"{cls.class_name} ({cls.class_code})")
-        title_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
-        card_layout.addWidget(title_btn)
-
-        caption_lbl = QLabel(f"{cls.class_code} · Section {cls.section}")
-        caption_lbl.setObjectName("class_row_caption_lbl")
-        caption_lbl.setVisible(not compact)
-        card_layout.addWidget(caption_lbl)
-
-        card_layout.addStretch(1)
-
-        bottom_row = QHBoxLayout()
-        duplicate_btn = QPushButton("Duplicate")
-        set_dynamic_property(duplicate_btn, "variant", "ghost")
-        duplicate_btn.setCursor(Qt.PointingHandCursor)
-        duplicate_btn.setToolTip("Create a new class with the same schedule and policy")
-        duplicate_btn.clicked.connect(lambda _, c=cls: self.open_duplicate_class_window(c))
-        bottom_row.addWidget(duplicate_btn)
-        bottom_row.addStretch(1)
-
-        archive_btn = QPushButton("✕")
-        archive_btn.setObjectName("class_delete_btn")
-        archive_btn.setFixedSize(24, 24)
-        archive_btn.setCursor(Qt.PointingHandCursor)
-        archive_btn.setToolTip("Archive class")
-        archive_btn.clicked.connect(lambda _, c=cls: self.archive_class(c))
-        bottom_row.addWidget(archive_btn)
-        card_layout.addLayout(bottom_row)
-
-        return card
+        outer_layout.addWidget(row)
+        outer_layout.addWidget(detail)
+        return outer
 
     def toggle_pin_class(self, cls):
         try:
@@ -954,10 +1158,7 @@ class MainWindow(QMainWindow):
 
         if existing_index is not None:
             self.stackedWidget.setCurrentIndex(existing_index)
-            class_page = self.stackedWidget.widget(existing_index)
-            class_page.refresh_info_panel()
-            self._sync_info_panel_visibility()
-            return class_page
+            return self.stackedWidget.widget(existing_index)
 
         from views.class_window import ClassWindow
 
@@ -965,7 +1166,6 @@ class MainWindow(QMainWindow):
         index = self.stackedWidget.addWidget(class_page)
         class_page.setProperty("class_code", class_obj.class_code)
         self.stackedWidget.setCurrentIndex(index)
-        self._sync_info_panel_visibility()
         return class_page
 
     def open_take_attendance_for(self, cls):
@@ -1294,12 +1494,12 @@ class MainWindow(QMainWindow):
         self.load_classes()
 
     def _apply_translations(self):
+        self.dashboard_btn.setText(t("dashboard"))
         self.my_classes_btn.setText(t("my_classes"))
         self.settings_btn.setText(t("settings"))
         self.statistics_btn.setText(t("statistics"))
         self.log_out_btn.setText(t("log_out"))
         self.create_new_class_btn.setText(t("create_new_class"))
-        self.profile_btn.setText(t("profile"))
         self.my_classes_title_lbl.setText(t("my_classes"))
         self.title_lbl_settings.setText(t("settings"))
         self.statistics_title_lbl.setText(t("attendance_statistics"))
@@ -1450,7 +1650,6 @@ class MainWindow(QMainWindow):
 
     def show_search(self):
         self.stackedWidget.setCurrentIndex(SEARCH_PAGE)
-        self._sync_info_panel_visibility()
         clear_layout(self.search_results_layout)
 
         query = self.search_bar_le.text().strip().lower()
@@ -1461,9 +1660,8 @@ class MainWindow(QMainWindow):
             self.search_status_lbl.setText("No matching classes found.")
         else:
             self.search_status_lbl.setText(f"{len(matches)} class(es) found:")
-            self._add_class_cards_to_grid(
-                self.search_results_layout, sorted(matches, key=self._class_sort_key)
-            )
+            for cls in sorted(matches, key=self._class_sort_key):
+                self.search_results_layout.addWidget(self._make_class_list_row_widget(cls))
 
     def _class_matches_query(self, cls, query):
         if query in cls.class_name.lower() or query in cls.class_code.lower():
@@ -1479,7 +1677,6 @@ class MainWindow(QMainWindow):
     def show_statistics(self):
         self._set_active_nav(self.statistics_btn)
         self.stackedWidget.setCurrentIndex(STATISTICS_PAGE)
-        self._sync_info_panel_visibility()
         self.statistics_class_combo.blockSignals(True)
         self.statistics_class_combo.clear()
         for cls in self.fetch_classes():
@@ -1497,7 +1694,6 @@ class MainWindow(QMainWindow):
         if cls is None:
             self.statistics_empty_lbl.setText("Select a class to view its statistics.")
             self.statistics_empty_lbl.setVisible(True)
-            self._update_info_panel_for_statistics(None)
             return
 
         try:
@@ -1505,8 +1701,6 @@ class MainWindow(QMainWindow):
         except ApiError as e:
             QMessageBox.critical(self, "Server Error", str(e))
             return
-
-        self._update_info_panel_for_statistics(cls, stats)
 
         palette = active_palette()
         figure = Figure(figsize=(8, 4))
@@ -1535,44 +1729,6 @@ class MainWindow(QMainWindow):
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
         self._last_chart_builder = self.render_statistics
-
-    def _update_info_panel_for_statistics(self, cls, stats=None):
-        """Statistics' Info panel shows the currently-selected class's
-        attendance rate/record count plus its identifying properties and
-        tags - mirrors the pattern already used for My Classes (aggregate)
-        and Class Window (per-class) in earlier phases."""
-        if cls is None:
-            self.set_info_panel_content(stats=[], properties=[], tags=[], footer_actions=[])
-            return
-
-        if stats is None:
-            total_records = 0
-            rate = 0
-        else:
-            total_records = stats["present"] + stats["late"] + stats["absent"]
-            rate = int(stats["present"] / total_records * 100) if total_records else 0
-
-        info_stats = [
-            ("Attendance Rate", f"{rate}%", rate, None),
-            ("Attendance Records", str(total_records), min(100, total_records * 5), None),
-        ]
-        properties = [
-            ("Class Code", cls.class_code),
-            ("Section", cls.section),
-            ("Total Weeks", str(cls.total_weeks)),
-            ("Weekly Hours", str(cls.weekly_hours)),
-        ]
-        tags = [(cls.class_code, class_tag_color_key(cls.class_code))]
-        if cls.archived:
-            tags.append(("Archived", "slate"))
-
-        self.set_info_panel_content(
-            stats=info_stats, properties=properties, tags=tags,
-            footer_actions=[
-                ("📄  Export PDF Report", self.export_statistics_pdf),
-                ("📂  View Full Class", lambda: self.open_class_window(cls)),
-            ],
-        )
 
     def show_class_comparison(self):
         """Bar chart comparing attendance rate across all of the

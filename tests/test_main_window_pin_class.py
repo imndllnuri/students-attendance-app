@@ -16,6 +16,9 @@ class FakeClassManager:
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 
+    def get_statistics(self, class_id):
+        return {"present": 0, "late": 0, "absent": 0}
+
     def __init__(self, classes):
         self._classes = classes
         self.updated = None
@@ -58,6 +61,7 @@ def build_window(qtbot, monkeypatch, classes):
     window = mw.MainWindow(user)
     qtbot.addWidget(window)
     window._inactivity_timer.stop()
+    window.show_my_classes()
     from PyQt5.QtWidgets import QApplication
     QApplication.instance().removeEventFilter(window)
     return window
@@ -68,7 +72,7 @@ def test_pinned_class_sorts_before_unpinned_by_class_code(qtbot, monkeypatch):
     window = build_window(qtbot, monkeypatch, classes)
 
     row0 = window.class_btns_layout.itemAt(0).widget()
-    label = row0.findChild(QPushButton, "class_card_title_btn")
+    label = row0.findChild(QPushButton, "class_row_name_btn")
     assert "ZZZ" in label.text()
 
 

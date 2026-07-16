@@ -15,6 +15,9 @@ class FakeClassManager:
     def flush_offline_queue(self, *args, **kwargs):
         return 0
 
+    def get_statistics(self, class_id):
+        return {"present": 0, "late": 0, "absent": 0}
+
     def __init__(self):
         self.archived_ids = []
         self.unarchived_ids = []
@@ -65,6 +68,7 @@ def build_window(qtbot, monkeypatch):
     window = mw.MainWindow(user)
     qtbot.addWidget(window)
     window._inactivity_timer.stop()
+    window.show_my_classes()
     QApplication.instance().removeEventFilter(window)
     return window
 
