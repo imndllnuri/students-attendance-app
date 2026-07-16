@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>775</width>
-    <height>771</height>
+    <width>1200</width>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,346 +15,409 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+    <widget class="QWidget" name="class_header_widget" native="true">
+     <layout class="QHBoxLayout" name="class_header_layout">
       <item>
-       <widget class="QWidget" name="class_header_widget" native="true">
-        <layout class="QHBoxLayout" name="class_header_layout">
-         <item>
-          <widget class="QPushButton" name="back_to_my_classes_btn">
-           <property name="minimumSize">
-            <size><width>32</width><height>32</height></size>
-           </property>
-           <property name="maximumSize">
-            <size><width>32</width><height>32</height></size>
-           </property>
-           <property name="toolTip">
-            <string>Back to My Classes</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="class_header_text_layout">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>16</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="class_breadcrumb_lbl">
-             <property name="text">
-              <string>My Classes</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="class_name_header_lbl">
-             <property name="text">
-              <string>Class Name</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="class_code_lbl">
-             <property name="text">
-              <string>Class Code</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="class_header_spacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-   </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="class_settings_btn">
-           <property name="text">
-            <string>Settings</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="take_attendance_btn">
-           <property name="text">
-            <string>Take Attendance</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <widget class="QPushButton" name="back_to_my_classes_btn">
+        <property name="minimumSize">
+         <size><width>32</width><height>32</height></size>
+        </property>
+        <property name="maximumSize">
+         <size><width>32</width><height>32</height></size>
+        </property>
+        <property name="toolTip">
+         <string>Back to My Classes</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="class_details_card">
-        <layout class="QVBoxLayout" name="class_details_card_layout">
-         <property name="leftMargin">
-          <number>24</number>
-         </property>
-         <property name="topMargin">
-          <number>24</number>
-         </property>
-         <property name="rightMargin">
-          <number>24</number>
-         </property>
-         <property name="bottomMargin">
-          <number>24</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="class_details_title_lbl">
-           <property name="text">
-            <string>Class Details</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="class_details_grid">
-           <property name="spacing"><number>6</number></property>
-           <item>
-            <layout class="QHBoxLayout" name="attendance_policy_row">
-             <item><widget class="QLabel" name="attendance_policy_key_lbl"><property name="text"><string>Attendance Policy</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
-             <item><spacer name="attendance_policy_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
-             <item><widget class="QLabel" name="attendance_policy_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="late_threshold_row">
-             <item><widget class="QLabel" name="late_threshold_key_lbl"><property name="text"><string>Late Threshold</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
-             <item><spacer name="late_threshold_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
-             <item><widget class="QLabel" name="late_threshold_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="number_of_weeks_row">
-             <item><widget class="QLabel" name="number_of_weeks_key_lbl"><property name="text"><string>Number of Weeks</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
-             <item><spacer name="number_of_weeks_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
-             <item><widget class="QLabel" name="number_of_weeks_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="total_hours_row">
-             <item><widget class="QLabel" name="total_hours_key_lbl"><property name="text"><string>Total Hours</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
-             <item><spacer name="total_hours_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
-             <item><widget class="QLabel" name="total_hours_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="weekly_hours_row">
-             <item><widget class="QLabel" name="weekly_hours_key_lbl"><property name="text"><string>Weekly Hours</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
-             <item><spacer name="weekly_hours_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
-             <item><widget class="QLabel" name="weekly_hours_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="Line" name="class_details_divider">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="schedule_title_lbl">
-           <property name="text">
-            <string>Schedule</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="schedule_grid_widget" native="true">
-           <layout class="QGridLayout" name="schedule_grid_layout"/>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="class_notes_divider">
-           <property name="orientation"><enum>Qt::Horizontal</enum></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="class_notes_title_lbl">
-           <property name="text"><string>Notes</string></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTextEdit" name="class_notes_edit">
-           <property name="placeholderText"><string>Instructor-only notes for this class...</string></property>
-           <property name="maximumSize"><size><width>16777215</width><height>100</height></size></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="save_notes_btn">
-           <property name="text"><string>Save Notes</string></property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+       <layout class="QVBoxLayout" name="class_header_text_layout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>16</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="class_breadcrumb_lbl">
+          <property name="text">
+           <string>My Classes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="class_name_header_lbl">
+          <property name="text">
+           <string>Class Name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="class_code_lbl">
+          <property name="text">
+           <string>Class Code</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QFrame" name="roster_section_card">
-        <layout class="QVBoxLayout" name="roster_section_card_layout">
-         <property name="leftMargin">
-          <number>24</number>
-         </property>
-         <property name="topMargin">
-          <number>24</number>
-         </property>
-         <property name="rightMargin">
-          <number>24</number>
-         </property>
-         <property name="bottomMargin">
-          <number>24</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="roster_section_header_layout">
-           <item>
-            <widget class="QLabel" name="roster_section_title_lbl">
-             <property name="text">
-              <string>Roster &amp; Attendance</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="roster_section_header_spacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
+       <spacer name="class_header_spacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
     <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
    </spacer>
-           </item>
+      </item>
+      <item>
+       <widget class="QPushButton" name="class_settings_btn">
+        <property name="text">
+         <string>Settings</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="take_attendance_btn">
+        <property name="text">
+         <string>Take Attendance</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="class_body_layout">
+     <property name="leftMargin"><number>20</number></property>
+     <property name="topMargin"><number>16</number></property>
+     <property name="rightMargin"><number>20</number></property>
+     <property name="bottomMargin"><number>20</number></property>
+     <property name="spacing"><number>16</number></property>
+     <item>
+      <widget class="QFrame" name="roster_section_card">
+       <layout class="QVBoxLayout" name="roster_section_card_layout">
+        <property name="leftMargin">
+         <number>20</number>
+        </property>
+        <property name="topMargin">
+         <number>20</number>
+        </property>
+        <property name="rightMargin">
+         <number>20</number>
+        </property>
+        <property name="bottomMargin">
+         <number>20</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="roster_section_header_layout">
+          <item>
+           <widget class="QLabel" name="roster_section_title_lbl">
+            <property name="text">
+             <string>Roster &amp; Attendance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="roster_section_header_spacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="merge_students_btn">
+            <property name="text">
+             <string>Merge Students</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="copy_roster_btn">
+            <property name="text">
+             <string>Copy Roster From Class</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="export_roster_btn">
+            <property name="text">
+             <string>Export Roster</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refresh_student_list_btn">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QWidget" name="at_risk_widget" native="true">
+          <property name="visible"><bool>false</bool></property>
+          <layout class="QVBoxLayout" name="at_risk_layout">
+           <property name="leftMargin"><number>14</number></property>
+           <property name="topMargin"><number>10</number></property>
+           <property name="rightMargin"><number>14</number></property>
+           <property name="bottomMargin"><number>10</number></property>
+           <property name="spacing"><number>4</number></property>
            <item>
-            <widget class="QPushButton" name="merge_students_btn">
-             <property name="text">
-              <string>Merge Students</string>
-             </property>
+            <widget class="QLabel" name="at_risk_title_lbl">
+             <property name="text"><string>At-Risk Students</string></property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="copy_roster_btn">
-             <property name="text">
-              <string>Copy Roster From Class</string>
-             </property>
+            <widget class="QLabel" name="at_risk_students_lbl">
+             <property name="wordWrap"><bool>true</bool></property>
+             <property name="text"><string/></property>
             </widget>
            </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="roster_status_widget" native="true">
+          <property name="visible">
+           <bool>false</bool>
+          </property>
+          <layout class="QVBoxLayout" name="roster_status_layout">
            <item>
-            <widget class="QPushButton" name="export_roster_btn">
-             <property name="text">
-              <string>Export Roster</string>
+            <widget class="QLabel" name="roster_status_lbl">
+             <property name="wordWrap">
+              <bool>true</bool>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="refresh_student_list_btn">
-             <property name="maximumSize">
-              <size>
-               <width>40</width>
-               <height>40</height>
-              </size>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QWidget" name="at_risk_widget" native="true">
-           <property name="visible"><bool>false</bool></property>
-           <layout class="QVBoxLayout" name="at_risk_layout">
-            <property name="leftMargin"><number>14</number></property>
-            <property name="topMargin"><number>10</number></property>
-            <property name="rightMargin"><number>14</number></property>
-            <property name="bottomMargin"><number>10</number></property>
-            <property name="spacing"><number>4</number></property>
-            <item>
-             <widget class="QLabel" name="at_risk_title_lbl">
-              <property name="text"><string>At-Risk Students</string></property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="at_risk_students_lbl">
-              <property name="wordWrap"><bool>true</bool></property>
-              <property name="text"><string/></property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="roster_status_widget" native="true">
-           <property name="visible">
-            <bool>false</bool>
-           </property>
-           <layout class="QVBoxLayout" name="roster_status_layout">
-            <item>
-             <widget class="QLabel" name="roster_status_lbl">
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="roster_retry_btn">
-              <property name="text">
-               <string>Retry</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="roster_add_student_layout">
            <item>
-            <widget class="QLineEdit" name="new_student_number_le">
-             <property name="placeholderText"><string> Student Number</string></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="new_student_name_le">
-             <property name="placeholderText"><string> Name Surname</string></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="add_student_btn">
-             <property name="text"><string>Add Student</string></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="remove_selected_student_btn">
-             <property name="text"><string>Remove Selected</string></property>
+            <widget class="QPushButton" name="roster_retry_btn">
+             <property name="text">
+              <string>Retry</string>
+             </property>
             </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <widget class="QTableWidget" name="student_list_tableWidget">
-           <property name="gridStyle">
-            <enum>Qt::SolidLine</enum>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="student_list_tableWidget">
+          <property name="gridStyle">
+           <enum>Qt::SolidLine</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="roster_add_student_layout">
+          <property name="topMargin"><number>4</number></property>
+          <item>
+           <widget class="QLineEdit" name="new_student_number_le">
+            <property name="placeholderText"><string>Student Number</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="new_student_name_le">
+            <property name="placeholderText"><string>Name Surname</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="add_student_btn">
+            <property name="text"><string>Add Student</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="remove_selected_student_btn">
+            <property name="text"><string>Remove Selected</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="class_side_rail_widget" native="true">
+       <property name="minimumSize"><size><width>300</width><height>0</height></size></property>
+       <property name="maximumSize"><size><width>320</width><height>16777215</height></size></property>
+       <layout class="QVBoxLayout" name="class_side_rail_layout">
+        <property name="leftMargin"><number>0</number></property>
+        <property name="topMargin"><number>0</number></property>
+        <property name="rightMargin"><number>0</number></property>
+        <property name="bottomMargin"><number>0</number></property>
+        <property name="spacing"><number>16</number></property>
+        <item>
+         <widget class="QFrame" name="class_details_card">
+          <layout class="QVBoxLayout" name="class_details_card_layout">
+           <property name="leftMargin">
+            <number>18</number>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+           <property name="topMargin">
+            <number>18</number>
+           </property>
+           <property name="rightMargin">
+            <number>18</number>
+           </property>
+           <property name="bottomMargin">
+            <number>18</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="class_details_title_lbl">
+             <property name="text">
+              <string>Class Details</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="class_details_grid">
+             <property name="spacing"><number>6</number></property>
+             <item>
+              <layout class="QHBoxLayout" name="attendance_policy_row">
+               <item><widget class="QLabel" name="attendance_policy_key_lbl"><property name="text"><string>Attendance Policy</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+               <item><spacer name="attendance_policy_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+               <item><widget class="QLabel" name="attendance_policy_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="late_threshold_row">
+               <item><widget class="QLabel" name="late_threshold_key_lbl"><property name="text"><string>Late Threshold</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+               <item><spacer name="late_threshold_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+               <item><widget class="QLabel" name="late_threshold_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="number_of_weeks_row">
+               <item><widget class="QLabel" name="number_of_weeks_key_lbl"><property name="text"><string>Number of Weeks</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+               <item><spacer name="number_of_weeks_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+               <item><widget class="QLabel" name="number_of_weeks_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="total_hours_row">
+               <item><widget class="QLabel" name="total_hours_key_lbl"><property name="text"><string>Total Hours</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+               <item><spacer name="total_hours_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+               <item><widget class="QLabel" name="total_hours_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="weekly_hours_row">
+               <item><widget class="QLabel" name="weekly_hours_key_lbl"><property name="text"><string>Weekly Hours</string></property><property name="fieldLabel" stdset="0"><bool>true</bool></property></widget></item>
+               <item><spacer name="weekly_hours_row_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+               <item><widget class="QLabel" name="weekly_hours_lbl"><property name="text"><string/></property><property name="fieldValue" stdset="0"><bool>true</bool></property></widget></item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QWidget" name="attendance_rate_widget" native="true">
+             <layout class="QVBoxLayout" name="attendance_rate_layout">
+              <property name="leftMargin"><number>12</number></property>
+              <property name="topMargin"><number>10</number></property>
+              <property name="rightMargin"><number>12</number></property>
+              <property name="bottomMargin"><number>10</number></property>
+              <property name="spacing"><number>4</number></property>
+              <item>
+               <widget class="QLabel" name="attendance_rate_lbl">
+                <property name="text"><string>Your attendance rate</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QProgressBar" name="attendance_rate_bar">
+                <property name="minimum"><number>0</number></property>
+                <property name="maximum"><number>100</number></property>
+                <property name="value"><number>0</number></property>
+                <property name="textVisible"><bool>false</bool></property>
+                <property name="maximumSize"><size><width>16777215</width><height>6</height></size></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="attendance_rate_fraction_lbl">
+                <property name="alignment"><set>Qt::AlignRight</set></property>
+                <property name="text"><string/></property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="schedule_card">
+          <layout class="QVBoxLayout" name="schedule_card_layout">
+           <property name="leftMargin"><number>18</number></property>
+           <property name="topMargin"><number>18</number></property>
+           <property name="rightMargin"><number>18</number></property>
+           <property name="bottomMargin"><number>18</number></property>
+           <item>
+            <widget class="QLabel" name="schedule_title_lbl">
+             <property name="text">
+              <string>Schedule</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="schedule_grid_widget" native="true">
+             <layout class="QGridLayout" name="schedule_grid_layout"/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="notes_card">
+          <layout class="QVBoxLayout" name="notes_card_layout">
+           <property name="leftMargin"><number>18</number></property>
+           <property name="topMargin"><number>18</number></property>
+           <property name="rightMargin"><number>18</number></property>
+           <property name="bottomMargin"><number>18</number></property>
+           <item>
+            <widget class="QLabel" name="class_notes_title_lbl">
+             <property name="text"><string>Notes</string></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="class_notes_edit">
+             <property name="placeholderText"><string>No additional notes for this class.</string></property>
+             <property name="maximumSize"><size><width>16777215</width><height>100</height></size></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="save_notes_btn">
+             <property name="text"><string>Save Notes</string></property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="class_side_rail_spacer">
+          <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+   </spacer>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

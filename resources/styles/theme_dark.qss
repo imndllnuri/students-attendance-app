@@ -172,6 +172,8 @@ QFrame#card_frame,
 QFrame#settings_card_frame,
 QFrame#profile_card_frame,
 QFrame#class_details_card,
+QFrame#schedule_card,
+QFrame#notes_card,
 QFrame#roster_section_card,
 QFrame#statistics_card,
 QFrame#dashboard_stat_card {
@@ -808,6 +810,30 @@ QProgressBar#class_card_progress_bar {
 QProgressBar#class_card_progress_bar::chunk[tier="success"] { background-color: #4ADE80; border-radius: 3px; }
 QProgressBar#class_card_progress_bar::chunk[tier="warning"] { background-color: #FBBF24; border-radius: 3px; }
 QProgressBar#class_card_progress_bar::chunk[tier="error"] { background-color: #F87171; border-radius: 3px; }
+
+/* --- Attendance-rate strip (Class Detail) --- */
+
+QWidget#attendance_rate_widget {
+    background-color: #1E2330;
+    border-radius: 10px;
+}
+
+QLabel#attendance_rate_lbl,
+QLabel#attendance_rate_fraction_lbl {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #8790A6;
+}
+
+QProgressBar#attendance_rate_bar {
+    background-color: #262B38;
+    border: none;
+    border-radius: 3px;
+}
+
+QProgressBar#attendance_rate_bar::chunk[tier="success"] { background-color: #4ADE80; border-radius: 3px; }
+QProgressBar#attendance_rate_bar::chunk[tier="warning"] { background-color: #FBBF24; border-radius: 3px; }
+QProgressBar#attendance_rate_bar::chunk[tier="error"] { background-color: #F87171; border-radius: 3px; }
 
 QPushButton#card_icon_btn,
 QPushButton#back_to_my_classes_btn,

@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from services.api_client import ApiError
-from shared.palette import qcolor
+from shared.palette import attendance_tier, qcolor
 from shared.qt_style import set_dynamic_property
 from shared.widgets import clear_layout
 
@@ -80,9 +80,11 @@ class ClassWindow(QWidget):
         if df.shape[0] == 0:
             self._show_roster_status("No students in this class's roster yet.", show_retry=False)
             self.at_risk_widget.setVisible(False)
+            self._update_attendance_rate(df)
             return
 
         self._render_at_risk_list(df)
+        self._update_attendance_rate(df)
 
         self.roster_status_widget.setVisible(False)
         self.student_list_tableWidget.setVisible(True)
@@ -101,10 +103,15 @@ class ClassWindow(QWidget):
                 value = str(df.iloc[row, col]).strip()
                 item = QTableWidgetItem(value)
 
+                # Per-session status is plain colored text, not a tinted
+                # background - matches the AttendU spec's convention for
+                # per-student status inside tables (§4.1), distinct from
+                # the filled-pill treatment used for class/session-level
+                # state elsewhere (e.g. the ACTIVE/INACTIVE class pill).
                 if value.lower() == "1 present":
-                    item.setBackground(qcolor("success_tint"))
+                    item.setForeground(qcolor("success"))
                 elif value.lower() == "1 late":
-                    item.setBackground(qcolor("warning_tint"))
+                    item.setForeground(qcolor("warning"))
 
                 if col == not_attended_col_index:
                     try:
@@ -161,6 +168,21 @@ class ClassWindow(QWidget):
             f"{len(at_risk)} student(s) at risk in {self.class_obj.class_code}"
         )
         return len(at_risk)
+
+    def _update_attendance_rate(self, df):
+        """The Class Details card's tinted "Your attendance rate" strip -
+        an aggregate across the whole roster, computed straight from the
+        already-loaded roster table rather than a second API call."""
+        attended = total = 0
+        if not df.empty and "Attended Hours" in df.columns and "Not Attended Hours" in df.columns:
+            attended = pd.to_numeric(df["Attended Hours"], errors="coerce").fillna(0).sum()
+            not_attended = pd.to_numeric(df["Not Attended Hours"], errors="coerce").fillna(0).sum()
+            total = attended + not_attended
+
+        rate = int(attended / total * 100) if total else 0
+        self.attendance_rate_bar.setValue(rate)
+        self.attendance_rate_fraction_lbl.setText(f"{rate}% — {int(attended)}/{int(total)} sessions")
+        set_dynamic_property(self.attendance_rate_bar, "tier", attendance_tier(rate, self.class_obj.attendance_policy))
 
     def display_class_details(self):
         """Displays class details in the UI."""
