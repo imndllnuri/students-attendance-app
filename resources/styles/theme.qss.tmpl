@@ -136,7 +136,15 @@ QLabel#security_question_2_field_lbl,
 QLabel#new_password_field_lbl,
 QLabel#confirm_new_password_field_lbl,
 QLabel#create_account_prompt_lbl,
-QLabel#sign_in_prompt_lbl {
+QLabel#sign_in_prompt_lbl,
+QLabel#settings_subtitle_lbl,
+QLabel#settings_dark_mode_lbl,
+QLabel#settings_session_caption_lbl,
+QLabel#profile_name_field_lbl,
+QLabel#profile_surname_field_lbl,
+QLabel#profile_email_field_lbl,
+QLabel#settings_security_question_1_field_lbl,
+QLabel#settings_security_question_2_field_lbl {
     color: {{text_secondary}};
     font-size: 9.5pt;
 }
@@ -222,19 +230,32 @@ QLabel#sidebar_wordmark_lbl {
 /* --- Cards / panels --- */
 
 QFrame#card_frame,
-QFrame#settings_card_frame,
-QFrame#profile_card_frame,
 QFrame#class_details_card,
 QFrame#schedule_card,
 QFrame#notes_card,
 QFrame#roster_section_card,
 QFrame#statistics_card,
 QFrame#dashboard_stat_card,
-QFrame#control_strip_card {
+QFrame#control_strip_card,
+QFrame#settings_appearance_card,
+QFrame#settings_language_card,
+QFrame#settings_session_card,
+QFrame#settings_typography_card,
+QFrame#settings_backup_card,
+QFrame#settings_personal_info_card,
+QFrame#settings_change_password_card,
+QFrame#settings_recent_logins_card,
+QFrame#settings_security_questions_card,
+QFrame#settings_danger_zone_card {
     background-color: {{bg_card}};
     border-radius: {{radius_card}}px;
     border: 1px solid {{border}};
 }
+
+QFrame#settings_danger_zone_card {
+    border: 1px solid {{error_border}};
+}
+
 
 /* --- Dashboard --- */
 
@@ -524,7 +545,14 @@ QLabel#statistics_filter_lbl,
 QLabel#search_status_lbl,
 QLabel#title_lbl_2,
 QLabel#security_question_lbl,
-QLabel#security_question_2_lbl {
+QLabel#security_question_2_lbl,
+QLabel#settings_appearance_title_lbl,
+QLabel#settings_language_title_lbl,
+QLabel#settings_session_title_lbl,
+QLabel#settings_typography_title_lbl,
+QLabel#settings_backup_title_lbl,
+QLabel#settings_personal_info_title_lbl,
+QLabel#recent_logins_title_lbl {
     font-size: 12pt;
     font-weight: 600;
     color: {{text_primary}};
@@ -821,6 +849,22 @@ QCheckBox::indicator:hover {
 }
 
 QCheckBox::indicator:checked {
+    background: {{accent}};
+    border: 1.5px solid {{accent}};
+}
+
+/* Dark Mode's checkbox reads as a toggle switch (wide pill, no visible
+   label text of its own - the row's own QLabel carries the text) rather
+   than a small square tickbox, matching the reference's switch control. */
+QCheckBox#dark_mode_cb::indicator {
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    border: 1.5px solid {{border_strong}};
+    background: {{bg_hover}};
+}
+
+QCheckBox#dark_mode_cb::indicator:checked {
     background: {{accent}};
     border: 1.5px solid {{accent}};
 }

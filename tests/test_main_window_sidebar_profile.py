@@ -45,4 +45,5 @@ def test_clicking_sidebar_profile_block_opens_profile_page(qtbot, monkeypatch):
 
     window.sidebar_profile_widget.mousePressEvent(None)
 
-    assert window.stackedWidget.currentIndex() == mw.PROFILE_PAGE
+    assert window.stackedWidget.currentIndex() == mw.SETTINGS_PAGE
+    assert window.settings_stack.currentIndex() == mw.SETTINGS_PROFILE_TAB

@@ -244,15 +244,50 @@ though the heatmap's `imshow` already covered its own axes rect edge-to-edge.
 
 ### Settings
 
-Also turned out to be mostly already covered: the card frame, title, section headers, every
-`QLineEdit`/`QComboBox`/`QCheckBox` (all styled by generic type selectors, not per-screen), and
-`change_password_btn`/`update_security_question_btn`/`delete_account_btn` (an older but still
-coherent solid/tinted button convention, reused as-is rather than migrated to the newer pill
-system - not broken, just a smaller radius than the newest screens) were already themed from
-earlier phases. The one real problem: `export_settings_btn`/`import_settings_btn` had **no styling
-at all** (rendering as bare native OS buttons) **and were never connected to a click handler**,
-despite `export_settings()`/`import_settings()` already being fully implemented - clicking them
-did nothing. Wired both up and gave them `variant="secondary"` pill styling.
+My first pass on Settings was wrong. I checked whether its existing widgets were internally
+consistent with the token system (they were) and stopped there - I never actually held it up
+against the reference screenshots. When you pushed back, I looked at `reference-theme/2026-07-16_
+02:45:59.png` (General), `...02:46:38.png` (Edit Profile), `...02:46:47.png` (Security) and the
+spec's §16, and the real structure has nothing to do with what was there: a `QTabWidget`-style
+General / Edit Profile / Security layout, full page width, one card per logical section - not the
+narrow 420px centered form with everything (including the separate Profile page's content) crammed
+into one column with `Line` dividers between subsections.
+
+Rebuilt to match:
+- **Full-width page** with a "Settings" title + "Manage your preferences and account" subtitle,
+  matching every other page's header treatment, replacing the centered-card layout.
+- **Segmented pill tab bar** (General / Edit Profile / Security) reusing the exact same
+  `variant="segmented"` + `QButtonGroup` pattern already built for Dashboard's filter tabs, driving
+  a `settings_stack` `QStackedWidget`.
+- **General tab:** four cards - Appearance (Dark Mode), Language & Region (Display Language),
+  Session (Auto Logout Timeout + caption), Typography (Font Size) - plus a fifth "Backup &
+  Restore" card for Export/Import Settings, which has no reference equivalent (the reference has no
+  app-preference backup feature) but needed a home since it's a real, working feature.
+- **Dark Mode is now a real toggle-switch look** (a wide pill `QCheckBox::indicator`, accent-filled
+  when on) instead of a small square tickbox, matching the reference's switch control - done via
+  QSS only, no custom painting.
+- **The standalone Profile page is gone.** Its content (Personal Information, Change Password,
+  Recent Logins, Download My Data) now lives in Settings' **Edit Profile tab**, exactly where the
+  reference puts it. `show_profile()` (still called from the sidebar/topbar) now opens Settings on
+  that tab instead of a separate page. The profile page's centered avatar image was dropped - the
+  reference's Edit Profile tab doesn't have one either, and the sidebar already shows an avatar.
+  `PROFILE_PAGE` is gone from the page-index enum; `stackedWidget` now has 5 pages, not 6.
+- **Security tab:** Security Questions card kept as this app's real 2-question flow (the reference
+  shows only one question+answer - a simplified mockup - but the actual backend requires two
+  distinct questions, an established deviation already recorded in §1). "Active Sessions" (only
+  meaningful for the networked/multi-device backend this app doesn't have, per §1/§20.1) is
+  replaced with a **Danger Zone card** (Delete Account) instead, since that's a real feature that
+  needs a home and Security is the most sensible tab for it.
+- Also fixed while rebuilding: `export_settings_btn`/`import_settings_btn` had **no styling at all**
+  (bare native buttons) **and were never wired to a click handler**, despite `export_settings()`/
+  `import_settings()` already being fully implemented - clicking them did nothing. Wired both up
+  with `variant="secondary"` styling. Same fix applied to `export_account_data_btn` ("Download My
+  Data"), found while re-screenshotting this pass.
+- **Not built:** Font Family switching (Sans/Serif/Mono) and Phone/Bio fields on Edit Profile - both
+  shown in the reference, neither backed by anything real yet. Font Family would need the QSS
+  generator to accept a font-family token (currently only accepts color/radius/spacing tokens);
+  Phone/Bio would need new `Account`/database columns. Flagging both rather than half-building them
+  (a dropdown that doesn't change anything, or fields that silently don't save).
 
 ### Notifications / Profile popover
 

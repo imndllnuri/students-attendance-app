@@ -74,7 +74,8 @@ from views.add_new_class_window import AddNewClassWindow
 from models.accounts import AccountManager
 from models.classes import Class, ClassManager
 
-DASHBOARD_PAGE, MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, PROFILE_PAGE, STATISTICS_PAGE = range(6)
+DASHBOARD_PAGE, MY_CLASSES_PAGE, SETTINGS_PAGE, SEARCH_PAGE, STATISTICS_PAGE = range(5)
+SETTINGS_GENERAL_TAB, SETTINGS_PROFILE_TAB, SETTINGS_SECURITY_TAB = range(3)
 
 _ACTIVITY_EVENTS = (QEvent.MouseMove, QEvent.MouseButtonPress, QEvent.KeyPress, QEvent.Wheel)
 
@@ -128,6 +129,16 @@ class MainWindow(QMainWindow):
             set_dynamic_property(tab_btn, "variant", "segmented")
             self._dashboard_filter_group.addButton(tab_btn)
             tab_btn.clicked.connect(self.render_dashboard)
+        self._settings_tab_group = QButtonGroup(self)
+        self._settings_tab_group.setExclusive(True)
+        for tab_btn, tab_index in (
+            (self.settings_tab_general_btn, SETTINGS_GENERAL_TAB),
+            (self.settings_tab_profile_btn, SETTINGS_PROFILE_TAB),
+            (self.settings_tab_security_btn, SETTINGS_SECURITY_TAB),
+        ):
+            set_dynamic_property(tab_btn, "variant", "segmented")
+            self._settings_tab_group.addButton(tab_btn)
+            tab_btn.clicked.connect(lambda _, idx=tab_index: self._show_settings_tab(idx))
         self.search_bar_le.addAction(qta.icon("fa5s.search", color="#C7C7D1"), QLineEdit.LeadingPosition)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.notifications_btn.clicked.connect(self.show_notifications_menu)
@@ -158,6 +169,7 @@ class MainWindow(QMainWindow):
         self.edit_profile_btn.clicked.connect(self.enable_profile_edit)
         self.save_profile_btn.clicked.connect(self.save_profile)
         self.export_account_data_btn.clicked.connect(self.export_account_data)
+        set_dynamic_property(self.export_account_data_btn, "variant", "secondary")
         self.profile_email_le.textChanged.connect(self.validate_profile_email)
 
         self.dark_mode_cb.blockSignals(True)
@@ -423,7 +435,13 @@ class MainWindow(QMainWindow):
         self.open_class_window(cls)
 
     def _apply_card_shadows(self):
-        for frame in (self.profile_card_frame, self.settings_card_frame):
+        for frame in (
+            self.settings_appearance_card, self.settings_language_card,
+            self.settings_session_card, self.settings_typography_card,
+            self.settings_backup_card, self.settings_personal_info_card,
+            self.settings_change_password_card, self.settings_recent_logins_card,
+            self.settings_security_questions_card, self.settings_danger_zone_card,
+        ):
             apply_card_shadow(frame, strength="md")
 
     def _set_active_nav(self, active_btn):
@@ -434,7 +452,14 @@ class MainWindow(QMainWindow):
 
     def show_profile(self):
         self.populate_profile_fields()
-        self.stackedWidget.setCurrentIndex(PROFILE_PAGE)
+        self.show_settings(tab=SETTINGS_PROFILE_TAB)
+
+    def _show_settings_tab(self, tab_index):
+        self.settings_stack.setCurrentIndex(tab_index)
+        for index, btn in enumerate((
+            self.settings_tab_general_btn, self.settings_tab_profile_btn, self.settings_tab_security_btn,
+        )):
+            btn.setChecked(index == tab_index)
 
     def show_profile_menu(self):
         """Avatar button in the topbar opens a small QMenu (name/email
@@ -599,10 +624,11 @@ class MainWindow(QMainWindow):
         self.stackedWidget.setCurrentIndex(MY_CLASSES_PAGE)
         self.load_classes()
 
-    def show_settings(self):
+    def show_settings(self, tab=SETTINGS_GENERAL_TAB):
         self._set_active_nav(self.settings_btn)
         self._clear_settings_form()
         self.stackedWidget.setCurrentIndex(SETTINGS_PAGE)
+        self._show_settings_tab(tab)
 
     def fetch_classes(self):
         showing_archived = self.show_archived_cb.isChecked()
@@ -1347,9 +1373,6 @@ class MainWindow(QMainWindow):
         self.profile_name_le.setText(self.user.name)
         self.profile_surname_le.setText(self.user.surname)
         self.profile_email_le.setText(self.user.email)
-        self.profile_avatar_lbl.setPixmap(
-            self._make_initials_avatar(self.user.name, self.user.surname)
-        )
         self._set_profile_editing(False)
         self._populate_recent_logins()
 

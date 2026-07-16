@@ -83,7 +83,7 @@ def test_update_security_questions_rejects_identical_questions(qtbot, monkeypatc
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
     window.show()
-    window.show_settings()
+    window.show_settings(tab=mw.SETTINGS_SECURITY_TAB)
 
     window.settings_current_password_for_question_le.setText("current-pass")
     window.settings_answer_le.setText("Rex")

@@ -407,216 +407,40 @@
         <widget class="QWidget" name="settingsPage">
          <layout class="QVBoxLayout" name="settingsPageLayout">
           <item>
-           <spacer name="settings_top_spacer">
-            <property name="orientation"><enum>Qt::Vertical</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
-   </spacer>
+           <widget class="QLabel" name="title_lbl_settings">
+            <property name="text"><string>Settings</string></property>
+           </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="settings_center_layout">
+           <widget class="QLabel" name="settings_subtitle_lbl">
+            <property name="text"><string>Manage your preferences and account</string></property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="settings_tabs_row">
+            <property name="topMargin"><number>10</number></property>
+            <property name="bottomMargin"><number>4</number></property>
             <item>
-             <spacer name="settings_left_spacer">
-              <property name="orientation"><enum>Qt::Horizontal</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-   </spacer>
-            </item>
-            <item>
-             <widget class="QFrame" name="settings_card_frame">
-              <property name="minimumSize"><size><width>420</width><height>0</height></size></property>
-              <property name="maximumSize"><size><width>420</width><height>16777215</height></size></property>
-              <layout class="QVBoxLayout" name="settings_card_layout">
-               <property name="leftMargin"><number>36</number></property>
-               <property name="topMargin"><number>28</number></property>
-               <property name="rightMargin"><number>36</number></property>
-               <property name="bottomMargin"><number>28</number></property>
-               <property name="spacing"><number>8</number></property>
-               <item>
-                <widget class="QLabel" name="title_lbl_settings">
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                 <property name="text"><string>Settings</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="dark_mode_cb">
-                 <property name="text"><string>Dark Mode</string></property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="language_row">
-                 <item>
-                  <widget class="QLabel" name="language_lbl">
-                   <property name="text"><string>Language:</string></property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="language_combo"/>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="session_timeout_row">
-                 <item>
-                  <widget class="QLabel" name="session_timeout_lbl">
-                   <property name="text"><string>Auto Logout:</string></property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="session_timeout_combo"/>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="font_scale_row">
-                 <item>
-                  <widget class="QLabel" name="font_scale_lbl">
-                   <property name="text"><string>Font Size:</string></property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="font_scale_combo"/>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="settings_export_import_row">
-                 <item>
-                  <widget class="QPushButton" name="export_settings_btn">
-                   <property name="text"><string>Export Settings</string></property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="import_settings_btn">
-                   <property name="text"><string>Import Settings</string></property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="QLabel" name="change_password_section_lbl">
-                 <property name="text"><string>Change Password</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="current_password_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-                 <property name="placeholderText"><string> Current password</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="new_password_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-                 <property name="placeholderText"><string> New password</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="settings_password_strength_lbl">
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="new_password_error_lbl">
-                 <property name="visible"><bool>false</bool></property>
-                 <property name="wordWrap"><bool>true</bool></property>
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="confirm_new_password_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-                 <property name="placeholderText"><string> Confirm new password</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="confirm_new_password_error_lbl">
-                 <property name="visible"><bool>false</bool></property>
-                 <property name="wordWrap"><bool>true</bool></property>
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="change_password_btn">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="text"><string>Change Password</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="settings_divider_1">
-                 <property name="orientation"><enum>Qt::Horizontal</enum></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="security_question_section_lbl">
-                 <property name="text"><string>Security Question</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QComboBox" name="settings_security_question_combo">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="settings_answer_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="placeholderText"><string> Your answer</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QComboBox" name="settings_security_question_2_combo">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="settings_answer_2_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="placeholderText"><string> Your answer</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="settings_current_password_for_question_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-                 <property name="placeholderText"><string> Current password (to confirm)</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="security_question_error_lbl">
-                 <property name="visible"><bool>false</bool></property>
-                 <property name="wordWrap"><bool>true</bool></property>
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="update_security_question_btn">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="text"><string>Update Security Question</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="settings_divider_2">
-                 <property name="orientation"><enum>Qt::Horizontal</enum></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="danger_zone_lbl">
-                 <property name="text"><string>Danger Zone</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="delete_account_btn">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="text"><string>Delete Account</string></property>
-                </widget>
-               </item>
-              </layout>
+             <widget class="QPushButton" name="settings_tab_general_btn">
+              <property name="checkable"><bool>true</bool></property>
+              <property name="checked"><bool>true</bool></property>
+              <property name="text"><string>General</string></property>
              </widget>
             </item>
             <item>
-             <spacer name="settings_right_spacer">
+             <widget class="QPushButton" name="settings_tab_profile_btn">
+              <property name="checkable"><bool>true</bool></property>
+              <property name="text"><string>Edit Profile</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="settings_tab_security_btn">
+              <property name="checkable"><bool>true</bool></property>
+              <property name="text"><string>Security</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="settings_tabs_spacer">
               <property name="orientation"><enum>Qt::Horizontal</enum></property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
     <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
@@ -625,11 +449,572 @@
            </layout>
           </item>
           <item>
-           <spacer name="settings_bottom_spacer">
-            <property name="orientation"><enum>Qt::Vertical</enum></property>
+           <widget class="QStackedWidget" name="settings_stack">
+            <widget class="QWidget" name="settings_general_page">
+             <layout class="QVBoxLayout" name="settings_general_page_layout">
+              <property name="leftMargin"><number>0</number></property>
+              <property name="topMargin"><number>0</number></property>
+              <property name="rightMargin"><number>0</number></property>
+              <property name="bottomMargin"><number>0</number></property>
+              <item>
+               <widget class="QFrame" name="settings_appearance_card">
+                <layout class="QVBoxLayout" name="settings_appearance_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="settings_appearance_title_lbl">
+                   <property name="text"><string>Appearance</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_appearance_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="settings_dark_mode_row">
+                   <item>
+                    <widget class="QLabel" name="settings_dark_mode_lbl">
+                     <property name="text"><string>Dark Mode</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="settings_dark_mode_spacer">
+                     <property name="orientation"><enum>Qt::Horizontal</enum></property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="dark_mode_cb">
+                     <property name="text"><string/></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_language_card">
+                <layout class="QVBoxLayout" name="settings_language_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="settings_language_title_lbl">
+                   <property name="text"><string>Language &amp; Region</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_language_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="language_row">
+                   <item>
+                    <widget class="QLabel" name="language_lbl">
+                     <property name="text"><string>Display Language</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="settings_language_spacer">
+                     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="language_combo">
+                     <property name="minimumWidth"><number>180</number></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_session_card">
+                <layout class="QVBoxLayout" name="settings_session_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="settings_session_title_lbl">
+                   <property name="text"><string>Session</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_session_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="session_timeout_row">
+                   <item>
+                    <layout class="QVBoxLayout" name="session_timeout_label_col">
+                     <property name="spacing"><number>0</number></property>
+                     <item>
+                      <widget class="QLabel" name="session_timeout_lbl">
+                       <property name="text"><string>Auto Logout Timeout</string></property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="settings_session_caption_lbl">
+                       <property name="text"><string>Automatically sign out after inactivity</string></property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="settings_session_spacer">
+                     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="session_timeout_combo">
+                     <property name="minimumWidth"><number>180</number></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_typography_card">
+                <layout class="QVBoxLayout" name="settings_typography_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="settings_typography_title_lbl">
+                   <property name="text"><string>Typography</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_typography_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="font_scale_row">
+                   <item>
+                    <widget class="QLabel" name="font_scale_lbl">
+                     <property name="text"><string>Font Size</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="settings_typography_spacer">
+                     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="font_scale_combo">
+                     <property name="minimumWidth"><number>180</number></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_backup_card">
+                <layout class="QVBoxLayout" name="settings_backup_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="settings_backup_title_lbl">
+                   <property name="text"><string>Backup &amp; Restore</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_backup_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="settings_export_import_row">
+                   <item>
+                    <widget class="QPushButton" name="export_settings_btn">
+                     <property name="text"><string>Export Settings</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="import_settings_btn">
+                     <property name="text"><string>Import Settings</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="settings_backup_spacer">
+                     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="settings_general_page_spacer">
+                <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+   </spacer>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="settings_profile_page">
+             <layout class="QVBoxLayout" name="settings_profile_page_layout">
+              <property name="leftMargin"><number>0</number></property>
+              <property name="topMargin"><number>0</number></property>
+              <property name="rightMargin"><number>0</number></property>
+              <property name="bottomMargin"><number>0</number></property>
+              <item>
+               <widget class="QFrame" name="settings_personal_info_card">
+                <layout class="QVBoxLayout" name="settings_personal_info_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="settings_personal_info_title_lbl">
+                   <property name="text"><string>Personal Information</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_personal_info_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="profile_name_row">
+                   <item>
+                    <layout class="QVBoxLayout" name="profile_name_col">
+                     <property name="spacing"><number>4</number></property>
+                     <item>
+                      <widget class="QLabel" name="profile_name_field_lbl">
+                       <property name="text"><string>First Name</string></property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="profile_name_le">
+                       <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                       <property name="readOnly"><bool>true</bool></property>
+                       <property name="placeholderText"><string> First name</string></property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QVBoxLayout" name="profile_surname_col">
+                     <property name="spacing"><number>4</number></property>
+                     <item>
+                      <widget class="QLabel" name="profile_surname_field_lbl">
+                       <property name="text"><string>Surname</string></property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="profile_surname_le">
+                       <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                       <property name="readOnly"><bool>true</bool></property>
+                       <property name="placeholderText"><string> Surname</string></property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="profile_email_field_lbl">
+                   <property name="text"><string>Email Address</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="profile_email_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="readOnly"><bool>true</bool></property>
+                   <property name="placeholderText"><string> Email</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="profile_email_error_lbl">
+                   <property name="visible"><bool>false</bool></property>
+                   <property name="wordWrap"><bool>true</bool></property>
+                   <property name="text"><string/></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="profile_edit_actions_row">
+                   <item>
+                    <spacer name="profile_edit_actions_spacer">
+                     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="edit_profile_btn">
+                     <property name="text"><string>Edit</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="save_profile_btn">
+                     <property name="visible"><bool>false</bool></property>
+                     <property name="text"><string>Save</string></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_change_password_card">
+                <layout class="QVBoxLayout" name="settings_change_password_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="change_password_section_lbl">
+                   <property name="text"><string>Change Password</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_divider_1">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="current_password_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                   <property name="placeholderText"><string> Current password</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="new_password_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                   <property name="placeholderText"><string> New password</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="settings_password_strength_lbl">
+                   <property name="text"><string/></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="new_password_error_lbl">
+                   <property name="visible"><bool>false</bool></property>
+                   <property name="wordWrap"><bool>true</bool></property>
+                   <property name="text"><string/></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="confirm_new_password_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                   <property name="placeholderText"><string> Confirm new password</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="confirm_new_password_error_lbl">
+                   <property name="visible"><bool>false</bool></property>
+                   <property name="wordWrap"><bool>true</bool></property>
+                   <property name="text"><string/></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="change_password_btn">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="text"><string>Change Password</string></property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_recent_logins_card">
+                <layout class="QVBoxLayout" name="settings_recent_logins_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="recent_logins_title_lbl">
+                   <property name="text"><string>Recent Logins</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_recent_logins_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="recent_logins_lbl">
+                   <property name="wordWrap"><bool>true</bool></property>
+                   <property name="text"><string/></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="export_account_data_btn">
+                   <property name="text"><string>Download My Data</string></property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="settings_profile_page_spacer">
+                <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+   </spacer>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="settings_security_page">
+             <layout class="QVBoxLayout" name="settings_security_page_layout">
+              <property name="leftMargin"><number>0</number></property>
+              <property name="topMargin"><number>0</number></property>
+              <property name="rightMargin"><number>0</number></property>
+              <property name="bottomMargin"><number>0</number></property>
+              <item>
+               <widget class="QFrame" name="settings_security_questions_card">
+                <layout class="QVBoxLayout" name="settings_security_questions_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="security_question_section_lbl">
+                   <property name="text"><string>Security Questions</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_divider_2">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="settings_security_question_1_field_lbl">
+                   <property name="text"><string>Security Question 1</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="settings_security_question_combo">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="settings_answer_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="placeholderText"><string> Your answer</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="settings_security_question_2_field_lbl">
+                   <property name="text"><string>Security Question 2</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="settings_security_question_2_combo">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="settings_answer_2_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="placeholderText"><string> Your answer</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="settings_current_password_for_question_le">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                   <property name="placeholderText"><string> Current password (to confirm)</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="security_question_error_lbl">
+                   <property name="visible"><bool>false</bool></property>
+                   <property name="wordWrap"><bool>true</bool></property>
+                   <property name="text"><string/></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="update_security_question_btn">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="text"><string>Save Security Settings</string></property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="settings_danger_zone_card">
+                <layout class="QVBoxLayout" name="settings_danger_zone_card_layout">
+                 <property name="leftMargin"><number>20</number></property>
+                 <property name="topMargin"><number>18</number></property>
+                 <property name="rightMargin"><number>20</number></property>
+                 <property name="bottomMargin"><number>20</number></property>
+                 <property name="spacing"><number>10</number></property>
+                 <item>
+                  <widget class="QLabel" name="danger_zone_lbl">
+                   <property name="text"><string>Danger Zone</string></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="settings_danger_zone_divider">
+                   <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="delete_account_btn">
+                   <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+                   <property name="text"><string>Delete Account</string></property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="settings_security_page_spacer">
+                <property name="orientation"><enum>Qt::Vertical</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+   </spacer>
+              </item>
+             </layout>
+            </widget>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -657,126 +1042,6 @@
              </size>
             </property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-   </spacer>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="profilePage">
-         <layout class="QVBoxLayout" name="profilePageLayout">
-          <item>
-           <spacer name="profile_top_spacer">
-            <property name="orientation"><enum>Qt::Vertical</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
-   </spacer>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="profile_center_layout">
-            <item>
-             <spacer name="profile_left_spacer">
-              <property name="orientation"><enum>Qt::Horizontal</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-   </spacer>
-            </item>
-            <item>
-             <widget class="QFrame" name="profile_card_frame">
-              <property name="minimumSize"><size><width>420</width><height>0</height></size></property>
-              <property name="maximumSize"><size><width>420</width><height>16777215</height></size></property>
-              <layout class="QVBoxLayout" name="profile_card_layout">
-               <property name="leftMargin"><number>36</number></property>
-               <property name="topMargin"><number>28</number></property>
-               <property name="rightMargin"><number>36</number></property>
-               <property name="bottomMargin"><number>28</number></property>
-               <property name="spacing"><number>12</number></property>
-               <item>
-                <widget class="QLabel" name="profile_avatar_lbl">
-                 <property name="minimumSize"><size><width>96</width><height>96</height></size></property>
-                 <property name="maximumSize"><size><width>96</width><height>96</height></size></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="title_lbl">
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                 <property name="text"><string>My Profile</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="profile_name_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="readOnly"><bool>true</bool></property>
-                 <property name="placeholderText"><string> Name</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="profile_surname_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="readOnly"><bool>true</bool></property>
-                 <property name="placeholderText"><string> Surname</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="profile_email_le">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="readOnly"><bool>true</bool></property>
-                 <property name="placeholderText"><string> Email</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="profile_email_error_lbl">
-                 <property name="visible"><bool>false</bool></property>
-                 <property name="wordWrap"><bool>true</bool></property>
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="edit_profile_btn">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="text"><string>Edit</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="save_profile_btn">
-                 <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
-                 <property name="visible"><bool>false</bool></property>
-                 <property name="text"><string>Save</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="recent_logins_title_lbl">
-                 <property name="text"><string>Recent Logins</string></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="recent_logins_lbl">
-                 <property name="wordWrap"><bool>true</bool></property>
-                 <property name="text"><string/></property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="export_account_data_btn">
-                 <property name="text"><string>Download My Data</string></property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <spacer name="profile_right_spacer">
-              <property name="orientation"><enum>Qt::Horizontal</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-   </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <spacer name="profile_bottom_spacer">
-            <property name="orientation"><enum>Qt::Vertical</enum></property>
-    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
    </spacer>
           </item>
          </layout>
