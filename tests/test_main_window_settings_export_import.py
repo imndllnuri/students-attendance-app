@@ -37,7 +37,6 @@ def build_window(qtbot, monkeypatch):
 
 def test_export_writes_current_preferences(qtbot, monkeypatch, tmp_path):
     window = build_window(qtbot, monkeypatch)
-    monkeypatch.setattr(mw, "load_theme_preference", lambda: "dark")
     monkeypatch.setattr(mw, "load_language_preference", lambda: "tr")
     monkeypatch.setattr(mw, "load_list_density", lambda: "compact")
     monkeypatch.setattr(mw, "load_font_scale", lambda: "large")
@@ -51,7 +50,7 @@ def test_export_writes_current_preferences(qtbot, monkeypatch, tmp_path):
 
     data = json.loads(out_file.read_text())
     assert data == {
-        "theme": "dark", "language": "tr", "session_timeout_minutes": 30,
+        "language": "tr", "session_timeout_minutes": 30,
         "list_density": "compact", "font_scale": "large",
     }
 
@@ -68,14 +67,13 @@ def test_import_applies_all_settings_and_updates_combos(qtbot, monkeypatch, tmp_
 
     settings_file = tmp_path / "settings.json"
     settings_file.write_text(json.dumps({
-        "theme": "dark", "language": "tr", "session_timeout_minutes": 30,
+        "language": "tr", "session_timeout_minutes": 30,
         "list_density": "compact", "font_scale": "large",
     }))
     monkeypatch.setattr(mw.QFileDialog, "getOpenFileName", lambda *a, **k: (str(settings_file), ""))
     monkeypatch.setattr(mw.QMessageBox, "information", lambda *a, **k: None)
 
     saved = {}
-    monkeypatch.setattr(mw, "save_theme_preference", lambda v: saved.setdefault("theme", v))
     monkeypatch.setattr(mw, "save_language_preference", lambda v: saved.setdefault("language", v))
     monkeypatch.setattr(mw, "save_session_timeout_minutes", lambda v: saved.setdefault("timeout", v))
     monkeypatch.setattr(mw, "save_list_density", lambda v: saved.setdefault("density", v))
@@ -84,9 +82,8 @@ def test_import_applies_all_settings_and_updates_combos(qtbot, monkeypatch, tmp_
     window.import_settings()
 
     assert saved == {
-        "theme": "dark", "language": "tr", "timeout": 30, "density": "compact", "font": "large",
+        "language": "tr", "timeout": 30, "density": "compact", "font": "large",
     }
-    assert window.dark_mode_cb.isChecked() is True
     assert window.language_combo.currentData() == "tr"
     assert window.session_timeout_combo.currentData() == 30
     assert window.session_timeout_minutes == 30
@@ -105,7 +102,7 @@ def test_import_with_unknown_values_is_ignored_gracefully(qtbot, monkeypatch, tm
     window = build_window(qtbot, monkeypatch)
 
     settings_file = tmp_path / "settings.json"
-    settings_file.write_text(json.dumps({"theme": "purple", "session_timeout_minutes": 999}))
+    settings_file.write_text(json.dumps({"language": "xx", "session_timeout_minutes": 999}))
     monkeypatch.setattr(mw.QFileDialog, "getOpenFileName", lambda *a, **k: (str(settings_file), ""))
     monkeypatch.setattr(mw.QMessageBox, "information", lambda *a, **k: None)
 

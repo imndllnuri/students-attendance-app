@@ -43,7 +43,6 @@ from shared.list_density import load_list_density, save_list_density
 from shared.palette import (
     PALETTE,
     RADIUS,
-    active_palette,
     attendance_tier,
     class_tag_color,
     class_tag_color_key,
@@ -55,7 +54,6 @@ from shared.session_timeout import (
     load_session_timeout_minutes,
     save_session_timeout_minutes,
 )
-from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.widgets import clear_layout, make_tag_pill
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
@@ -97,7 +95,6 @@ class MainWindow(QMainWindow):
         self.class_manager = ClassManager()
         self.account_manager = AccountManager()
         self.statistics_canvas = None
-        self._last_chart_builder = None
         self.notifications = []
         self.recently_viewed_class_ids = []
         self.selected_class_ids = set()
@@ -143,7 +140,6 @@ class MainWindow(QMainWindow):
         self.search_bar_le.addAction(qta.icon("fa5s.search", color="#C7C7D1"), QLineEdit.LeadingPosition)
         self.search_bar_le.returnPressed.connect(self.show_search)
         self.notifications_btn.clicked.connect(self.show_notifications_menu)
-        self.theme_toggle_btn.clicked.connect(self.toggle_theme_button)
         self.statistics_class_combo.currentIndexChanged.connect(self.render_statistics)
         self.export_chart_btn.clicked.connect(self.export_statistics_chart)
         self.compare_classes_btn.clicked.connect(self.show_class_comparison)
@@ -172,11 +168,6 @@ class MainWindow(QMainWindow):
         self.export_account_data_btn.clicked.connect(self.export_account_data)
         set_dynamic_property(self.export_account_data_btn, "variant", "secondary")
         self.profile_email_le.textChanged.connect(self.validate_profile_email)
-
-        self.dark_mode_cb.blockSignals(True)
-        self.dark_mode_cb.setChecked(load_theme_preference() == "dark")
-        self.dark_mode_cb.blockSignals(False)
-        self.dark_mode_cb.toggled.connect(self.toggle_dark_mode)
 
         self._apply_translations()
         self._setup_language_combo()
@@ -286,7 +277,7 @@ class MainWindow(QMainWindow):
         self.update_server_health_indicator()
 
     def update_server_health_indicator(self):
-        palette = active_palette()
+        palette = PALETTE
         if self.class_manager.check_server_health():
             self.server_health_lbl.setText("● Connected")
             self.server_health_lbl.setStyleSheet(f"color: {palette['success']};")
@@ -302,7 +293,6 @@ class MainWindow(QMainWindow):
             return
 
         settings = {
-            "theme": load_theme_preference(),
             "language": load_language_preference(),
             "session_timeout_minutes": self.session_timeout_minutes,
             "list_density": load_list_density(),
@@ -330,15 +320,6 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to read file:\n{e}")
             return
-
-        if settings.get("theme") in ("light", "dark"):
-            theme = settings["theme"]
-            save_theme_preference(theme)
-            with open(stylesheet_path(theme)) as f:
-                QApplication.instance().setStyleSheet(f.read())
-            self.dark_mode_cb.blockSignals(True)
-            self.dark_mode_cb.setChecked(theme == "dark")
-            self.dark_mode_cb.blockSignals(False)
 
         if settings.get("language") in LANGUAGES:
             save_language_preference(settings["language"])
@@ -393,7 +374,6 @@ class MainWindow(QMainWindow):
         self.profile_btn.setIconSize(QSize(34, 34))
         self.notifications_btn.setIcon(qta.icon("fa5s.bell", color="#8A93A7"))
         self.notifications_btn.setIconSize(QSize(16, 16))
-        self._update_theme_toggle_icon()
 
         self.dashboard_btn.setToolTip("Dashboard (Ctrl+1)")
         self.my_classes_btn.setToolTip("My Classes (Ctrl+2)")
@@ -437,7 +417,7 @@ class MainWindow(QMainWindow):
 
     def _apply_card_shadows(self):
         for frame in (
-            self.settings_appearance_card, self.settings_language_card,
+            self.settings_language_card,
             self.settings_session_card, self.settings_typography_card,
             self.settings_backup_card, self.settings_personal_info_card,
             self.settings_change_password_card, self.settings_recent_logins_card,
@@ -478,21 +458,6 @@ class MainWindow(QMainWindow):
         menu.addAction("Sign Out", self.confirm_logout)
         menu.exec_(self.profile_btn.mapToGlobal(self.profile_btn.rect().bottomRight()))
 
-    def toggle_theme_button(self):
-        """The topbar's sun/moon icon button - same mechanism as the
-        Settings page's Dark Mode checkbox (toggle_dark_mode), just
-        triggered from a plain button instead of a checked state."""
-        self.toggle_dark_mode(load_theme_preference() != "dark")
-        self.dark_mode_cb.blockSignals(True)
-        self.dark_mode_cb.setChecked(load_theme_preference() == "dark")
-        self.dark_mode_cb.blockSignals(False)
-        self._update_theme_toggle_icon()
-
-    def _update_theme_toggle_icon(self):
-        is_dark = load_theme_preference() == "dark"
-        icon_name = "fa5s.sun" if is_dark else "fa5s.moon"
-        self.theme_toggle_btn.setIcon(qta.icon(icon_name, color="#8A93A7"))
-
     def show_dashboard(self):
         self._set_active_nav(self.dashboard_btn)
         self.stackedWidget.setCurrentIndex(DASHBOARD_PAGE)
@@ -510,7 +475,7 @@ class MainWindow(QMainWindow):
         self.dashboard_date_lbl.setText(datetime.now().strftime("%A, %B %-d, %Y"))
 
     def _make_dashboard_stat_card(self, label, value, caption, icon_name=None, icon_color=None):
-        palette = active_palette()
+        palette = PALETTE
         card = QFrame()
         card.setObjectName("dashboard_stat_card")
         apply_card_shadow(card, strength="sm")
@@ -767,7 +732,7 @@ class MainWindow(QMainWindow):
 
         icon_lbl = QLabel()
         icon_lbl.setObjectName("today_class_icon_lbl")
-        icon_lbl.setPixmap(qta.icon("fa5s.calendar-day", color=active_palette()["accent"]).pixmap(16, 16))
+        icon_lbl.setPixmap(qta.icon("fa5s.calendar-day", color=PALETTE["accent"]).pixmap(16, 16))
         layout.addWidget(icon_lbl)
 
         label = QLabel(f"{cls.class_name} ({cls.class_code})")
@@ -809,7 +774,7 @@ class MainWindow(QMainWindow):
 
         icon_lbl = QLabel()
         icon_lbl.setObjectName("recently_viewed_icon_lbl")
-        icon_lbl.setPixmap(qta.icon("fa5s.history", color=active_palette()["text_secondary"]).pixmap(16, 16))
+        icon_lbl.setPixmap(qta.icon("fa5s.history", color=PALETTE["text_secondary"]).pixmap(16, 16))
         layout.addWidget(icon_lbl)
 
         label = QLabel(f"{cls.class_name} ({cls.class_code})")
@@ -1526,14 +1491,6 @@ class MainWindow(QMainWindow):
             menu.addAction("Clear All").triggered.connect(self.clear_notifications)
         menu.exec_(self.notifications_btn.mapToGlobal(self.notifications_btn.rect().bottomLeft()))
 
-    def toggle_dark_mode(self, checked):
-        theme = "dark" if checked else "light"
-        save_theme_preference(theme)
-        with open(stylesheet_path(theme)) as f:
-            QApplication.instance().setStyleSheet(f.read())
-        if self._last_chart_builder is not None:
-            self._last_chart_builder()
-
     def toggle_list_density(self, checked):
         save_list_density("compact" if checked else "comfortable")
         self.load_classes()
@@ -1747,7 +1704,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Server Error", str(e))
             return
 
-        palette = active_palette()
+        palette = PALETTE
         figure = Figure(figsize=(8, 4))
         figure.patch.set_facecolor(palette["bg_card"])
         axes_pie = figure.add_subplot(121)
@@ -1775,7 +1732,6 @@ class MainWindow(QMainWindow):
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
-        self._last_chart_builder = self.render_statistics
 
     def show_class_comparison(self):
         """Bar chart comparing attendance rate across all of the
@@ -1809,7 +1765,7 @@ class MainWindow(QMainWindow):
             return
         self.statistics_empty_lbl.setVisible(False)
 
-        palette = active_palette()
+        palette = PALETTE
         figure = Figure(figsize=(8, 4))
         figure.patch.set_facecolor(palette["bg_card"])
         axes = figure.add_subplot(111)
@@ -1822,7 +1778,6 @@ class MainWindow(QMainWindow):
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
-        self._last_chart_builder = self.show_class_comparison
 
     def show_attendance_heatmap(self):
         """Heatmap of attendance rate by day-of-week/time-slot for the
@@ -1877,7 +1832,7 @@ class MainWindow(QMainWindow):
         for (day, slot), (rate_sum, count) in cell_totals.items():
             grid[time_slots_present.index(slot), days_present.index(day)] = rate_sum / count
 
-        palette = active_palette()
+        palette = PALETTE
         figure = Figure(figsize=(8, 4))
         figure.patch.set_facecolor(palette["bg_card"])
         axes = figure.add_subplot(111)
@@ -1892,7 +1847,6 @@ class MainWindow(QMainWindow):
 
         self.statistics_canvas = FigureCanvasQTAgg(figure)
         self.statistics_chart_layout.addWidget(self.statistics_canvas)
-        self._last_chart_builder = self.show_attendance_heatmap
 
     def export_statistics_pdf(self):
         """Combines class policy, present/late/absent rates, the
@@ -1984,7 +1938,7 @@ class MainWindow(QMainWindow):
         `palette` defaults to the active (theme-aware) palette for on-screen
         rendering; export_statistics_pdf passes the light PALETTE explicitly
         so exported reports stay print-friendly regardless of app theme."""
-        palette = palette or active_palette()
+        palette = palette or PALETTE
         try:
             table = self.class_manager.get_student_table(cls.class_id)
         except ApiError:

@@ -149,9 +149,9 @@ class AddNewClassWindow(QDialog):
         self._update_color_swatch()
 
     def _update_color_swatch(self):
-        from shared.palette import active_palette
+        from shared.palette import PALETTE
 
-        color = self.selected_color or active_palette()["border_strong"]
+        color = self.selected_color or PALETTE["border_strong"]
         self.class_color_swatch.setStyleSheet(f"background-color: {color}; border-radius: 6px;")
 
     def _prefill_fields(self, cls):

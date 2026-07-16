@@ -2,8 +2,8 @@
 values used across the app. Qt stylesheets have no variables, so
 resources/styles/theme.qss.tmpl references these tokens by name
 (`{{token_name}}`) and scripts/generate_theme.py renders it into the real
-theme.qss/theme_dark.qss files consumed at runtime - never hand-edit those
-generated files directly, edit the template instead and re-run the script.
+theme.qss file consumed at runtime - never hand-edit that generated file
+directly, edit the template instead and re-run the script.
 
 Any Python code that sets colors dynamically (e.g. per-cell pass/fail/
 attendance-status coloring in table widgets, which QSS can't express since
@@ -79,56 +79,6 @@ PALETTE = {
     "border_strong": "#D4D8E2",
 }
 
-# Dark-mode counterpart to PALETTE, same keys - resources/styles/theme_dark.qss
-# is generated from resources/styles/theme.qss.tmpl (see scripts/generate_theme.py).
-# Dynamic per-cell coloring (qcolor(), class_tag_color()) intentionally still
-# uses the light PALETTE in both themes - only the static QSS chrome and
-# matplotlib charts (via active_palette()) are dark-mode aware.
-DARK_PALETTE = {
-    "bg_app": "#0B0E14",
-    "bg_card": "#161A24",
-    "bg_elevated": "#1B202C",
-    "bg_hover": "#1E2330",
-
-    # Sidebar stays the same fixed dark values in both themes - see PALETTE.
-    "bg_sidebar": "#12141C",
-    "bg_sidebar_hover": "#1B202C",
-    "bg_sidebar_active": "#1F2333",
-    "text_sidebar": "#C7CCDA",
-    "text_sidebar_muted": "#767D91",
-
-    "text_primary": "#F1F2F6",
-    "text_secondary": "#8790A6",
-    "text_disabled": "#4B5162",
-
-    "accent": "#8B7CF9",
-    "accent_end": "#6EA8FE",
-    "accent_hover": "#9D90FA",
-    "accent_pressed": "#7C6EF7",
-    "accent_subtle": "#262040",
-
-    "success": "#4ADE80",
-    "success_tint": "#123722",
-    "success_border": "#16A34A",
-    "success_text": "#BBF7D0",
-
-    "warning": "#FBBF24",
-    "warning_tint": "#3A2E0F",
-    "warning_border": "#B45309",
-    "warning_text": "#FDE68A",
-
-    "error": "#F87171",
-    "error_tint": "#3A1414",
-    "error_border": "#DC2626",
-    "error_text": "#FECACA",
-
-    "neutral_pill_bg": "#232838",
-    "neutral_pill_text": "#9AA1B4",
-
-    "border": "#262B38",
-    "border_strong": "#333A4A",
-}
-
 # Class-card color tags: a small, hand-picked set of distinct hues (not an
 # arbitrary hash-to-RGB, which tends to produce muddy colors). Matches the
 # 9-swatch "Class Color" picker shown in the Add/Edit Class wizard's
@@ -176,40 +126,14 @@ TAG_COLORS = {
     "slate": {"dot": "#94A3B8", "tint": "#F1F3F6"},
 }
 
-DARK_TAG_COLORS = {
-    "indigo": {"dot": "#8B7CF9", "tint": "#262040"},
-    "sky": {"dot": "#5FCBFB", "tint": "#173A4A"},
-    "green": {"dot": "#4ADE80", "tint": "#173A26"},
-    "amber": {"dot": "#FBBF24", "tint": "#3D2E0E"},
-    "rose": {"dot": "#FDA4AF", "tint": "#3D1E22"},
-    "violet": {"dot": "#C4B5FD", "tint": "#2E2650"},
-    "teal": {"dot": "#5EEAD4", "tint": "#123531"},
-    "slate": {"dot": "#CBD5E1", "tint": "#2A2E36"},
-}
-
-
-def active_palette() -> dict:
-    """Returns the currently-active PALETTE or DARK_PALETTE, based on the
-    saved theme preference - lets code that colors things dynamically
-    (matplotlib charts, custom-painted widgets) follow dark mode instead of
-    always reading the light PALETTE."""
-    from shared.theme import load_theme_preference
-
-    return DARK_PALETTE if load_theme_preference() == "dark" else PALETTE
-
 
 def qcolor(token: str):
-    """Return a QColor for a palette token, following the active theme.
-
-    Used to color QTableWidgetItem backgrounds/foregrounds, which are set
-    programmatically and never touched by the app's QSS stylesheet - so
-    unlike widgets, these need to read active_palette() themselves or they
-    stay stuck on light-mode colors (e.g. a pale tint cell) even in dark
-    mode. Imports PyQt5 lazily so this module stays importable from
-    non-GUI code (e.g. scripts, tests) without requiring a display."""
+    """Return a QColor for a palette token. Imports PyQt5 lazily so this
+    module stays importable from non-GUI code (e.g. scripts, tests) without
+    requiring a display."""
     from PyQt5.QtGui import QColor
 
-    return QColor(active_palette()[token])
+    return QColor(PALETTE[token])
 
 
 def attendance_tier(percent: float, minimum: float) -> str:
@@ -235,10 +159,10 @@ def class_tag_color(class_code: str) -> str:
 
 
 def class_tag_color_key(class_code: str) -> str:
-    """Deterministic TAG_COLORS/DARK_TAG_COLORS key per class code, for
-    contexts that need a named tag-pill color (see shared.widgets.make_tag_pill)
-    rather than class_tag_color()'s raw hex (used for the class-card
-    illustration tint)."""
+    """Deterministic TAG_COLORS key per class code, for contexts that need
+    a named tag-pill color (see shared.widgets.make_tag_pill) rather than
+    class_tag_color()'s raw hex (used for the class-card illustration
+    tint)."""
     import zlib
 
     keys = list(TAG_COLORS.keys())

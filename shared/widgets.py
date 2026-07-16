@@ -4,11 +4,6 @@ with a progress bar, and a colored tag pill. These are plain factory
 functions rather than QWidget subclasses since neither one changes state or
 handles events after construction; callers just drop the returned widget
 into a layout.
-
-Both read shared.palette.active_palette() so they render correctly whether
-the app is currently in light or dark mode, since they're styled with an
-inline per-instance stylesheet (parameterized by color) rather than a
-static QSS objectName selector.
 """
 
 from PyQt5.QtCore import Qt
@@ -21,7 +16,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from shared.palette import DARK_PALETTE, RADIUS, TAG_COLORS, DARK_TAG_COLORS, active_palette
+from shared.palette import PALETTE, RADIUS, TAG_COLORS
 
 
 def clear_layout(layout) -> None:
@@ -41,7 +36,7 @@ def clear_layout(layout) -> None:
 def make_stat_card(label: str, value: str, percent: int, fill_color: str = None) -> QFrame:
     """A small rounded card: a label, a big value, and a thin rounded
     progress bar - e.g. "Attendance Rate" / "82%" / a mostly-filled bar."""
-    palette = active_palette()
+    palette = PALETTE
     fill_color = fill_color or palette["accent"]
 
     card = QFrame()
@@ -82,23 +77,18 @@ def make_stat_card(label: str, value: str, percent: int, fill_color: str = None)
 def set_auth_headline(label: QLabel, first_line: str, second_line: str) -> None:
     """The two-tone headline on every auth screen's fixed-dark left panel
     (e.g. "Track every session." / "Never miss a beat.") - white first
-    line, accent-colored second line. Always uses DARK_PALETTE regardless
-    of the app's light/dark setting, since the left panel itself is fixed
-    dark chrome (see shared/palette.py's bg_sidebar token)."""
+    line, accent-colored second line."""
     label.setTextFormat(Qt.RichText)
     label.setText(
         f'<span style="color:#FFFFFF;">{first_line}</span><br>'
-        f'<span style="color:{DARK_PALETTE["accent"]};">{second_line}</span>'
+        f'<span style="color:{PALETTE["accent"]};">{second_line}</span>'
     )
 
 
 def make_tag_pill(text: str, color_key: str = "indigo") -> QWidget:
     """A small rounded pill: a colored dot + a label, tinted to match -
     e.g. a class's color tag or an "Archived" status flag."""
-    from shared.theme import load_theme_preference
-
-    colors = DARK_TAG_COLORS if load_theme_preference() == "dark" else TAG_COLORS
-    entry = colors.get(color_key, colors["slate"])
+    entry = TAG_COLORS.get(color_key, TAG_COLORS["slate"])
 
     pill = QWidget()
     pill.setStyleSheet(

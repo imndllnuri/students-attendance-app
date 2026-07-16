@@ -3,7 +3,6 @@ shared/widgets.py: stat cards with a progress bar, and tag pills."""
 
 from PyQt5.QtWidgets import QLabel, QProgressBar
 
-import shared.theme as theme
 from shared.widgets import make_stat_card, make_tag_pill
 
 
@@ -50,17 +49,3 @@ def test_tag_pill_falls_back_to_slate_for_unknown_color_key(qtbot):
 
     label = pill.findChild(QLabel)
     assert TAG_COLORS["slate"]["dot"] in label.styleSheet()
-
-
-def test_tag_pill_uses_dark_tag_colors_in_dark_mode(qtbot, monkeypatch, tmp_path):
-    from shared.palette import DARK_TAG_COLORS
-
-    pref_path = tmp_path / ".theme_preference"
-    pref_path.write_text("dark")
-    monkeypatch.setattr(theme, "THEME_PREFERENCE_PATH", pref_path)
-
-    pill = make_tag_pill("COMP101", color_key="indigo")
-    qtbot.addWidget(pill)
-
-    label = pill.findChild(QLabel)
-    assert DARK_TAG_COLORS["indigo"]["dot"] in label.styleSheet()

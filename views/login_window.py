@@ -2,12 +2,11 @@ from pathlib import Path
 
 import qtawesome as qta
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMessageBox, QWidget
+from PyQt5.QtWidgets import QLineEdit, QMessageBox, QWidget
 
 from models.accounts import Account, AccountManager
 from shared.i18n import t
 from shared.qt_style import set_dynamic_property
-from shared.theme import load_theme_preference, save_theme_preference, stylesheet_path
 from shared.validation import (
     MIN_PASSWORD_LENGTH,
     SECURITY_QUESTIONS,
@@ -31,7 +30,6 @@ class LoginWindow(QWidget):
         self._reset_email = None
 
         set_auth_headline(self.auth_headline_lbl, "Track every session.", "Never miss a beat.")
-        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
 
         self._setup_sign_in_page()
         self._setup_sign_up_page()
@@ -47,7 +45,6 @@ class LoginWindow(QWidget):
         self.steps_stack.currentChanged.connect(lambda _: self._sync_stack_height(self.steps_stack))
 
         self._apply_translations()
-        self._update_theme_icon()
         self.load_remembered_email()
         self.auth_stack.setCurrentIndex(SIGN_IN_PAGE)
         self._sync_stack_height(self.auth_stack)
@@ -75,21 +72,6 @@ class LoginWindow(QWidget):
         self.reset_email_le.clear()
         self.error_lbl_step1.setVisible(False)
         self.auth_stack.setCurrentIndex(RESET_PAGE)
-
-    def toggle_theme(self):
-        """Same mechanism as MainWindow.toggle_dark_mode - this button is
-        the only theme control visible before login, matching the
-        reference's top-right sun/moon toggle on every auth screen."""
-        new_theme = "light" if load_theme_preference() == "dark" else "dark"
-        save_theme_preference(new_theme)
-        with open(stylesheet_path(new_theme)) as f:
-            QApplication.instance().setStyleSheet(f.read())
-        self._update_theme_icon()
-
-    def _update_theme_icon(self):
-        is_dark = load_theme_preference() == "dark"
-        icon_name = "fa5s.sun" if is_dark else "fa5s.moon"
-        self.theme_toggle_btn.setIcon(qta.icon(icon_name, color="#8A93A7"))
 
     def _apply_translations(self):
         self.signin_title_lbl.setText(t("welcome_back"))

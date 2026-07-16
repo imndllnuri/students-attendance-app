@@ -322,3 +322,30 @@ The PDF export chart's `PALETTE["success"/"warning"/"error"]` (main_window.py, `
 pdf`) is the one intentional exception left as-is - it always uses the light palette on purpose so
 exported reports stay print-friendly regardless of the app's current theme (documented back in
 this file's `render_statistics` note).
+
+## 16. Dark mode removed entirely (per your request)
+
+The light/dark toggle is gone - the app now has one visual theme, always. Removed:
+
+- The sun/moon toggle button on every auth screen and the app's top bar (`theme_toggle_btn`), and
+  the Settings General tab's "Appearance" card, which only ever contained the Dark Mode switch -
+  once that's gone the card had nothing left in it, so the whole card is gone too.
+- `shared/theme.py` (theme preference persistence) - deleted entirely, along with the
+  `.theme_preference` file it used.
+- `DARK_PALETTE`/`DARK_TAG_COLORS` in `shared/palette.py`, and `active_palette()` - there's only
+  one palette now, so the "pick light or dark" indirection was removed rather than kept as a
+  no-op; every former `active_palette()` call site now reads `PALETTE` directly.
+- `scripts/generate_theme.py` now renders only `theme.qss` (the `theme_dark.qss` output is gone).
+- The dark-mode-skips-the-shadow rule in `shared/shadow.py` (§4.4 of the original spec) - shadows
+  now always apply.
+- "theme" as an Export/Import Settings JSON field.
+- Test coverage that only existed to verify dark-mode behavior (`test_theme.py`,
+  `test_main_window_dark_mode.py`, `test_main_window_dark_mode_charts.py`) - deleted. Kept the
+  parts of `test_theme.py` that were really about the QSS generator's token-substitution logic
+  (still applies with a single palette), moved into a new `test_generate_theme.py`.
+
+**What did NOT change:** the sidebar and auth-screens' left panel are still fixed-dark chrome -
+that was never the "dark mode" feature (it doesn't toggle; it's the same permanently-dark
+navigation surface in what is now the app's only theme), so it's untouched. `PALETTE`'s
+`bg_sidebar`/`text_sidebar`/etc. tokens already held these fixed-dark values before this change
+and still do.

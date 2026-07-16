@@ -1,30 +1,21 @@
 /* Shared theme TEMPLATE for the whole app - "AttendU" direction (see
    reference-theme/student-attendance-app-redesign-prompt.md and
-   reference-theme/ASSUMPTIONS.md): a dark-first look with a purple-to-blue
-   gradient on every primary CTA, 16px card radius, fully-rounded pill
-   controls, and a sidebar / auth-left-panel that stay fixed-dark chrome
-   regardless of the light/dark toggle (confirmed from the reference
-   screenshots). Replaces the earlier "Kintsugi" white/black-chrome
-   direction.
+   reference-theme/ASSUMPTIONS.md): a purple-to-blue gradient on every
+   primary CTA, 16px card radius, fully-rounded pill controls, and a
+   sidebar / auth-left-panel that are fixed-dark chrome (confirmed from the
+   reference screenshots) against an otherwise light app. Replaces the
+   earlier "Kintsugi" white/black-chrome direction.
 
    This file is NOT consumed directly by the app - it's rendered into the
-   real resources/styles/theme.qss (light) and resources/styles/theme_dark.qss
-   (dark) by scripts/generate_theme.py, which fills in every double-curly
-   placeholder from shared/palette.py's PALETTE (light output) or
-   DARK_PALETTE (dark output), plus the theme-independent SPACING/RADIUS
-   scales. Edit THIS file and re-run the script - never hand-edit the
-   generated theme.qss/theme_dark.qss, they'll be overwritten.
-
-   Each placeholder is substituted by NAME, not by matching a hex value, so
-   two rules that happen to want the same light-mode color but different
-   dark-mode colors (or vice versa) can't collide the way a blind
-   hex-substitution generator would.
+   real resources/styles/theme.qss by scripts/generate_theme.py, which
+   fills in every double-curly placeholder from shared/palette.py's
+   PALETTE, plus the theme-independent SPACING/RADIUS scales. Edit THIS
+   file and re-run the script - never hand-edit the generated theme.qss,
+   it'll be overwritten.
 
    Some literal `#FFFFFF`-style colors below are intentionally NOT
    tokenized: they're "always white text on a colored control" (primary-
-   button labels, the notification badge, active sidebar-nav text) that
-   should stay pure white in both themes, not resolve through the bg_card
-   token (which does change between themes).
+   button labels, the notification badge, active sidebar-nav text).
 
    Card/control radius: card={{radius_card}}px  control_sm={{radius_control_sm}}px
    pill/avatar controls use `border-radius: {{radius_pill}}px` (999) on a
@@ -56,9 +47,8 @@ QStackedWidget#stackedWidget {
 }
 
 /* Sidebar (and the auth screens' left brand panel, styled separately by
-   objectName as each screen is built) are fixed-dark chrome in BOTH
-   themes - see shared/palette.py's bg_sidebar token, which is identical
-   in PALETTE and DARK_PALETTE on purpose. */
+   objectName as each screen is built) are fixed-dark chrome against the
+   otherwise light app - see shared/palette.py's bg_sidebar token. */
 QWidget#sidebar_widget {
     background-color: {{bg_sidebar}};
     border-right: 1px solid #1F2333;
@@ -138,7 +128,6 @@ QLabel#confirm_new_password_field_lbl,
 QLabel#create_account_prompt_lbl,
 QLabel#sign_in_prompt_lbl,
 QLabel#settings_subtitle_lbl,
-QLabel#settings_dark_mode_lbl,
 QLabel#settings_session_caption_lbl,
 QLabel#profile_name_field_lbl,
 QLabel#profile_surname_field_lbl,
@@ -211,15 +200,14 @@ QLabel#danger_zone_caption_lbl {
 
 /* Dialog/page roots that show generous margins around their cards (rather
    than filling edge-to-edge) need an explicit background - otherwise Qt's
-   default palette shows through, which is fine in light mode by coincidence
-   but reads as a jarring unstyled light strip in dark mode. */
+   default palette shows through as an unstyled strip around the cards. */
 QWidget#ClassWindow,
 QWidget#TakeAttendanceWindow {
     background-color: {{bg_app}};
 }
 
 /* Text wordmark, fixed-dark chrome like the rest of the sidebar/auth-panel
-   it sits on - always uses the dark-mode accent tint regardless of theme. */
+   it sits on. */
 QLabel#auth_wordmark_lbl,
 QLabel#sidebar_wordmark_lbl {
     color: #9D90FA;
@@ -237,7 +225,6 @@ QFrame#roster_section_card,
 QFrame#statistics_card,
 QFrame#dashboard_stat_card,
 QFrame#control_strip_card,
-QFrame#settings_appearance_card,
 QFrame#settings_language_card,
 QFrame#settings_session_card,
 QFrame#settings_typography_card,
@@ -343,9 +330,7 @@ QFrame#class_color_swatch {
 
 /* --- Typography --- */
 
-/* Fallback for every QLabel with no more specific #id rule below - without
-   this, unstyled labels inherit Qt's default (near-black) text color,
-   which is invisible against a dark-mode background. */
+/* Fallback for every QLabel with no more specific #id rule below. */
 QLabel {
     color: {{text_primary}};
 }
@@ -546,7 +531,6 @@ QLabel#search_status_lbl,
 QLabel#title_lbl_2,
 QLabel#security_question_lbl,
 QLabel#security_question_2_lbl,
-QLabel#settings_appearance_title_lbl,
 QLabel#settings_language_title_lbl,
 QLabel#settings_session_title_lbl,
 QLabel#settings_typography_title_lbl,
@@ -853,22 +837,6 @@ QCheckBox::indicator:checked {
     border: 1.5px solid {{accent}};
 }
 
-/* Dark Mode's checkbox reads as a toggle switch (wide pill, no visible
-   label text of its own - the row's own QLabel carries the text) rather
-   than a small square tickbox, matching the reference's switch control. */
-QCheckBox#dark_mode_cb::indicator {
-    width: 40px;
-    height: 22px;
-    border-radius: 11px;
-    border: 1.5px solid {{border_strong}};
-    background: {{bg_hover}};
-}
-
-QCheckBox#dark_mode_cb::indicator:checked {
-    background: {{accent}};
-    border: 1.5px solid {{accent}};
-}
-
 /* --- Class row (My Classes / Search) --- */
 
 QFrame#class_row_widget {
@@ -1052,7 +1020,7 @@ QLabel#scan_status_icon_lbl {
     font-size: 14pt;
 }
 
-/* --- Sidebar navigation - fixed-dark chrome, same in both themes --- */
+/* --- Sidebar navigation - fixed-dark chrome --- */
 
 QPushButton#dashboard_btn,
 QPushButton#my_classes_btn,
