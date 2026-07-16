@@ -106,7 +106,7 @@ class TakeAttendance(QDialog):
         self._apply_session_template()
 
         self.save_session_template_btn.clicked.connect(self.save_current_as_template)
-        self.hours_comboBox.currentIndexChanged.connect(self.update_session_countdown)
+        self.hours_combo.currentIndexChanged.connect(self.update_session_countdown)
         self._countdown_timer = QTimer(self)
         self._countdown_timer.timeout.connect(self.update_session_countdown)
         self._countdown_timer.start(30000)  # refresh every 30s
@@ -296,15 +296,15 @@ class TakeAttendance(QDialog):
         template = load_session_template(self.class_obj.class_id)
         time_slot = template.get("time_slot")
         if time_slot:
-            index = self.hours_comboBox.findText(time_slot)
+            index = self.hours_combo.findText(time_slot)
             if index >= 0:
-                self.hours_comboBox.setCurrentIndex(index)
+                self.hours_combo.setCurrentIndex(index)
         override = template.get("late_threshold_override")
         if override is not None:
             self.late_threshold_override_le.setText(str(override))
 
     def save_current_as_template(self):
-        time_slot = self.hours_comboBox.currentText()
+        time_slot = self.hours_combo.currentText()
         if not time_slot:
             QMessageBox.information(self, "Nothing to Save", "Select a time slot first.")
             return
@@ -317,7 +317,7 @@ class TakeAttendance(QDialog):
 
     def mark_attendance(self, student):
         selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
-        time_slot = self.hours_comboBox.currentText()
+        time_slot = self.hours_combo.currentText()
         status, exact_time_str = self.compute_status(time_slot)
         self.record_attendance(student, selected_date, time_slot, exact_time_str, status)
 
@@ -329,7 +329,7 @@ class TakeAttendance(QDialog):
             return
 
         selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
-        time_slot = self.hours_comboBox.currentText()
+        time_slot = self.hours_combo.currentText()
         now_str = QDateTime.currentDateTime().toString("HH:mm")
 
         remaining = [s for s in self.roster if s["student_id"] not in self.staged_student_ids]
@@ -377,7 +377,7 @@ class TakeAttendance(QDialog):
             return
 
         selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
-        time_slot = self.hours_comboBox.currentText()
+        time_slot = self.hours_combo.currentText()
         now_str = QDateTime.currentDateTime().toString("HH:mm")
 
         marked = 0
@@ -420,7 +420,7 @@ class TakeAttendance(QDialog):
             return
 
         selected_date = self.calendarWidget.selectedDate().toString("dd-MM-yyyy")
-        time_slot = self.hours_comboBox.currentText()
+        time_slot = self.hours_combo.currentText()
         now_str = QDateTime.currentDateTime().toString("HH:mm")
         self.record_attendance(student, selected_date, time_slot, now_str, status)
 
@@ -614,7 +614,7 @@ class TakeAttendance(QDialog):
             self.session_countdown_lbl.setText("")
             return
 
-        time_slot = self.hours_comboBox.currentText()
+        time_slot = self.hours_combo.currentText()
         if not time_slot or "-" not in time_slot:
             self.session_countdown_lbl.setText("")
             return
@@ -630,13 +630,13 @@ class TakeAttendance(QDialog):
 
     def update_hours_combobox(self, day_name):
         """Update hours combobox based on selected day's schedule"""
-        self.hours_comboBox.clear()
+        self.hours_combo.clear()
         schedule = self.class_obj.schedule.get(day_name, [])
 
         for slot in schedule:
             if slot.selected:
                 time_str = f"{slot.start_time.toString('HH:mm')}-{slot.end_time.toString('HH:mm')}"
-                self.hours_comboBox.addItem(time_str)
+                self.hours_combo.addItem(time_str)
 
     def closeEvent(self, event):
         """Cleanup when window closes"""

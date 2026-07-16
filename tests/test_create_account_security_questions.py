@@ -36,8 +36,8 @@ def test_second_security_question_combo_defaults_to_a_different_question(qtbot, 
     window = build_window(qtbot, monkeypatch, FakeAccountManager())
 
     assert (
-        window.security_question_ComboBox.currentText()
-        != window.security_question_2_ComboBox.currentText()
+        window.security_question_combo.currentText()
+        != window.security_question_2_combo.currentText()
     )
 
 
@@ -62,8 +62,8 @@ def test_create_account_rejects_identical_security_questions(qtbot, monkeypatch)
     fill_common_fields(window)
     window.signup_answer_le.setText("Rex")
     window.signup_answer_2_le.setText("London")
-    window.security_question_2_ComboBox.setCurrentIndex(
-        window.security_question_ComboBox.currentIndex()
+    window.security_question_2_combo.setCurrentIndex(
+        window.security_question_combo.currentIndex()
     )
 
     window.create_account()

@@ -487,3 +487,26 @@ so `AccountManager`/`ClassManager` don't change at all, only which client they'r
   instances, plus a persistence-across-reload test the SQL-backed test suite doesn't need (SQLite's
   file already covers that implicitly); `tests/test_backend_config.py` covers the config/factory
   logic itself.
+
+## 21. Roadmap Phase 3: remaining GUI/architecture fixes
+
+Per your request to implement "phase 3" - turned out 2 of its 4 items were already resolved earlier in
+this project (just not reflected in `ROADMAP.md`'s checkboxes), 1 was a genuine small cleanup done
+now, and 1 I'm declining with a documented reason rather than building unnecessary abstraction. Full
+detail is in `ROADMAP.md` itself; summary:
+
+- `ClassWindow(QMainWindow)`-embedded-as-a-page: already a plain `QWidget` added via `addWidget()`,
+  confirmed by reading the current code - nothing to do.
+- Modal-vs-non-modal consistency: already resolved as a side effect of Login/Create Account/Reset
+  Password having been consolidated into one non-modal `LoginWindow` with an internal
+  `QStackedWidget`, at some point earlier in this project.
+- `.ui` naming cleanup: renamed the last 3 outliers (`security_question_ComboBox`,
+  `security_question_2_ComboBox`, `hours_comboBox`) to the `_combo` convention the other 7 combo
+  boxes in the app already use.
+- `Session`/`AppState` object: **declined**. Investigated the actual object-threading in
+  `MainWindow`/`ClassWindow`/`TakeAttendance`/`AddNewClassWindow` first rather than assuming the
+  roadmap bullet was still warranted just because it existed - found small, direct constructor
+  argument passing (2-4 args each), no tangled global state to untangle. Building a `Session` singleton
+  here would be introducing an abstraction with no current problem to solve, which cuts against this
+  project's own stated engineering principles. Left as an explicitly-declined roadmap item with
+  reasoning attached, rather than silently dropped or done anyway for completeness.

@@ -65,19 +65,50 @@ attendance stored in `.xlsx` files.
 
 ## Phase 3 — Remaining GUI/architecture fixes
 
-- [ ] Replace `ClassWindow(QMainWindow)` being embedded as a
+- [x] Replace `ClassWindow(QMainWindow)` being embedded as a
       `QStackedWidget` page (unsupported pattern — a `QMainWindow` isn't
       meant to be a non-top-level child widget) with a proper widget-based
-      page.
-- [ ] Introduce a formal `Session`/`AppState` object once the above
-      navigation rework happens — doing it earlier would be redundant with
-      this change.
-- [ ] Consistent modal-vs-non-modal rule across dialogs (currently mixed:
-      e.g. account creation is non-modal, password reset is modal, with no
-      stated reason for the difference).
-- [ ] Remaining `.ui` widget-naming-convention cleanup
-      (`security_question_ComboBox` vs `hours_comboBox` vs
-      `statistics_class_combo` — pick one convention).
+      page. **Already done** by the time this item was revisited —
+      `views/class_window.py`'s `ClassWindow` is a plain `QWidget` (and
+      `ui/class_window.ui`'s root is `QWidget`), added to
+      `MainWindow.stackedWidget` via `addWidget()` like every other page.
+      Must have landed during an earlier redesign pass in this same
+      project without the checkbox being updated.
+- [x] Consistent modal-vs-non-modal rule across dialogs. **Already
+      resolved**, as a side effect of a different change rather than a
+      dedicated fix: Login, Create Account, and Reset Password used to be
+      described as separate windows with inconsistent modality, but they've
+      since been consolidated into a single non-modal `LoginWindow`
+      (`QWidget`, shown once via `.show()`) with an internal `auth_stack`
+      `QStackedWidget` switching between sign-in/sign-up/reset pages. Every
+      other top-level window (`MainWindow`, `AddNewClassWindow`,
+      `TakeAttendance`) is likewise always shown via `.show()`, never
+      `.exec_()` — the only `.exec_()` calls in the app are on small,
+      correctly-modal sub-dialogs (`ChoiceDialog`, `DetailDialog`, the
+      inline Mark Selected Absent picker), which is the right call for a
+      confirm/pick popup, not the inconsistency this item was about.
+- [x] Remaining `.ui` widget-naming-convention cleanup. Renamed the last 3
+      outliers to match the dominant `snake_case_combo` convention already
+      used by the other 7 combo boxes in the app:
+      `security_question_ComboBox`/`security_question_2_ComboBox` →
+      `security_question_combo`/`security_question_2_combo`
+      (`ui/login_window.ui`, `views/login_window.py`), `hours_comboBox` →
+      `hours_combo` (`ui/take_attendance_window.ui`,
+      `views/take_attendance_window.py`), plus their test references.
+- [ ] ~~Introduce a formal `Session`/`AppState` object~~ **Assessed, not
+      pursued.** This item's own stated precondition (the `ClassWindow`
+      navigation rework above) turned out to already be satisfied, so it
+      was fair to revisit - but today's user/manager threading is already
+      small and direct: `MainWindow(user)` holds the one `Account`;
+      `ClassWindow`/`TakeAttendance`/`AddNewClassWindow` each take exactly
+      2-4 constructor args (`class_obj`, a `main_window` or `class_window`
+      back-reference, `class_manager`) rather than a long threaded chain.
+      There's no evidence of the kind of tangled global-state problem a
+      `Session`/`AppState` singleton is meant to fix - introducing one now
+      would just relocate the same 2-3 objects behind a new indirection
+      layer for a single-user desktop app. Left undone deliberately;
+      revisit only if a concrete pain point (hard-to-test coupling,
+      multi-window state desync) actually shows up.
 
 ## Phase 4 — Software design/architecture report
 

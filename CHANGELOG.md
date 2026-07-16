@@ -6,6 +6,11 @@ YYYY-MM-DD.
 
 ## [Unreleased]
 
+### Changed
+- Renamed the last 3 `.ui` widget-naming outliers to match the dominant convention (ROADMAP.md
+  Phase 3): `security_question_ComboBox`/`security_question_2_ComboBox` → `security_question_combo`/
+  `security_question_2_combo`, `hours_comboBox` → `hours_combo`.
+
 ### Added
 - **Offline/local-storage backend (ROADMAP.md Phase 2)**: `services/local_storage_client.py`'s
   `LocalStorageClient` implements the full `ApiClient` method surface against local JSON +

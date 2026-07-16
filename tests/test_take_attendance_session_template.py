@@ -61,7 +61,7 @@ def test_saving_a_template_persists_time_slot_and_override(qtbot, monkeypatch, f
     monkeypatch.setattr(stpl, "SESSION_TEMPLATES_PATH", tmp_path / ".session_templates.json")
 
     window = build_window(qtbot, monkeypatch, fake_serial, schedule=two_slot_schedule())
-    window.hours_comboBox.setCurrentIndex(1)  # 13:00-14:50
+    window.hours_combo.setCurrentIndex(1)  # 13:00-14:50
     window.late_threshold_override_le.setText("20")
 
     window.save_current_as_template()
@@ -78,7 +78,7 @@ def test_opening_again_applies_the_saved_template(qtbot, monkeypatch, fake_seria
 
     window = build_window(qtbot, monkeypatch, fake_serial, schedule=two_slot_schedule())
 
-    assert window.hours_comboBox.currentText() == "13:00-14:50"
+    assert window.hours_combo.currentText() == "13:00-14:50"
     assert window.late_threshold_override_le.text() == "25"
 
 

@@ -177,10 +177,10 @@ class LoginWindow(QWidget):
         self.signup_password_le.textChanged.connect(self._update_password_strength)
         self.password_again_le.textChanged.connect(self.validate_password_match)
 
-        self.security_question_ComboBox.addItems(SECURITY_QUESTIONS)
-        self.security_question_2_ComboBox.addItems(SECURITY_QUESTIONS)
+        self.security_question_combo.addItems(SECURITY_QUESTIONS)
+        self.security_question_2_combo.addItems(SECURITY_QUESTIONS)
         if len(SECURITY_QUESTIONS) > 1:
-            self.security_question_2_ComboBox.setCurrentIndex(1)
+            self.security_question_2_combo.setCurrentIndex(1)
 
     def _add_password_toggle(self, line_edit):
         action = line_edit.addAction(qta.icon("fa5s.eye", color="#8A93A7"), QLineEdit.TrailingPosition)
@@ -253,9 +253,9 @@ class LoginWindow(QWidget):
         password_again = self.password_again_le.text()
         name = self.name_le.text().strip()
         surname = self.surname_le.text().strip()
-        security_question_1 = self.security_question_ComboBox.currentText()
+        security_question_1 = self.security_question_combo.currentText()
         answer_1 = self.signup_answer_le.text()
-        security_question_2 = self.security_question_2_ComboBox.currentText()
+        security_question_2 = self.security_question_2_combo.currentText()
         answer_2 = self.signup_answer_2_le.text()
 
         email_ok = self.validate_email()

@@ -56,7 +56,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="hours_comboBox">
+         <widget class="QComboBox" name="hours_combo">
           <property name="minimumSize">
            <size><width>160</width><height>40</height></size>
           </property>
