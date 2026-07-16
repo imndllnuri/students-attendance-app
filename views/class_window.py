@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from services.api_client import ApiError
+from shared.dialogs import ChoiceDialog, DetailDialog
 from shared.palette import attendance_tier, qcolor
 from shared.qt_style import set_dynamic_property
 from shared.widgets import clear_layout
@@ -262,13 +263,9 @@ class ClassWindow(QWidget):
             lines.append(f"{header_item.text()}: {status}")
             session_rows.append((header_item.text(), status))
 
-        msg = QMessageBox(self)
-        msg.setWindowTitle("Student Detail")
-        msg.setText("\n".join(lines))
-        export_btn = msg.addButton("Export CSV", QMessageBox.ActionRole)
-        msg.addButton(QMessageBox.Ok)
-        msg.exec_()
-        if msg.clickedButton() == export_btn:
+        dialog = DetailDialog(self, "Student Detail", "\n".join(lines), action_label="Export CSV")
+        dialog.exec_()
+        if dialog.action_triggered:
             self.export_student_attendance_csv(student_name, student_number, session_rows)
 
     def export_student_attendance_csv(self, student_name, student_number, session_rows):
@@ -314,10 +311,10 @@ class ClassWindow(QWidget):
 
         statuses = ["Present", "Late", "Absent"]
         default_index = statuses.index(current_status) if current_status in statuses else 0
-        new_status, ok = QInputDialog.getItem(
+        new_status, ok = ChoiceDialog.get_item(
             self, "Correct Attendance",
             f"{student_name} - {date} {time_slot}:",
-            statuses, default_index, False,
+            statuses, default_index,
         )
         if not ok or new_status == current_status:
             return
@@ -458,16 +455,16 @@ class ClassWindow(QWidget):
 
         labels = [f"{s['name_surname']} ({s['student_number']})" for s in roster]
 
-        keep_label, ok = QInputDialog.getItem(
-            self, "Merge Students", "Keep this student (the correct entry):", labels, 0, False
+        keep_label, ok = ChoiceDialog.get_item(
+            self, "Merge Students", "Keep this student (the correct entry):", labels
         )
         if not ok:
             return
         keep_student = roster[labels.index(keep_label)]
 
         remaining_labels = [label for label in labels if label != keep_label]
-        remove_label, ok = QInputDialog.getItem(
-            self, "Merge Students", "Merge and remove this duplicate entry:", remaining_labels, 0, False
+        remove_label, ok = ChoiceDialog.get_item(
+            self, "Merge Students", "Merge and remove this duplicate entry:", remaining_labels
         )
         if not ok:
             return

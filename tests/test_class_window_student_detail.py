@@ -6,6 +6,7 @@ from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
 from models.classes import Class, ScheduleSlot
+from shared.dialogs import DetailDialog
 from views.class_window import ClassWindow
 
 
@@ -66,7 +67,7 @@ def test_double_clicking_name_column_shows_detail_dialog(qtbot, monkeypatch):
         captured["text"] = self.text()
         return None
 
-    monkeypatch.setattr(QMessageBox, "exec_", fake_exec)
+    monkeypatch.setattr(DetailDialog, "exec_", fake_exec)
     window.handle_roster_cell_double_click(0, 1)
 
     assert captured["title"] == "Student Detail"

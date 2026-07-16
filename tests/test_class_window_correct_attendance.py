@@ -82,7 +82,7 @@ def test_double_clicking_a_session_cell_prompts_and_corrects(qtbot, monkeypatch)
     _set_up_table(window, "01-09-2025 - 09:00-10:50", "1 Present")
 
     monkeypatch.setattr(
-        "views.class_window.QInputDialog.getItem",
+        "views.class_window.ChoiceDialog.get_item",
         lambda *a, **k: ("Late", True),
     )
 
@@ -99,7 +99,7 @@ def test_cancelling_the_dialog_does_not_correct(qtbot, monkeypatch):
     _set_up_table(window, "01-09-2025 - 09:00-10:50", "1 Present")
 
     monkeypatch.setattr(
-        "views.class_window.QInputDialog.getItem",
+        "views.class_window.ChoiceDialog.get_item",
         lambda *a, **k: ("Late", False),
     )
 
@@ -114,7 +114,7 @@ def test_marking_absent_deletes_the_record(qtbot, monkeypatch):
     _set_up_table(window, "01-09-2025 - 09:00-10:50", "1 Present")
 
     monkeypatch.setattr(
-        "views.class_window.QInputDialog.getItem",
+        "views.class_window.ChoiceDialog.get_item",
         lambda *a, **k: ("Absent", True),
     )
 

@@ -395,3 +395,47 @@ card" rather than just "attendance app #4327."
 - `README.md`'s title is now "TapIn" too; left the "originally built for the COMP413 IoT course at
   Abdullah Gül University" line alone - that's true project provenance/history, not branding, and
   erasing it would just be inaccurate.
+
+## 19. Doc cleanup + non-standard dialogs rebuilt as real QDialogs
+
+Per your request to "work on .md files ... fix QDialog rebuild":
+
+- Deleted `.claude/plans/wild-jingling-unicorn.md` (the Kintsugi visual-redesign plan) - it assumed
+  dark mode would be redesigned in parallel, which directly contradicts §16's full removal, so it was
+  stale rather than something to resume.
+- `CHANGELOG.md` hadn't been touched since Phase 1; added a `[0.2.0]` entry summarizing the ~80
+  features shipped since (grouped by area, pointing at `FEATURE_BACKLOG.md` for the itemized list)
+  and moved dark mode/roster-wizard/TapIn changes into `[Unreleased]`.
+- `FEATURE_BACKLOG.md` #27 still claimed dark mode was shipped; corrected to unchecked + a note
+  explaining it was removed, cross-referencing §15-16.
+- `ARCHITECTURE.md`'s module layout annotated to mention the generated `app_icon.png` and that roster
+  add/remove now lives in the Edit Class wizard, not `class_window.py`.
+- `shared/widgets.py`'s module docstring (and `tests/test_widgets.py`'s) referenced the
+  now-deleted plan file too - reworded, since `make_stat_card`/`make_tag_pill` are just reusable
+  widget builders, not exclusively Kintsugi-Info-panel-specific (the Info panel itself never shipped;
+  `make_tag_pill` is the one of the two actually used, by class color tags).
+- New `shared/dialogs.py`: `ChoiceDialog` (a real `QDialog` - label + `QComboBox` + OK/Cancel) and
+  `DetailDialog` (a real `QDialog` - label + Close + an optional extra `ActionRole` button), both
+  styled automatically via a new generic `QDialog {}` / `QDialog QPushButton {}` / `QDialog QComboBox
+  {}` block added to `theme.qss.tmpl` next to the existing `QMessageBox` block (custom `QDialog`
+  subclasses had **no** styling at all before this - a gap, not an intentional omission).
+- Rebuilt onto these: `register_card()`'s `QMessageBox()` with a `QComboBox` manually inserted into
+  its own layout and **no buttons at all** (`take_attendance_window.py`) → `ChoiceDialog.get_item()` -
+  this also fixes a real defect, since there was previously no way to cancel out of registering a card
+  to the wrong student; `show_student_detail()`'s `QMessageBox.addButton("Export CSV",
+  QMessageBox.ActionRole)` hack (`class_window.py`) → `DetailDialog`; and the `QInputDialog.getItem()`
+  calls in `correct_attendance_cell()` and both picks in `merge_students()` → `ChoiceDialog.get_item()`
+  (same `(text, ok)` return shape, so the call sites barely changed).
+- **Deliberately left alone**: `mark_selected_absent()`'s dialog (`take_attendance_window.py`) was
+  already a real `QDialog` with a proper button box, just built inline - no rebuild needed, it now
+  also picks up the new generic `QDialog` QSS for free. Also left alone: the serial-port-picker
+  `QInputDialog.getItem` (hardware setup, not part of the originally-flagged set),
+  `manual_attendance_entry()`'s 2 `getItem` calls, and `copy_roster_from_class()`'s `getItem` call -
+  these are standard, correctly-functioning uses of the built-in dialog, not hijacked ones; converting
+  them too would be scope creep on already-working code.
+- Also found and removed while in `theme.qss.tmpl`: two dead `QPushButton#theme_toggle_btn` selector
+  blocks (§16 deleted the widget itself but missed these two QSS rules targeting it).
+- New `tests/test_dialogs.py` covers `ChoiceDialog`/`DetailDialog` directly; `tests/test_class_window_merge_students.py`,
+  `tests/test_class_window_correct_attendance.py`, `tests/test_class_window_student_detail.py`, and
+  `tests/test_take_attendance_duplicate_card.py` updated to patch the new dialog classes instead of
+  `QInputDialog`/`QMessageBox` internals.

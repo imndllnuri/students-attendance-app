@@ -1,9 +1,7 @@
-"""Small, reusable composite-widget builders for the Kintsugi-redesign Info
-panel (see .claude/plans/wild-jingling-unicorn.md, Part B) - a stat card
-with a progress bar, and a colored tag pill. These are plain factory
-functions rather than QWidget subclasses since neither one changes state or
-handles events after construction; callers just drop the returned widget
-into a layout.
+"""Small, reusable composite-widget builders: a stat card with a progress
+bar, and a colored tag pill. These are plain factory functions rather than
+QWidget subclasses since neither one changes state or handles events after
+construction; callers just drop the returned widget into a layout.
 """
 
 from PyQt5.QtCore import Qt

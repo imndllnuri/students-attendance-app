@@ -1,5 +1,5 @@
-"""Covers the Kintsugi-redesign Info panel widget builders in
-shared/widgets.py: stat cards with a progress bar, and tag pills."""
+"""Covers the reusable widget builders in shared/widgets.py: stat cards
+with a progress bar, and tag pills."""
 
 from PyQt5.QtWidgets import QLabel, QProgressBar
 

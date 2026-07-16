@@ -73,7 +73,7 @@ def test_merging_two_students_calls_manager_with_keep_and_remove_ids(qtbot, monk
         ("Grace H. (2)", True),
     ])
     monkeypatch.setattr(
-        "views.class_window.QInputDialog.getItem", lambda *a, **k: next(responses)
+        "views.class_window.ChoiceDialog.get_item", lambda *a, **k: next(responses)
     )
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
     monkeypatch.setattr(QMessageBox, "information", lambda *a, **k: None)
@@ -95,7 +95,7 @@ def test_declining_confirmation_does_not_merge(qtbot, monkeypatch):
         ("Grace H. (2)", True),
     ])
     monkeypatch.setattr(
-        "views.class_window.QInputDialog.getItem", lambda *a, **k: next(responses)
+        "views.class_window.ChoiceDialog.get_item", lambda *a, **k: next(responses)
     )
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.No)
 
@@ -112,7 +112,7 @@ def test_cancelling_first_pick_does_not_merge(qtbot, monkeypatch):
     window, manager = build_window(qtbot, roster)
 
     monkeypatch.setattr(
-        "views.class_window.QInputDialog.getItem",
+        "views.class_window.ChoiceDialog.get_item",
         lambda *a, **k: ("Grace Hopper (1)", False),
     )
 

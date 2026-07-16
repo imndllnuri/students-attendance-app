@@ -6,6 +6,12 @@ YYYY-MM-DD.
 
 ## [Unreleased]
 
+### Added
+- `shared/dialogs.py`: `ChoiceDialog` and `DetailDialog`, real `QDialog` subclasses replacing the
+  RFID card-registration combo box and the student-detail "Export CSV" button that had previously
+  been hand-inserted into a `QMessageBox`'s own layout - the registration dialog also gained a
+  proper Cancel path it never had before.
+
 ### Changed
 - App renamed from "AttendU" to **TapIn**, with a generated contactless-tap
   icon wired into the taskbar/title-bar, sidebar wordmark, and auth screens.

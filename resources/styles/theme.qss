@@ -103,16 +103,6 @@ QLabel#auth_footer_lbl {
     font-size: 8.5pt;
 }
 
-QPushButton#theme_toggle_btn {
-    background-color: #FFFFFF;
-    border: 1px solid #E4E7ED;
-    border-radius: 18px;
-}
-
-QPushButton#theme_toggle_btn:hover {
-    background-color: #F4F5F9;
-}
-
 QLabel#signin_email_field_lbl,
 QLabel#signin_password_field_lbl,
 QLabel#signup_email_field_lbl,
@@ -1089,16 +1079,6 @@ QPushButton#notifications_btn:hover {
     background-color: #F4F5F9;
 }
 
-QPushButton#theme_toggle_btn {
-    background-color: transparent;
-    border: 1px solid #E4E7ED;
-    border-radius: 17px;
-}
-
-QPushButton#theme_toggle_btn:hover {
-    background-color: #F4F5F9;
-}
-
 QLabel#server_health_lbl {
     background-color: #F4F5F9;
     border-radius: 999px;
@@ -1222,6 +1202,36 @@ QMessageBox QPushButton {
 
 QMessageBox QPushButton:hover {
     background-color: #6C5CE1;
+}
+
+/* --- Generic dialogs (ChoiceDialog/DetailDialog and other plain QDialog
+   subclasses) - a base look so every dialog matches the app's card/pill
+   language without needing its own per-dialog stylesheet. More specific
+   selectors elsewhere (objectName or [variant=...]) still win over these. --- */
+
+QDialog {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+}
+
+QDialog QPushButton {
+    background-color: #7C6EF7;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 18px;
+    min-width: 64px;
+}
+
+QDialog QPushButton:hover {
+    background-color: #6C5CE1;
+}
+
+QDialog QComboBox {
+    background-color: #F4F5F9;
+    border: 1px solid #E4E7ED;
+    border-radius: 10px;
+    padding: 6px 10px;
 }
 
 /* --- Scrollbars --- */

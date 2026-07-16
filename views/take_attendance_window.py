@@ -4,7 +4,6 @@ import pandas as pd
 import qtawesome as qta
 from PyQt5.QtWidgets import (
     QAbstractItemView,
-    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -24,6 +23,7 @@ import serial.tools.list_ports
 
 from services.api_client import ApiError
 from services.card_reader import create_card_reader
+from shared.dialogs import ChoiceDialog
 from shared.hardware_config import load_hardware_config
 from shared.offline_queue import enqueue
 from shared.palette import qcolor
@@ -445,16 +445,12 @@ class TakeAttendance(QDialog):
             QMessageBox.warning(self, "Error", "No students in roster to register this card to.")
             return
 
-        msg = QMessageBox()
-        msg.setWindowTitle("Register New Card")
-        msg.setText("Card not registered. Select student:")
-
-        combo = QComboBox()
-        combo.addItems([s["name_surname"] for s in self.roster])
-        msg.layout().addWidget(combo)
-        msg.exec_()
-
-        selected_student = combo.currentText()
+        selected_student, ok = ChoiceDialog.get_item(
+            self, "Register New Card", "Card not registered. Select student:",
+            [s["name_surname"] for s in self.roster],
+        )
+        if not ok:
+            return
         student = next(s for s in self.roster if s["name_surname"] == selected_student)
 
         existing_card = student.get("card_id")

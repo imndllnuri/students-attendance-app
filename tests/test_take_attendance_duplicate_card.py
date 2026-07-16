@@ -39,7 +39,10 @@ def build_window(qtbot, monkeypatch, fake_serial, roster):
     monkeypatch.setattr("views.take_attendance_window.QMessageBox.information", lambda *a, **k: None)
     monkeypatch.setattr("views.take_attendance_window.QMessageBox.critical", lambda *a, **k: None)
     monkeypatch.setattr("views.take_attendance_window.QMessageBox.warning", lambda *a, **k: None)
-    monkeypatch.setattr(QMessageBox, "exec_", lambda self: None)
+    monkeypatch.setattr(
+        "views.take_attendance_window.ChoiceDialog.get_item",
+        lambda *a, **k: (roster[0]["name_surname"], True),
+    )
 
     class_manager = FakeClassManager(roster)
     window = TakeAttendance(FakeClassObj(), class_window=None, class_manager=class_manager)
