@@ -176,9 +176,6 @@ sent, keeping that literal label would actively mislead the user into expecting 
 
 ## 12. What's explicitly NOT done this pass
 
-- Settings screen restyle (still old visual language)
-- Notifications popover restyle (still old visual language)
-- Statistics page (explicitly out of scope, per your instruction)
 - Reset-password "sent confirmation" and "set new password" states (§9.4 says these "aren't in the
   new screenshots" and can extend naturally later — flagged, not built, since there's no reference
   image to match against and no existing token/link-based reset flow in the backend to hang it on)
@@ -189,3 +186,43 @@ sent, keeping that literal label would actively mislead the user into expecting 
   places, consistent with what was already there. Introducing a whole new transient-notification
   widget felt like scope creep beyond "restyle to match the reference + reorganize two screens";
   say the word if you want it added.
+
+## 13. Round 2 fixes (post-review corrections)
+
+After the first pass, you flagged several real problems. Fixed as follows:
+
+- **Auth screens consolidated into one window.** Forgot Password and Create One used to open a
+  brand-new top-level window/dialog (`CreateAccountWindow`, `ResetPasswordWindow`), duplicating the
+  left brand panel each time. `views/login_window.py` now owns all three flows directly - the right
+  panel is a `QStackedWidget` (`auth_stack`: sign-in/sign-up/reset pages) that swaps in place, one
+  shared left panel, one shared theme toggle. `create_account_window.py`/`reset_password_window.py`
+  and their `.ui` files are deleted; every field kept its business logic unchanged, only prefixed
+  (`signin_`/`signup_`/`reset_`) where a name collided across the merged pages (`email_le`,
+  `answer_le`, `answer_2_le`).
+- **Fixed a real layout bug causing huge, uneven gaps between fields** on all three auth pages (your
+  screenshots showed "Welcome back." and "Sign in to your account" nearly 150px apart with nothing
+  between). Root cause: `QStackedWidget` sizes itself to its **tallest** page by default, not the
+  currently-shown one - so the compact Sign In page was being stretched to Sign Up's much taller
+  natural height, and that slack space leaked out as gaps between fields. Fixed by pinning each
+  stack (`auth_stack` and the reset flow's inner `steps_stack`) to its current page's actual
+  `sizeHint()` height on every page switch, plus proper top/bottom `Expanding` spacers around the
+  form so it now sits centered rather than stretched top-to-bottom.
+- **Removed the Abdullah Gül Üniversitesi logo everywhere** (auth screens' left panel, sidebar) per
+  your instruction to genericize the branding. Replaced with a plain text wordmark ("AttendU"),
+  same position/rhythm as before. Deleted the now-unused `resources/images/qrc.qrc`,
+  `resources/images/qrc.py`, and the logo PNG, and dropped every `from resources.images import qrc`
+  import across the codebase.
+- **Sidebar's profile block (avatar/name/email, directly above Log Out) is now clickable** and
+  opens the Profile page - previously it was decorative only, and the *only* way to reach Profile
+  was a top-bar avatar menu, which isn't an obvious place to look for it.
+- **Restyled Dashboard's "Today's Classes" / "Recently Viewed" rows.** These were bare, unstyled
+  `QWidget`s with a plain label and a native OS-style button - the one part of the Dashboard that
+  didn't look like it belonged to the rest of the redesign. Now themed compact cards (soft
+  background, rounded corners, a small leading icon, pill action button), matching the visual
+  language used everywhere else on the page.
+
+## 14. Continuing past §14: Statistics, Settings, Notifications
+
+Per your latest instruction, the pass now continues onto the screens previously marked out of
+scope. See the sections below (added as this work lands) for Statistics/Settings/Notifications
+decisions.

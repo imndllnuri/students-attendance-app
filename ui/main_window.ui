@@ -183,7 +183,9 @@
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="today_classes_layout"/>
+           <layout class="QVBoxLayout" name="today_classes_layout">
+            <property name="spacing"><number>8</number></property>
+           </layout>
           </item>
           <item>
            <widget class="QLabel" name="recently_viewed_title_lbl">
@@ -197,7 +199,9 @@
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="recently_viewed_layout"/>
+           <layout class="QVBoxLayout" name="recently_viewed_layout">
+            <property name="spacing"><number>8</number></property>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="dashboard_filter_tabs_row">
@@ -882,27 +886,13 @@
       </property>
       <item>
        <layout class="QHBoxLayout" name="sidebar_logo_row">
-        <property name="leftMargin"><number>4</number></property>
+        <property name="leftMargin"><number>8</number></property>
+        <property name="topMargin"><number>4</number></property>
         <property name="bottomMargin"><number>4</number></property>
         <item>
-         <widget class="QLabel" name="agu_logo_lbl">
-          <property name="maximumSize">
-           <size>
-            <width>170</width>
-            <height>44</height>
-           </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
+         <widget class="QLabel" name="sidebar_wordmark_lbl">
           <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="../resources/images/qrc.qrc">:/images/abdullah_gul-universitesi-logo.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
+           <string>AttendU</string>
           </property>
          </widget>
         </item>
@@ -1036,8 +1026,6 @@
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="../resources/images/qrc.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

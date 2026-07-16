@@ -1,7 +1,7 @@
 """Covers #6: account creation now collects two distinct security
 questions (pick 2 of 3) instead of one."""
 
-from views.create_account_window import CreateAccountWindow
+import views.login_window as lw
 
 
 class FakeAccountManager:
@@ -14,17 +14,19 @@ class FakeAccountManager:
 
 
 def build_window(qtbot, monkeypatch, account_manager):
-    monkeypatch.setattr("views.create_account_window.QMessageBox.information", lambda *a, **k: None)
-    monkeypatch.setattr("views.create_account_window.QMessageBox.warning", lambda *a, **k: None)
-    monkeypatch.setattr("views.create_account_window.QMessageBox.critical", lambda *a, **k: None)
-    window = CreateAccountWindow(account_manager)
+    monkeypatch.setattr(lw, "AccountManager", lambda: account_manager)
+    monkeypatch.setattr(lw.QMessageBox, "information", lambda *a, **k: None)
+    monkeypatch.setattr(lw.QMessageBox, "warning", lambda *a, **k: None)
+    monkeypatch.setattr(lw.QMessageBox, "critical", lambda *a, **k: None)
+    window = lw.LoginWindow()
     qtbot.addWidget(window)
+    window.show_sign_up_page()
     return window
 
 
 def fill_common_fields(window):
-    window.email_le.setText("new@example.edu")
-    window.password_le.setText("Password123")
+    window.signup_email_le.setText("new@example.edu")
+    window.signup_password_le.setText("Password123")
     window.password_again_le.setText("Password123")
     window.name_le.setText("Ada")
     window.surname_le.setText("Lovelace")
@@ -43,8 +45,8 @@ def test_create_account_sends_both_questions_and_answers(qtbot, monkeypatch):
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
     fill_common_fields(window)
-    window.answer_le.setText("Rex")
-    window.answer_2_le.setText("London")
+    window.signup_answer_le.setText("Rex")
+    window.signup_answer_2_le.setText("London")
 
     window.create_account()
 
@@ -58,8 +60,8 @@ def test_create_account_rejects_identical_security_questions(qtbot, monkeypatch)
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
     fill_common_fields(window)
-    window.answer_le.setText("Rex")
-    window.answer_2_le.setText("London")
+    window.signup_answer_le.setText("Rex")
+    window.signup_answer_2_le.setText("London")
     window.security_question_2_ComboBox.setCurrentIndex(
         window.security_question_ComboBox.currentIndex()
     )
@@ -74,8 +76,8 @@ def test_create_account_requires_both_answers(qtbot, monkeypatch):
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
     fill_common_fields(window)
-    window.answer_le.setText("Rex")
-    window.answer_2_le.setText("")
+    window.signup_answer_le.setText("Rex")
+    window.signup_answer_2_le.setText("")
 
     window.create_account()
 

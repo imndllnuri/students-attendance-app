@@ -123,8 +123,11 @@ QPushButton#theme_toggle_btn:hover {
     background-color: #F4F5F9;
 }
 
-QLabel#email_field_lbl,
-QLabel#password_field_lbl,
+QLabel#signin_email_field_lbl,
+QLabel#signin_password_field_lbl,
+QLabel#signup_email_field_lbl,
+QLabel#signup_password_field_lbl,
+QLabel#reset_email_field_lbl,
 QLabel#name_field_lbl,
 QLabel#surname_field_lbl,
 QLabel#confirm_password_field_lbl,
@@ -207,13 +210,13 @@ QWidget#TakeAttendanceWindow {
     background-color: #EEF0F5;
 }
 
-/* Logo is a static raster asset with dark text baked in - keeps a fixed
-   near-white plate behind it (not the bg_card token, which does change in
-   dark mode) so it stays readable in dark mode too, regardless of theme. */
-QLabel#agu_logo_lbl {
-    background-color: #FFFFFE;
-    border-radius: 10px;
-    padding: 4px 14px;
+/* Text wordmark, fixed-dark chrome like the rest of the sidebar/auth-panel
+   it sits on - always uses the dark-mode accent tint regardless of theme. */
+QLabel#auth_wordmark_lbl,
+QLabel#sidebar_wordmark_lbl {
+    color: #9D90FA;
+    font-size: 14pt;
+    font-weight: 700;
 }
 
 /* --- Cards / panels --- */
@@ -254,18 +257,37 @@ QLabel#dashboard_stat_value_lbl {
 
 QLabel#dashboard_pinned_title_lbl,
 QLabel#dashboard_active_title_lbl,
-QLabel#dashboard_inactive_title_lbl {
+QLabel#dashboard_inactive_title_lbl,
+QLabel#today_classes_title_lbl,
+QLabel#recently_viewed_title_lbl {
     font-size: 9pt;
     font-weight: 700;
     color: #8A93A7;
     padding-top: 8px;
 }
 
-QLabel#dashboard_empty_state_lbl {
+QLabel#dashboard_empty_state_lbl,
+QLabel#no_classes_today_lbl,
+QLabel#no_recently_viewed_lbl {
     font-size: 10pt;
     color: #8A93A7;
     padding: 24px;
     qproperty-alignment: AlignCenter;
+}
+
+/* --- Today's Classes / Recently Viewed rows (Dashboard) --- */
+
+QFrame#today_class_row_widget,
+QFrame#recently_viewed_row_widget {
+    background-color: #F4F5F9;
+    border-radius: 10px;
+}
+
+QLabel#today_class_label_lbl,
+QLabel#recently_viewed_label_lbl {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1B1E2B;
 }
 
 QLabel#my_classes_count_lbl {
@@ -310,13 +332,18 @@ QLabel {
 QLabel#title_lbl,
 QLabel#title_lbl_settings,
 QLabel#statistics_title_lbl,
-QLabel#my_classes_title_lbl {
+QLabel#my_classes_title_lbl,
+QLabel#signin_title_lbl,
+QLabel#signup_title_lbl,
+QLabel#reset_title_lbl {
     font-size: 20pt;
     font-weight: 700;
     color: #1B1E2B;
 }
 
-QLabel#subtitle_lbl,
+QLabel#signin_subtitle_lbl,
+QLabel#signup_subtitle_lbl,
+QLabel#reset_subtitle_lbl,
 QLabel#class_code_lbl,
 QLabel#class_row_caption_lbl,
 QLabel#login_error_lbl,
@@ -342,6 +369,14 @@ QLabel#sidebar_top_name_lbl {
 QLabel#sidebar_user_email_lbl {
     font-size: 9pt;
     color: #767D91;
+}
+
+QWidget#sidebar_profile_widget {
+    border-radius: 10px;
+}
+
+QWidget#sidebar_profile_widget:hover {
+    background-color: #1B202C;
 }
 
 /* --- Progress/session badges (Take Attendance) --- */

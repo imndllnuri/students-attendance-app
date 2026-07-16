@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1040</width>
-    <height>640</height>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,13 +30,9 @@
       <property name="bottomMargin"><number>28</number></property>
       <property name="spacing"><number>0</number></property>
       <item>
-       <widget class="QLabel" name="agu_logo_lbl">
-        <property name="maximumSize"><size><width>16777215</width><height>48</height></size></property>
-        <property name="alignment"><set>Qt::AlignLeft|Qt::AlignVCenter</set></property>
-        <property name="pixmap">
-         <pixmap resource="../resources/images/qrc.qrc">:/images/abdullah_gul-universitesi-logo.png</pixmap>
-        </property>
-        <property name="scaledContents"><bool>true</bool></property>
+       <widget class="QLabel" name="auth_wordmark_lbl">
+        <property name="maximumSize"><size><width>16777215</width><height>32</height></size></property>
+        <property name="text"><string>AttendU</string></property>
        </widget>
       </item>
       <item>
@@ -113,6 +109,7 @@
       <property name="topMargin"><number>0</number></property>
       <property name="rightMargin"><number>0</number></property>
       <property name="bottomMargin"><number>0</number></property>
+      <property name="spacing"><number>0</number></property>
       <item>
        <layout class="QHBoxLayout" name="theme_toggle_row">
         <property name="leftMargin"><number>20</number></property>
@@ -135,6 +132,13 @@
        </layout>
       </item>
       <item>
+       <spacer name="form_top_center_spacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+       </spacer>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="form_center_layout">
         <item>
          <spacer name="form_left_spacer">
@@ -144,130 +148,531 @@
          </spacer>
         </item>
         <item>
-         <widget class="QWidget" name="form_widget" native="true">
+         <widget class="QStackedWidget" name="auth_stack">
           <property name="minimumSize"><size><width>360</width><height>0</height></size></property>
-          <property name="maximumSize"><size><width>400</width><height>16777215</height></size></property>
-          <layout class="QVBoxLayout" name="form_layout">
-           <property name="spacing"><number>6</number></property>
-           <item>
-            <widget class="QLabel" name="title_lbl">
-             <property name="text"><string>Welcome back.</string></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="subtitle_lbl">
-             <property name="wordWrap"><bool>true</bool></property>
-             <property name="text"><string>Sign in to your account</string></property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="form_top_spacer">
-             <property name="orientation"><enum>Qt::Vertical</enum></property>
-             <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
-             <property name="sizeHint" stdset="0"><size><width>20</width><height>14</height></size></property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="email_field_lbl">
-             <property name="text"><string>Email Address</string></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="email_le">
-             <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
-             <property name="placeholderText"><string>you@university.edu</string></property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="email_password_spacer">
-             <property name="orientation"><enum>Qt::Vertical</enum></property>
-             <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
-             <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
-            </spacer>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="password_label_row">
-             <item>
-              <widget class="QLabel" name="password_field_lbl">
-               <property name="text"><string>Password</string></property>
+          <property name="maximumSize"><size><width>420</width><height>16777215</height></size></property>
+          <widget class="QWidget" name="sign_in_page">
+           <layout class="QVBoxLayout" name="sign_in_page_layout">
+            <property name="spacing"><number>6</number></property>
+            <property name="leftMargin"><number>0</number></property>
+            <property name="topMargin"><number>0</number></property>
+            <property name="rightMargin"><number>0</number></property>
+            <property name="bottomMargin"><number>0</number></property>
+            <item>
+             <widget class="QLabel" name="signin_title_lbl">
+              <property name="text"><string>Welcome back.</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="signin_subtitle_lbl">
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string>Sign in to your account</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="signin_top_spacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>14</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="signin_email_field_lbl">
+              <property name="text"><string>Email Address</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="signin_email_le">
+              <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+              <property name="placeholderText"><string>you@university.edu</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="signin_email_password_spacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="password_label_row">
+              <item>
+               <widget class="QLabel" name="signin_password_field_lbl">
+                <property name="text"><string>Password</string></property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="password_label_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="forgot_password_btn">
+                <property name="text"><string>Forgot password?</string></property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="signin_password_le">
+              <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+              <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+              <property name="placeholderText"><string>••••••••</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="login_error_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="remember_me_cb">
+              <property name="text"><string>Remember me for 30 days</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="options_button_spacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>8</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="login_btn">
+              <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+              <property name="text"><string>Sign In</string></property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="create_account_row">
+              <property name="topMargin"><number>10</number></property>
+              <item>
+               <spacer name="create_account_left_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="create_account_prompt_lbl">
+                <property name="text"><string>Don't have an account?</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="create_account_btn">
+                <property name="text"><string>Create one</string></property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="create_account_right_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="sign_up_page">
+           <layout class="QVBoxLayout" name="sign_up_page_layout">
+            <property name="spacing"><number>5</number></property>
+            <property name="leftMargin"><number>0</number></property>
+            <property name="topMargin"><number>0</number></property>
+            <property name="rightMargin"><number>0</number></property>
+            <property name="bottomMargin"><number>0</number></property>
+            <item>
+             <widget class="QLabel" name="signup_title_lbl">
+              <property name="text"><string>Create account.</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="signup_subtitle_lbl">
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string>Join and start tracking attendance</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="signup_top_spacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="name_label_row">
+              <item>
+               <widget class="QLabel" name="name_field_lbl">
+                <property name="text"><string>First Name</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="surname_field_lbl">
+                <property name="text"><string>Surname</string></property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="name_row">
+              <item>
+               <widget class="QLineEdit" name="name_le">
+                <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+                <property name="placeholderText"><string>Aiden</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="surname_le">
+                <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+                <property name="placeholderText"><string>Kovacs</string></property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="signup_email_field_lbl">
+              <property name="text"><string>Email Address</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="signup_email_le">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+              <property name="placeholderText"><string>you@university.edu</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="email_error_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="signup_password_field_lbl">
+              <property name="text"><string>Password</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="signup_password_le">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+              <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+              <property name="placeholderText"><string>Min. 8 characters</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="password_strength_lbl">
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="password_error_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="confirm_password_field_lbl">
+              <property name="text"><string>Confirm Password</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="password_again_le">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+              <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+              <property name="placeholderText"><string>Repeat password</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="password_again_error_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="security_question_field_lbl">
+              <property name="text"><string>Security Question 1</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="security_question_ComboBox">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="signup_answer_le">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+              <property name="placeholderText"><string>Your answer</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="security_questions_error_lbl">
+              <property name="visible"><bool>false</bool></property>
+              <property name="wordWrap"><bool>true</bool></property>
+              <property name="text"><string/></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="security_question_2_field_lbl">
+              <property name="text"><string>Security Question 2</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="security_question_2_ComboBox">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="signup_answer_2_le">
+              <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+              <property name="placeholderText"><string>Your answer</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="signup_bottom_spacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>8</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="sign_up_btn">
+              <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+              <property name="text"><string>Create Account</string></property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="sign_in_row">
+              <property name="topMargin"><number>10</number></property>
+              <item>
+               <spacer name="sign_in_left_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="sign_in_prompt_lbl">
+                <property name="text"><string>Already have an account?</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="sign_in_btn">
+                <property name="text"><string>Sign in</string></property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="sign_in_right_spacer">
+                <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="reset_page">
+           <layout class="QVBoxLayout" name="reset_page_layout">
+            <property name="leftMargin"><number>0</number></property>
+            <property name="topMargin"><number>0</number></property>
+            <property name="rightMargin"><number>0</number></property>
+            <property name="bottomMargin"><number>0</number></property>
+            <item>
+             <widget class="QPushButton" name="back_to_signin_btn">
+              <property name="text"><string>←  Back to sign in</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="back_link_spacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>14</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QStackedWidget" name="steps_stack">
+              <widget class="QWidget" name="email_page">
+               <layout class="QVBoxLayout" name="email_page_layout">
+                <property name="spacing"><number>5</number></property>
+                <property name="leftMargin"><number>0</number></property>
+                <property name="topMargin"><number>0</number></property>
+                <property name="rightMargin"><number>0</number></property>
+                <property name="bottomMargin"><number>0</number></property>
+                <item>
+                 <widget class="QLabel" name="reset_title_lbl">
+                  <property name="text"><string>Reset password.</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="reset_subtitle_lbl">
+                  <property name="text"><string>Enter your email and we'll ask your security questions to reset it.</string></property>
+                  <property name="wordWrap"><bool>true</bool></property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="email_page_top_spacer">
+                  <property name="orientation"><enum>Qt::Vertical</enum></property>
+                  <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>20</width><height>14</height></size></property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="reset_email_field_lbl">
+                  <property name="text"><string>Email Address</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="reset_email_le">
+                  <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                  <property name="placeholderText"><string>you@university.edu</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="error_lbl_step1">
+                  <property name="visible"><bool>false</bool></property>
+                  <property name="wordWrap"><bool>true</bool></property>
+                  <property name="text"><string/></property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="email_page_spacer">
+                  <property name="orientation"><enum>Qt::Vertical</enum></property>
+                  <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>20</width><height>14</height></size></property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="email_page_btn_row">
+                  <item>
+                   <widget class="QPushButton" name="cancel_btn">
+                    <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                    <property name="text"><string>Cancel</string></property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="next_btn">
+                    <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                    <property name="text"><string>Continue</string></property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
               </widget>
-             </item>
-             <item>
-              <spacer name="password_label_spacer">
-               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-               <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-               <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="forgot_password_btn">
-               <property name="text"><string>Forgot password?</string></property>
+              <widget class="QWidget" name="answer_page">
+               <layout class="QVBoxLayout" name="answer_page_layout">
+                <property name="spacing"><number>5</number></property>
+                <property name="leftMargin"><number>0</number></property>
+                <property name="topMargin"><number>0</number></property>
+                <property name="rightMargin"><number>0</number></property>
+                <property name="bottomMargin"><number>0</number></property>
+                <item>
+                 <widget class="QLabel" name="title_lbl_2">
+                  <property name="text"><string>Answer your security questions</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="answer_page_top_spacer">
+                  <property name="orientation"><enum>Qt::Vertical</enum></property>
+                  <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="security_question_lbl">
+                  <property name="text"><string/></property>
+                  <property name="wordWrap"><bool>true</bool></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="reset_answer_le">
+                  <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+                  <property name="placeholderText"><string>Your answer</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="security_question_2_lbl">
+                  <property name="text"><string/></property>
+                  <property name="wordWrap"><bool>true</bool></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="reset_answer_2_le">
+                  <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+                  <property name="placeholderText"><string>Your answer</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="new_password_field_lbl">
+                  <property name="text"><string>New Password</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="new_password_le">
+                  <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                  <property name="placeholderText"><string>Min. 8 characters</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="new_password_strength_lbl">
+                  <property name="text"><string/></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="confirm_new_password_field_lbl">
+                  <property name="text"><string>Confirm New Password</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="confirm_password_le">
+                  <property name="minimumSize"><size><width>0</width><height>42</height></size></property>
+                  <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+                  <property name="placeholderText"><string>Repeat password</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="error_lbl_step2">
+                  <property name="visible"><bool>false</bool></property>
+                  <property name="wordWrap"><bool>true</bool></property>
+                  <property name="text"><string/></property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="answer_page_spacer">
+                  <property name="orientation"><enum>Qt::Vertical</enum></property>
+                  <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="answer_page_btn_row">
+                  <item>
+                   <widget class="QPushButton" name="back_btn">
+                    <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                    <property name="text"><string>Back</string></property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="reset_btn">
+                    <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+                    <property name="text"><string>Reset Password</string></property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
               </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="password_le">
-             <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
-             <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-             <property name="placeholderText"><string>••••••••</string></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="login_error_lbl">
-             <property name="visible"><bool>false</bool></property>
-             <property name="wordWrap"><bool>true</bool></property>
-             <property name="text"><string/></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="remember_me_cb">
-             <property name="text"><string>Remember me for 30 days</string></property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="options_button_spacer">
-             <property name="orientation"><enum>Qt::Vertical</enum></property>
-             <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
-             <property name="sizeHint" stdset="0"><size><width>20</width><height>8</height></size></property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="login_btn">
-             <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
-             <property name="text"><string>Sign In</string></property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="create_account_row">
-             <property name="topMargin"><number>10</number></property>
-             <item>
-              <spacer name="create_account_left_spacer">
-               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-               <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-               <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="create_account_prompt_lbl">
-               <property name="text"><string>Don't have an account?</string></property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="create_account_btn">
-               <property name="text"><string>Create one</string></property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="create_account_right_spacer">
-               <property name="orientation"><enum>Qt::Horizontal</enum></property>
-               <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-               <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-          </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
         <item>
@@ -279,13 +684,18 @@
         </item>
        </layout>
       </item>
+      <item>
+       <spacer name="form_bottom_center_spacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+       </spacer>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resources/images/qrc.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

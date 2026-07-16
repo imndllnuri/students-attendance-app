@@ -35,7 +35,6 @@ from PyQt5.QtWidgets import (
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
-from resources.images import qrc
 from services.api_client import ApiError
 from shared.class_order import load_class_order, save_class_order
 from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
@@ -114,6 +113,8 @@ class MainWindow(QMainWindow):
         self.settings_btn.clicked.connect(self.show_settings)
         self.statistics_btn.clicked.connect(self.show_statistics)
         self.log_out_btn.clicked.connect(self.confirm_logout)
+        self.sidebar_profile_widget.setCursor(Qt.PointingHandCursor)
+        self.sidebar_profile_widget.mousePressEvent = lambda _event: self.show_profile()
         self.create_new_class_btn.clicked.connect(self.open_add_new_class_window)
         self.add_class_dashboard_btn.clicked.connect(self.open_add_new_class_window)
         self.import_classes_btn.clicked.connect(self.import_classes_from_spreadsheet)
@@ -727,16 +728,24 @@ class MainWindow(QMainWindow):
             self.today_classes_layout.addWidget(self._make_today_class_row_widget(cls))
 
     def _make_today_class_row_widget(self, cls):
-        row = QWidget()
+        row = QFrame()
         row.setObjectName("today_class_row_widget")
         layout = QHBoxLayout(row)
-        layout.setContentsMargins(4, 4, 4, 4)
+        layout.setContentsMargins(14, 10, 14, 10)
+        layout.setSpacing(10)
+
+        icon_lbl = QLabel()
+        icon_lbl.setObjectName("today_class_icon_lbl")
+        icon_lbl.setPixmap(qta.icon("fa5s.calendar-day", color=active_palette()["accent"]).pixmap(16, 16))
+        layout.addWidget(icon_lbl)
 
         label = QLabel(f"{cls.class_name} ({cls.class_code})")
+        label.setObjectName("today_class_label_lbl")
         layout.addWidget(label, 1)
 
         take_attendance_btn = QPushButton("Take Attendance")
         take_attendance_btn.setCursor(Qt.PointingHandCursor)
+        set_dynamic_property(take_attendance_btn, "variant", "secondary")
         take_attendance_btn.clicked.connect(lambda _, c=cls: self.open_take_attendance_for(c))
         layout.addWidget(take_attendance_btn)
 
@@ -761,16 +770,24 @@ class MainWindow(QMainWindow):
             self.recently_viewed_layout.addWidget(self._make_recently_viewed_row_widget(cls))
 
     def _make_recently_viewed_row_widget(self, cls):
-        row = QWidget()
+        row = QFrame()
         row.setObjectName("recently_viewed_row_widget")
         layout = QHBoxLayout(row)
-        layout.setContentsMargins(4, 4, 4, 4)
+        layout.setContentsMargins(14, 10, 14, 10)
+        layout.setSpacing(10)
+
+        icon_lbl = QLabel()
+        icon_lbl.setObjectName("recently_viewed_icon_lbl")
+        icon_lbl.setPixmap(qta.icon("fa5s.history", color=active_palette()["text_secondary"]).pixmap(16, 16))
+        layout.addWidget(icon_lbl)
 
         label = QLabel(f"{cls.class_name} ({cls.class_code})")
+        label.setObjectName("recently_viewed_label_lbl")
         layout.addWidget(label, 1)
 
         open_btn = QPushButton("Open")
         open_btn.setCursor(Qt.PointingHandCursor)
+        set_dynamic_property(open_btn, "variant", "ghost")
         open_btn.clicked.connect(lambda _, c=cls: self.open_class_window(c))
         layout.addWidget(open_btn)
 

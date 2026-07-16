@@ -1,7 +1,7 @@
 """Covers #6: password reset now requires answering both of the
 account's two security questions, not just one."""
 
-from views.reset_password_window import ResetPasswordWindow
+import views.login_window as lw
 
 
 class FakeAccountManager:
@@ -19,18 +19,20 @@ class FakeAccountManager:
 
 
 def build_window(qtbot, monkeypatch, account_manager):
-    monkeypatch.setattr("views.reset_password_window.QMessageBox.information", lambda *a, **k: None)
-    monkeypatch.setattr("views.reset_password_window.QMessageBox.warning", lambda *a, **k: None)
-    monkeypatch.setattr("views.reset_password_window.QMessageBox.critical", lambda *a, **k: None)
-    window = ResetPasswordWindow(account_manager)
+    monkeypatch.setattr(lw, "AccountManager", lambda: account_manager)
+    monkeypatch.setattr(lw.QMessageBox, "information", lambda *a, **k: None)
+    monkeypatch.setattr(lw.QMessageBox, "warning", lambda *a, **k: None)
+    monkeypatch.setattr(lw.QMessageBox, "critical", lambda *a, **k: None)
+    window = lw.LoginWindow()
     qtbot.addWidget(window)
+    window.show_reset_page()
     return window
 
 
 def test_fetch_question_shows_both_security_questions(qtbot, monkeypatch):
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
-    window.email_le.setText("a@b.com")
+    window.reset_email_le.setText("a@b.com")
 
     window.fetch_question()
 
@@ -42,11 +44,11 @@ def test_fetch_question_shows_both_security_questions(qtbot, monkeypatch):
 def test_submit_reset_requires_both_answers(qtbot, monkeypatch):
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
-    window.email_le.setText("a@b.com")
+    window.reset_email_le.setText("a@b.com")
     window.fetch_question()
 
-    window.answer_le.setText("Rex")
-    window.answer_2_le.setText("")
+    window.reset_answer_le.setText("Rex")
+    window.reset_answer_2_le.setText("")
     window.new_password_le.setText("NewPass123")
     window.confirm_password_le.setText("NewPass123")
 
@@ -58,11 +60,11 @@ def test_submit_reset_requires_both_answers(qtbot, monkeypatch):
 def test_submit_reset_sends_both_answers_to_the_manager(qtbot, monkeypatch):
     manager = FakeAccountManager()
     window = build_window(qtbot, monkeypatch, manager)
-    window.email_le.setText("a@b.com")
+    window.reset_email_le.setText("a@b.com")
     window.fetch_question()
 
-    window.answer_le.setText("Rex")
-    window.answer_2_le.setText("London")
+    window.reset_answer_le.setText("Rex")
+    window.reset_answer_2_le.setText("London")
     window.new_password_le.setText("NewPass123")
     window.confirm_password_le.setText("NewPass123")
 
@@ -74,11 +76,11 @@ def test_submit_reset_sends_both_answers_to_the_manager(qtbot, monkeypatch):
 def test_submit_reset_shows_error_when_an_answer_is_wrong(qtbot, monkeypatch):
     manager = FakeAccountManager(reset_result=(False, "One or more security answers are incorrect"))
     window = build_window(qtbot, monkeypatch, manager)
-    window.email_le.setText("a@b.com")
+    window.reset_email_le.setText("a@b.com")
     window.fetch_question()
 
-    window.answer_le.setText("wrong")
-    window.answer_2_le.setText("London")
+    window.reset_answer_le.setText("wrong")
+    window.reset_answer_2_le.setText("London")
     window.new_password_le.setText("NewPass123")
     window.confirm_password_le.setText("NewPass123")
 

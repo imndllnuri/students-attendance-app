@@ -28,7 +28,7 @@ def test_defaults_to_english_strings(qtbot, monkeypatch):
     }[key])
     window = build_window(qtbot, monkeypatch)
 
-    assert window.title_lbl.text() == "Welcome back."
+    assert window.signin_title_lbl.text() == "Welcome back."
     assert window.login_btn.text() == "Sign In"
     assert window.create_account_prompt_lbl.text() == "Don't have an account?"
     assert window.create_account_btn.text() == "Create one"
@@ -49,7 +49,7 @@ def test_uses_turkish_strings_when_that_is_the_saved_language(qtbot, monkeypatch
     monkeypatch.setattr(lw, "t", lambda key: turkish[key])
     window = build_window(qtbot, monkeypatch)
 
-    assert window.title_lbl.text() == "Tekrar hoş geldiniz."
+    assert window.signin_title_lbl.text() == "Tekrar hoş geldiniz."
     assert window.forgot_password_btn.text() == "Şifremi unuttum?"
     assert window.login_btn.text() == "Giriş Yap"
     assert window.create_account_btn.text() == "Hesap oluşturun"

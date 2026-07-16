@@ -1,9 +1,9 @@
 """Validation rules shared by every view that collects account credentials.
 
 Previously EMAIL_RE/MIN_PASSWORD_LENGTH/SECURITY_QUESTIONS were redefined
-independently in main_window.py, create_account_window.py and
-reset_password_window.py, and had drifted out of sync (reset only checked
-password length, skipping the letter+digit rule enforced elsewhere).
+independently in main_window.py and login_window.py's sign-up/reset flows,
+and had drifted out of sync (reset only checked password length, skipping
+the letter+digit rule enforced elsewhere).
 """
 
 import re
