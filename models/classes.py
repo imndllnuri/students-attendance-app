@@ -3,7 +3,8 @@ from typing import Dict, List, Optional
 
 from PyQt5.QtCore import QTime
 
-from services.api_client import ApiClient, ApiError
+from services.api_client import ApiError
+from shared.backend_config import create_client
 
 
 @dataclass
@@ -102,7 +103,7 @@ class ClassManager:
     """Thin wrapper around the attendance server's class endpoints."""
 
     def __init__(self, api_client=None):
-        self.api_client = api_client or ApiClient()
+        self.api_client = api_client or create_client()
         self.classes: List[Class] = []
 
     def load_classes_for_instructor(self, instructor_id: str, include_archived: bool = False) -> List[Class]:

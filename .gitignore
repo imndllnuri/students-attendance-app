@@ -15,7 +15,6 @@ accounts.json
 server/attendance.db
 server/backups/
 .remembered_email
-.theme_preference
 .language_preference
 .session_timeout_preference
 .class_order_preference
@@ -25,6 +24,10 @@ server/backups/
 .font_scale_preference
 .last_seen_version
 .hardware_config.json
+
+# Offline/local-storage backend (Phase 2) - config + the data directory itself
+.backend_config.json
+local_data/
 
 # Test/CI artifacts
 .pytest_cache/

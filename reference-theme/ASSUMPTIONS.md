@@ -439,3 +439,51 @@ Per your request to "work on .md files ... fix QDialog rebuild":
   `tests/test_class_window_correct_attendance.py`, `tests/test_class_window_student_detail.py`, and
   `tests/test_take_attendance_duplicate_card.py` updated to patch the new dialog classes instead of
   `QInputDialog`/`QMessageBox` internals.
+- Also fixed while touching `.gitignore`: a dead `.theme_preference` entry (§16 deleted the file's
+  only writer/reader, but missed the gitignore line).
+
+## 20. Roadmap Phase 2: offline/local-storage backend
+
+Per your request to implement "phase 2" (`ROADMAP.md`'s own already-written design) - a
+`LocalStorageClient` (`services/local_storage_client.py`) implementing every method `ApiClient` has,
+so `AccountManager`/`ClassManager` don't change at all, only which client they're constructed with.
+
+- **Storage, under `local_data/` (gitignored, one directory per install)**: `accounts.json` (hashed
+  passwords/answers via the same `werkzeug.security` helpers the server uses - deliberately a fresh
+  schema, not the old pre-server `data/<instructor>/<class>/class_info.json` + `student_list.xlsx`
+  format `server/migrate_legacy_data.py` reads, since that legacy format stored **plaintext**
+  passwords/answers, which is exactly the kind of file this project's own history flagged as a
+  problem (the original `accounts.json` was deleted from disk early this project for that reason -
+  see `CHANGELOG.md`'s `[Unreleased]`/Removed section). `login_history.json`, and one
+  `classes/<class_id>.json` (metadata + schedule, same shape as `server/app.py`'s
+  `class_row_to_dict()`) + `classes/<class_id>.xlsx` per class.
+- **The `.xlsx` is long-form, not a pivoted crosstab**: a "Roster" sheet (student_id, student_number,
+  name_surname, card_id) and an "Attendance" sheet with **one row per recorded scan** (student_id,
+  date, time_slot, time, status) - considered and rejected keeping a live pivoted spreadsheet (matching
+  `get_student_table()`'s output shape exactly, which is what the *original* pre-server prototype's
+  `student_list.xlsx` apparently was, going by that route's docstring) because dynamically adding/
+  finding pivot columns in a real spreadsheet on every attendance submission is a much larger, more
+  fragile surface than appending a row - `get_student_table()`/`get_statistics()` pivot/aggregate the
+  long-form sheet in Python instead, porting `server/app.py`'s SQL logic step-for-step so the output
+  shape is identical either way.
+- **Global `student_id`, not per-class**: `remove_student(student_id)`/`register_card(student_id,
+  ...)` only take a bare id (no `class_id`), exactly like the SQL version (student_id is a
+  database-wide autoincrement PK there). A per-class counter would let two different classes'
+  students collide on the same id, so student_id is a single global counter
+  (`local_data/_meta.json`'s `next_student_id`) instead - `_find_student_class_id()` scans every
+  class's roster sheet to resolve which class a bare id belongs to, which is fine at the scale this
+  backend is for (one instructor, a handful of classes).
+- **Backend selection**: `shared/backend_config.py`'s `create_client()`, driven by
+  `.backend_config.json` (mirrors `shared/hardware_config.py`'s existing file-based-config pattern
+  exactly) - defaults to `"server"` (today's `ApiClient` behavior, byte-for-byte unchanged unless this
+  file is explicitly written). Also where `ApiClient.base_url` became configurable, per `ROADMAP.md`'s
+  own note that this was the natural point to do it.
+- **Not implemented**: the server's `/audit-log` and `/admin/backup` routes have no `LocalStorageClient`
+  equivalent - they're server-admin routes never exposed through `ApiClient`'s method surface (which is
+  the literal spec this backend was built to match), so there was nothing in
+  `AccountManager`/`ClassManager` that would ever call them.
+- **Tests**: `tests/test_local_storage_client.py` mirrors `tests/test_server_routes.py`'s scenarios
+  (skipping the audit-log/backup ones, per the point above) directly against `LocalStorageClient`
+  instances, plus a persistence-across-reload test the SQL-backed test suite doesn't need (SQLite's
+  file already covers that implicitly); `tests/test_backend_config.py` covers the config/factory
+  logic itself.

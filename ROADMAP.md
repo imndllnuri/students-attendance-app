@@ -36,21 +36,32 @@ first, to avoid rewriting large sections twice).
 Goal: run the whole app with **zero Flask server involvement**, per-class
 attendance stored in `.xlsx` files.
 
-- [ ] Design a `LocalStorageClient` implementing the same method surface as
+- [x] Design a `LocalStorageClient` implementing the same method surface as
       `ApiClient` (`authenticate`, `create_class`, `get_roster`,
       `submit_attendance`, etc.) so `AccountManager`/`ClassManager` don't
       need to change — only which client they're constructed with.
-- [ ] Accounts/classes stored as local files (JSON, reusing the shape
-      `server/migrate_legacy_data.py` already knows how to read); attendance
-      per class as one `.xlsx` per class via `openpyxl` (already a
-      dependency).
-- [ ] A config flag/env var to choose backend (`ApiClient` vs
-      `LocalStorageClient`) — also the point where `ApiClient`'s hardcoded
-      `base_url` should become configurable (see `ARCHITECTURE.md` known
-      limitations).
-- [ ] Test suite mirroring `tests/test_server_routes.py` but against the
-      local adapter, reusing the CI harness from Phase 1.
-- [ ] Document the file/folder naming convention chosen.
+      (`services/local_storage_client.py`)
+- [x] Accounts/classes stored as local files (JSON: `accounts.json`,
+      `login_history.json`, `classes/<class_id>.json` — the class-metadata
+      shape matches `server/app.py`'s `class_row_to_dict()`, not the older
+      pre-server `data/<instructor>/<class>/class_info.json` layout
+      `server/migrate_legacy_data.py` reads, since that legacy format
+      stored plaintext passwords/answers, which this backend deliberately
+      does not); attendance per class as one `.xlsx` per class via
+      `openpyxl`/`pandas` (`classes/<class_id>.xlsx`, "Roster" +
+      "Attendance" sheets — see `ARCHITECTURE.md`).
+- [x] A config flag to choose backend (`ApiClient` vs `LocalStorageClient`)
+      — `.backend_config.json` via `shared/backend_config.py`'s
+      `create_client()`, defaulting to the server backend so behavior is
+      unchanged unless explicitly configured (same convention as
+      `shared/hardware_config.py`). Also the point where `ApiClient`'s
+      `base_url` is now configurable, instead of hardcoded.
+- [x] Test suite mirroring `tests/test_server_routes.py` but against the
+      local adapter (`tests/test_local_storage_client.py`,
+      `tests/test_backend_config.py`), reusing the CI harness from Phase 1.
+- [x] Document the file/folder naming convention chosen. See
+      `services/local_storage_client.py`'s module docstring and
+      `ARCHITECTURE.md`.
 
 ## Phase 3 — Remaining GUI/architecture fixes
 

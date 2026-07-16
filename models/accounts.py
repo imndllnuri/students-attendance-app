@@ -1,4 +1,5 @@
-from services.api_client import ApiClient, ApiError
+from services.api_client import ApiError
+from shared.backend_config import create_client
 
 
 class Account:
@@ -48,7 +49,7 @@ class AccountManager:
     """Thin wrapper around the attendance server's account endpoints."""
 
     def __init__(self, api_client=None):
-        self.api_client = api_client or ApiClient()
+        self.api_client = api_client or create_client()
 
     def add_account(self, account):
         try:

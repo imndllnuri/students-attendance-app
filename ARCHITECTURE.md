@@ -33,11 +33,17 @@ models/                   # data containers + thin server-backed managers
 
 services/
   api_client.py            # ApiClient: HTTP client wrapping every server route
+  local_storage_client.py  # LocalStorageClient: same method surface as
+                            # ApiClient, backed by local JSON/.xlsx files
+                            # instead of the Flask server (Phase 2)
 
 shared/
   validation.py             # EMAIL_RE, MIN_PASSWORD_LENGTH, SECURITY_QUESTIONS,
                              # is_valid_email(), is_valid_password() - the single
                              # source of truth so views don't redefine these
+  backend_config.py         # create_client(): builds the ApiClient or
+                             # LocalStorageClient AccountManager/ClassManager
+                             # use by default, per .backend_config.json
 
 server/                    # Flask + SQLite backend, runs as its own process
   app.py                    # all REST routes
@@ -105,14 +111,39 @@ legacy `student_list.xlsx` roster files did, so the GUI's table-rendering
 code in `views/class_window.py` didn't need to change during the migration
 off file-based storage.
 
+## Offline / local-storage backend (Phase 2)
+
+`services/local_storage_client.py`'s `LocalStorageClient` implements the
+exact same method surface as `ApiClient` — every view/model call goes
+through `AccountManager`/`ClassManager` either way, so nothing above the
+client boundary needs to know or care which backend is active. Which one
+`AccountManager()`/`ClassManager()` construct by default is decided once,
+in `shared/backend_config.py`'s `create_client()`, driven by
+`.backend_config.json` (`{"backend": "server"|"local", "base_url": ...,
+"local_data_dir": ...}` — mirrors `shared/hardware_config.py`'s pattern).
+Defaults to `"server"` (today's `ApiClient` behavior, unchanged unless
+explicitly configured).
+
+`LocalStorageClient` stores everything as plain files under a data
+directory (default `local_data/`, gitignored): `accounts.json`,
+`login_history.json`, and one `classes/<class_id>.json` (metadata/schedule)
++ `classes/<class_id>.xlsx` (a "Roster" sheet and a long-form "Attendance"
+sheet — one row per recorded scan, not a pivoted crosstab) per class.
+`get_student_table()`/`get_statistics()` pivot/aggregate that long-form
+sheet in Python, mirroring `server/app.py`'s SQL logic step for step rather
+than reinventing the shape. See the module docstring for the full layout
+and why it's a fresh JSON schema rather than a literal reuse of the old
+pre-server `data/<instructor>/<class>/` format (that format stored
+plaintext passwords, which this one deliberately does not).
+
 ## Config / known limitations
 
 These are known, intentional simplifications for the current prototype
 stage, not oversights — tracked in `ROADMAP.md` where relevant:
 
-- `services/api_client.py` hardcodes `base_url="http://127.0.0.1:5000"`.
-  There's no config file or environment variable yet; a real deployment or
-  the planned offline mode would need this to be configurable.
+- `services/api_client.py`'s `base_url` is configurable via
+  `.backend_config.json` (see above) but still defaults to
+  `"http://127.0.0.1:5000"` if unconfigured or constructed directly.
 - `server/db.py`'s `DB_PATH` is a module-level constant pointing at
   `server/attendance.db` next to the code. Tests override it via
   `monkeypatch` (see `tests/conftest.py`); production has no equivalent

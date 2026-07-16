@@ -7,6 +7,13 @@ YYYY-MM-DD.
 ## [Unreleased]
 
 ### Added
+- **Offline/local-storage backend (ROADMAP.md Phase 2)**: `services/local_storage_client.py`'s
+  `LocalStorageClient` implements the full `ApiClient` method surface against local JSON +
+  per-class `.xlsx` files instead of the Flask/SQLite server - zero server process required.
+  `shared/backend_config.py`'s `create_client()` decides which backend `AccountManager`/
+  `ClassManager` get by default, via `.backend_config.json` (defaults to the server backend,
+  unchanged unless explicitly configured); this is also where `ApiClient`'s `base_url`
+  became configurable instead of hardcoded. See `ARCHITECTURE.md`.
 - `shared/dialogs.py`: `ChoiceDialog` and `DetailDialog`, real `QDialog` subclasses replacing the
   RFID card-registration combo box and the student-detail "Export CSV" button that had previously
   been hand-inserted into a `QMessageBox`'s own layout - the registration dialog also gained a
