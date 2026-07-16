@@ -27,6 +27,7 @@ from services.card_reader import create_card_reader
 from shared.hardware_config import load_hardware_config
 from shared.offline_queue import enqueue
 from shared.palette import qcolor
+from shared.qt_style import set_dynamic_property
 from shared.session_templates import load_session_template, save_session_template
 
 logger = logging.getLogger(__name__)
@@ -64,14 +65,27 @@ class TakeAttendance(QDialog):
             self.close()
 
     def setup_ui(self):
-        self.class_name_lbl.setText(f"Taking attendance for {self.class_obj.class_name}")
+        self.attendance_class_name_lbl.setText(self.class_obj.class_name)
+        self.back_to_class_btn.setText(f"←  {self.class_obj.class_name}")
+        self.back_to_class_btn.clicked.connect(self.close)
         self.start_attendance_btn.clicked.connect(self.start_attendance)
         self.submit_attendance_btn.clicked.connect(self.submit_attendance)
         self.mark_all_present_btn.clicked.connect(self.mark_all_present)
         self.undo_last_scan_btn.clicked.connect(self.undo_last_scan)
         self.manual_attendance_btn.clicked.connect(self.manual_attendance_entry)
         self.mark_selected_absent_btn.clicked.connect(self.mark_selected_absent)
+        self.date_toggle_btn.toggled.connect(self.calendarWidget.setVisible)
         self.calendarWidget.selectionChanged.connect(self.update_date_info)
+        self.calendarWidget.selectionChanged.connect(self._collapse_calendar_popover)
+
+        set_dynamic_property(self.start_attendance_btn, "variant", "primary")
+        set_dynamic_property(self.submit_attendance_btn, "variant", "primary")
+        set_dynamic_property(self.save_session_template_btn, "variant", "ghost")
+        set_dynamic_property(self.mark_all_present_btn, "variant", "secondary")
+        set_dynamic_property(self.undo_last_scan_btn, "variant", "ghost")
+        set_dynamic_property(self.manual_attendance_btn, "variant", "secondary")
+        set_dynamic_property(self.mark_selected_absent_btn, "variant", "destructive")
+        set_dynamic_property(self.export_to_excel_btn, "variant", "ghost")
 
         self.export_to_excel_btn.setIcon(qta.icon("fa5s.file-excel", color="#2563EB"))
         self.export_to_excel_btn.clicked.connect(self.export_attendance_sheet)
@@ -104,9 +118,18 @@ class TakeAttendance(QDialog):
         self._set_scan_status("idle", "Press Start Attendance to begin scanning.")
         self._update_progress_label()
 
+    def _collapse_calendar_popover(self):
+        self.date_toggle_btn.setChecked(False)
+
     def _update_progress_label(self):
         self.attendance_progress_lbl.setText(
             f"{len(self.staged_student_ids)}/{len(self.roster)} recorded"
+        )
+        present = sum(1 for r in self.staged_records if r["status"] == "Present")
+        late = sum(1 for r in self.staged_records if r["status"] == "Late")
+        absent = sum(1 for r in self.staged_records if r["status"] == "Absent")
+        self.todays_summary_lbl.setText(
+            f"Present {present}  ·  Late {late}  ·  Absent {absent}  ·  Total {len(self.roster)}"
         )
 
     def setup_serial(self):
@@ -583,7 +606,7 @@ class TakeAttendance(QDialog):
         day_name = selected_date.toString("dddd")
         date_str = selected_date.toString("dd-MM-yyyy")
 
-        self.selected_day_lbl.setText(f"{day_name} - {date_str}")
+        self.date_toggle_btn.setText(f"📅  {day_name} - {date_str}")
         self.update_hours_combobox(day_name)
         self.update_session_countdown()
 

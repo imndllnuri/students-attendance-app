@@ -105,6 +105,31 @@ Both were rebuilt around the student roster as the dominant element:
 These are genuinely new layouts, not a re-skin of the reference screenshots — flag anything you
 don't like and I'll adjust.
 
+### 7a. Take Attendance implementation details
+
+- "Today's Summary" (Present/Late/Absent/Total) is a single condensed caption line
+  (`todays_summary_lbl`) inside the control strip, not 4 separate stat-card widgets — matches the
+  "slim control strip" intent instead of competing with the roster table for visual weight.
+- The spec's separate "Session state" caption (e.g. "Session not started") was **not** added as its
+  own label. The existing `scan_status_card`/`scan_status_text_lbl` already communicates this exact
+  information ("Press Start Attendance to begin scanning." → "Listening for scans...") — a second,
+  parallel status indicator would just be redundant chrome.
+- Fixed a real bug found while building this: connecting the calendar popover's auto-collapse via a
+  `lambda: self.date_toggle_btn.setChecked(False)` created a Python reference cycle
+  (window → calendarWidget → lambda closure → window) that kept the whole dialog alive past its
+  local scope in tests, long enough for `qtbot`'s teardown to call the real (unmocked)
+  `.close()` → a blocking `QMessageBox.question` under the offscreen test platform → a full test-
+  suite hang. Fixed by using a plain bound method instead of a lambda, matching the rest of the
+  file's existing connect-a-method pattern.
+- Fixed a second, cosmetic-but-real dark-mode bug also present (independently) on Class Detail: both
+  `ClassWindow` and `TakeAttendanceWindow` lay their cards out with generous outer margins rather
+  than filling edge-to-edge, and neither root widget had an explicit background rule in the QSS, so
+  Qt's default (light) palette showed through as a jarring light strip around the cards in dark
+  mode, with page titles rendered in a light dark-mode text color on top of it (nearly unreadable).
+  Added `QWidget#ClassWindow, QWidget#TakeAttendanceWindow { background-color: {{bg_app}}; }` to fix
+  both. Screens that fill edge-to-edge (Login, Dashboard, My Classes, Add/Edit Class) don't have
+  this problem since a themed child widget already covers the full window.
+
 ## 8. Add/Edit Class — wizard dialog
 
 Rebuilt as a real 3-step `QDialog` wizard (`QStackedWidget` of 3 pages + step-dot indicator +

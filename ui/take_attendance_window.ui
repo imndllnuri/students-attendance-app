@@ -6,211 +6,194 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>580</height>
+    <width>1180</width>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Take Attendance</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="root_layout">
+   <property name="leftMargin"><number>20</number></property>
+   <property name="topMargin"><number>20</number></property>
+   <property name="rightMargin"><number>20</number></property>
+   <property name="bottomMargin"><number>20</number></property>
+   <property name="spacing"><number>14</number></property>
    <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
-       <widget class="QFrame" name="scan_status_card">
-        <layout class="QHBoxLayout" name="scan_status_layout">
-         <item>
-          <widget class="QLabel" name="scan_status_icon_lbl">
-           <property name="minimumSize"><size><width>24</width><height>0</height></size></property>
-           <property name="text"><string/></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="scan_status_text_lbl">
-           <property name="text"><string>Press Start Attendance to begin scanning.</string></property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <layout class="QHBoxLayout" name="attendance_actions_row">
+    <layout class="QVBoxLayout" name="attendance_header_layout">
+     <property name="spacing"><number>0</number></property>
+     <item>
+      <widget class="QPushButton" name="back_to_class_btn">
+       <property name="text"><string>←  Back</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="attendance_page_title_lbl">
+       <property name="text"><string>Take Attendance</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="attendance_class_name_lbl">
+       <property name="text"><string>Class Name</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="control_strip_card">
+     <layout class="QVBoxLayout" name="control_strip_card_layout">
+      <property name="leftMargin"><number>16</number></property>
+      <property name="topMargin"><number>14</number></property>
+      <property name="rightMargin"><number>16</number></property>
+      <property name="bottomMargin"><number>14</number></property>
+      <property name="spacing"><number>10</number></property>
+      <item>
+       <layout class="QHBoxLayout" name="control_strip_top_row">
         <item>
-         <widget class="QPushButton" name="mark_all_present_btn">
-          <property name="text"><string>Mark All Present</string></property>
+         <widget class="QPushButton" name="date_toggle_btn">
+          <property name="checkable"><bool>true</bool></property>
+          <property name="text"><string>📅  Selected Day</string></property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="undo_last_scan_btn">
-          <property name="text"><string>Undo Last Scan</string></property>
+         <widget class="QComboBox" name="hours_comboBox">
+          <property name="minimumSize">
+           <size><width>160</width><height>40</height></size>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="manual_attendance_btn">
-          <property name="text"><string>Manual Attendance</string></property>
-          <property name="toolTip"><string>Mark a student's attendance without an RFID scan</string></property>
+         <widget class="QLineEdit" name="late_threshold_override_le">
+          <property name="maximumSize"><size><width>230</width><height>16777215</height></size></property>
+          <property name="minimumSize"><size><width>170</width><height>0</height></size></property>
+          <property name="placeholderText">
+           <string>Late threshold (min)</string>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="mark_selected_absent_btn">
-          <property name="text"><string>Mark Selected Absent</string></property>
-          <property name="toolTip"><string>Explicitly record chosen students as absent (e.g. a cancelled session)</string></property>
+         <widget class="QLabel" name="session_countdown_lbl">
+          <property name="text">
+           <string/>
+          </property>
          </widget>
         </item>
         <item>
-         <spacer name="attendance_actions_spacer">
+         <spacer name="control_strip_spacer">
           <property name="orientation"><enum>Qt::Horizontal</enum></property>
     <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
-    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+    <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
    </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="attendance_progress_lbl">
-          <property name="text"><string>0/0 recorded</string></property>
+         <widget class="QPushButton" name="save_session_template_btn">
+          <property name="text">
+           <string>Save as Template</string>
+          </property>
+          <property name="toolTip">
+           <string>Remember this time slot and late-threshold override for next time</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="export_to_excel_btn">
+          <property name="text">
+           <string>Export To Excel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="start_attendance_btn">
+          <property name="text">
+           <string>Start Attendance</string>
+          </property>
          </widget>
         </item>
        </layout>
       </item>
-      <item row="3" column="0">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item>
+       <widget class="QCalendarWidget" name="calendarWidget">
+        <property name="visible"><bool>false</bool></property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>280</height>
+         </size>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QTableWidget" name="take_attendance_tableWidget"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QPushButton" name="submit_attendance_btn">
-        <property name="text">
-         <string>Submit Attendance</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QWidget" name="widget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QCalendarWidget" name="calendarWidget">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>320</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="topSideWidget" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>200</height>
-            </size>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetDefaultConstraint</enum>
-            </property>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QLabel" name="class_name_lbl">
-                <property name="maximumSize">
-                 <size>
-                  <width>369</width>
-                  <height>42</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Class Name</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="selected_day_lbl">
-                <property name="text">
-                 <string>Selected Day:</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QComboBox" name="hours_comboBox">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>40</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="session_countdown_lbl">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="late_threshold_override_le">
-              <property name="placeholderText">
-               <string>Late threshold override (min)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="save_session_template_btn">
-              <property name="text">
-               <string>Save as Template</string>
-              </property>
-              <property name="toolTip">
-               <string>Remember this time slot and late-threshold override for next time</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="export_to_excel_btn">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>40</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Export To Excel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="start_attendance_btn">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>40</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Start Attendance</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
+      <item>
+       <widget class="QLabel" name="todays_summary_lbl">
+        <property name="text"><string>Present 0  ·  Late 0  ·  Absent 0  ·  Total 0</string></property>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="scan_status_card">
+     <layout class="QHBoxLayout" name="scan_status_layout">
+      <item>
+       <widget class="QLabel" name="scan_status_icon_lbl">
+        <property name="minimumSize"><size><width>24</width><height>0</height></size></property>
+        <property name="text"><string/></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="scan_status_text_lbl">
+        <property name="text"><string>Press Start Attendance to begin scanning.</string></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="attendance_actions_row">
+     <item>
+      <widget class="QPushButton" name="mark_all_present_btn">
+       <property name="text"><string>Mark All Present</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="undo_last_scan_btn">
+       <property name="text"><string>Undo Last Scan</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="manual_attendance_btn">
+       <property name="text"><string>Manual Attendance</string></property>
+       <property name="toolTip"><string>Mark a student's attendance without an RFID scan</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mark_selected_absent_btn">
+       <property name="text"><string>Mark Selected Absent</string></property>
+       <property name="toolTip"><string>Explicitly record chosen students as absent (e.g. a cancelled session)</string></property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="attendance_actions_spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+    <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+    <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+   </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="attendance_progress_lbl">
+       <property name="text"><string>0/0 recorded</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="take_attendance_tableWidget"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="submit_attendance_btn">
+     <property name="minimumSize"><size><width>0</width><height>44</height></size></property>
+     <property name="text">
+      <string>Submit Attendance</string>
+     </property>
     </widget>
    </item>
   </layout>
