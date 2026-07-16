@@ -224,5 +224,20 @@ After the first pass, you flagged several real problems. Fixed as follows:
 ## 14. Continuing past §14: Statistics, Settings, Notifications
 
 Per your latest instruction, the pass now continues onto the screens previously marked out of
-scope. See the sections below (added as this work lands) for Statistics/Settings/Notifications
-decisions.
+scope.
+
+### Statistics
+
+Turned out to need much less than expected: its objectNames (`statistics_title_lbl`,
+`statistics_card`, `statistics_empty_lbl`, the 4 action buttons) already matched shared selectors
+from earlier phases and were already using the `variant`/card/typography system, and
+`active_palette()` was already wired into every chart builder's figure background - so visually it
+was already consistent with the rest of the app, contrary to what I'd assumed when I flagged it as
+"still old visual language" earlier. What I found and fixed instead: a real dark-mode bug where
+`figure.patch.set_facecolor()` only tints the *figure's* background, not each individual `Axes`'
+own background - so the pie chart (no visible rectangular background) looked fine, but the
+Attendance Trend line chart and the Class Comparison bar chart both showed a stark white plot
+rectangle in dark mode, because empty/undrawn space inside an Axes still paints white unless you
+also call `axes.set_facecolor(...)`. Added that call to all three chart builders
+(`render_statistics`, `show_class_comparison`, `show_attendance_heatmap`) for consistency, even
+though the heatmap's `imshow` already covered its own axes rect edge-to-edge.

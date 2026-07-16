@@ -1724,6 +1724,8 @@ class MainWindow(QMainWindow):
         figure.patch.set_facecolor(palette["bg_card"])
         axes_pie = figure.add_subplot(121)
         axes_trend = figure.add_subplot(122)
+        axes_pie.set_facecolor(palette["bg_card"])
+        axes_trend.set_facecolor(palette["bg_card"])
         labels = ["Present", "Late", "Absent"]
         values = [stats["present"], stats["late"], stats["absent"]]
         if sum(values) == 0:
@@ -1783,6 +1785,7 @@ class MainWindow(QMainWindow):
         figure = Figure(figsize=(8, 4))
         figure.patch.set_facecolor(palette["bg_card"])
         axes = figure.add_subplot(111)
+        axes.set_facecolor(palette["bg_card"])
         axes.bar(labels, rates, color=palette["accent"])
         axes.set_ylim(0, 100)
         axes.set_ylabel("Attendance Rate (%)", color=palette["text_primary"])
@@ -1850,6 +1853,7 @@ class MainWindow(QMainWindow):
         figure = Figure(figsize=(8, 4))
         figure.patch.set_facecolor(palette["bg_card"])
         axes = figure.add_subplot(111)
+        axes.set_facecolor(palette["bg_card"])
         image = axes.imshow(grid, cmap="RdYlGn", vmin=0, vmax=100, aspect="auto")
         axes.set_xticks(range(len(days_present)))
         axes.set_xticklabels(days_present, color=palette["text_primary"])
