@@ -61,6 +61,9 @@ buildable subset of that architecture:
 The GUI talks to `http://127.0.0.1:5000` by default
 (`services/api_client.py`).
 
+To run the server as an always-on LAN service on a separate machine instead
+of alongside the GUI, see `DEPLOYMENT.md`.
+
 ### Migrating old local data
 
 If you have an existing `accounts.json` / `data/` directory from a previous

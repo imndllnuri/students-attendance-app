@@ -1,10 +1,12 @@
 """Covers shared/dialogs.py: ChoiceDialog (real-QDialog replacement for
-QInputDialog.getItem) and DetailDialog (replacement for a QMessageBox with
-an ActionRole button hijacked into it)."""
+QInputDialog.getItem), DetailDialog (replacement for a QMessageBox with
+an ActionRole button hijacked into it), and ServerConnectionDialog (lets
+the user point the app at a TapIn server and test the connection)."""
 
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
-from shared.dialogs import ChoiceDialog, DetailDialog
+from services.api_client import ApiError
+from shared.dialogs import ChoiceDialog, DetailDialog, ServerConnectionDialog
 
 
 def test_choice_dialog_get_item_returns_selection_on_accept(qtbot, monkeypatch):
@@ -42,3 +44,57 @@ def test_detail_dialog_action_button_sets_triggered_and_accepts(qtbot):
 
     assert dialog.action_triggered is True
     assert dialog.result() == QDialog.Accepted
+
+
+def test_server_connection_dialog_prefills_current_values(qtbot):
+    dialog = ServerConnectionDialog(None, "http://192.168.1.42:5000", "secret-token")
+    qtbot.addWidget(dialog)
+
+    assert dialog.base_url() == "http://192.168.1.42:5000"
+    assert dialog.api_key() == "secret-token"
+
+
+def test_server_connection_dialog_test_connection_success(qtbot, monkeypatch):
+    from services.api_client import ApiClient
+
+    monkeypatch.setattr(ApiClient, "check_health", lambda self: {"status": "ok"})
+
+    dialog = ServerConnectionDialog(None)
+    qtbot.addWidget(dialog)
+    dialog.base_url_le.setText("http://192.168.1.42:5000")
+    dialog.api_key_le.setText("secret-token")
+
+    dialog.test_connection()
+
+    assert dialog.status_lbl.text() == "Connected."
+
+
+def test_server_connection_dialog_test_connection_failure(qtbot, monkeypatch):
+    from services.api_client import ApiClient
+
+    def raise_api_error(self):
+        raise ApiError("Unauthorized", status_code=401)
+
+    monkeypatch.setattr(ApiClient, "check_health", raise_api_error)
+
+    dialog = ServerConnectionDialog(None)
+    qtbot.addWidget(dialog)
+    dialog.base_url_le.setText("http://192.168.1.42:5000")
+    dialog.api_key_le.setText("wrong-token")
+
+    dialog.test_connection()
+
+    assert "Unauthorized" in dialog.status_lbl.text()
+
+
+def test_server_connection_dialog_ok_returns_entered_values(qtbot, monkeypatch):
+    monkeypatch.setattr(QDialog, "exec_", lambda self: QDialog.Accepted)
+
+    dialog = ServerConnectionDialog(None)
+    qtbot.addWidget(dialog)
+    dialog.base_url_le.setText(" http://192.168.1.42:5000 ")
+    dialog.api_key_le.setText("secret-token")
+
+    assert dialog.exec_() == QDialog.Accepted
+    assert dialog.base_url() == "http://192.168.1.42:5000"
+    assert dialog.api_key() == "secret-token"

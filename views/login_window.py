@@ -7,6 +7,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QWidget
 
 from models.accounts import Account, AccountManager
+from shared.backend_config import load_backend_config, save_backend_config
+from shared.dialogs import ServerConnectionDialog
 from shared.i18n import t
 from shared.qt_style import set_dynamic_property
 from shared.validation import (
@@ -41,6 +43,7 @@ class LoginWindow(QWidget):
         self._setup_sign_in_page()
         self._setup_sign_up_page()
         self._setup_reset_page()
+        self._setup_server_settings()
 
         # QStackedWidget sizes itself to the TALLEST page by default (not the
         # current one) so the window doesn't jump around when switching -
@@ -159,6 +162,22 @@ class LoginWindow(QWidget):
         self.main_window.show()
         self.main_window._maybe_show_whats_new()
         self.close()
+
+    # --- Server Connection ---
+
+    def _setup_server_settings(self):
+        self.server_settings_btn.setIcon(qta.icon("fa5s.cog", color="#8A93A7"))
+        self.server_settings_btn.setToolTip("Server Connection")
+        self.server_settings_btn.clicked.connect(self.show_server_connection_dialog)
+
+    def show_server_connection_dialog(self):
+        config = load_backend_config()
+        dialog = ServerConnectionDialog(self, config["base_url"], config.get("api_key", ""))
+        if dialog.exec_() == ServerConnectionDialog.Accepted:
+            config["base_url"] = dialog.base_url()
+            config["api_key"] = dialog.api_key()
+            save_backend_config(config)
+            self.account_manager = AccountManager()
 
     # --- Sign Up ---
 

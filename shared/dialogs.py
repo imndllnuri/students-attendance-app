@@ -8,11 +8,16 @@ QDialog subclasses instead, styled by the shared `QDialog` rules in
 theme.qss like any other dialog.
 """
 
+import qtawesome as qta
+import requests
 from PyQt5.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
+    QFormLayout,
     QLabel,
+    QLineEdit,
+    QPushButton,
     QVBoxLayout,
 )
 
@@ -81,3 +86,70 @@ class DetailDialog(QDialog):
     def _trigger_action(self):
         self.action_triggered = True
         self.accept()
+
+
+class ServerConnectionDialog(QDialog):
+    """Lets the user point the app at a TapIn server (base URL + API key)
+    and verify the connection before saving - see DEPLOYMENT.md / the
+    Server Connection card in Settings and the gear icon on the login
+    screen, which are the two callers of this dialog."""
+
+    def __init__(self, parent, current_base_url="", current_api_key=""):
+        super().__init__(parent)
+        self.setWindowTitle("Server Connection")
+
+        layout = QVBoxLayout(self)
+
+        form = QFormLayout()
+        self.base_url_le = QLineEdit(current_base_url)
+        self.base_url_le.setPlaceholderText("http://192.168.1.42:5000")
+        form.addRow("Server URL", self.base_url_le)
+
+        self.api_key_le = QLineEdit(current_api_key)
+        self.api_key_le.setEchoMode(QLineEdit.Password)
+        api_key_toggle = self.api_key_le.addAction(
+            qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
+        )
+        api_key_toggle.setCheckable(True)
+        api_key_toggle.setToolTip("Show API key")
+        api_key_toggle.toggled.connect(
+            lambda checked: self.api_key_le.setEchoMode(
+                QLineEdit.Normal if checked else QLineEdit.Password
+            )
+        )
+        form.addRow("API Key", self.api_key_le)
+        layout.addLayout(form)
+
+        self.status_lbl = QLabel("")
+        self.status_lbl.setWordWrap(True)
+        layout.addWidget(self.status_lbl)
+
+        self.test_connection_btn = QPushButton("Test Connection")
+        self.test_connection_btn.clicked.connect(self.test_connection)
+        layout.addWidget(self.test_connection_btn)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def test_connection(self):
+        # Deliberately bypasses shared.backend_config.create_client(): the
+        # whole point is probing the *unsaved* field values, which
+        # create_client() has no way to see since it always reads the
+        # persisted config file.
+        from services.api_client import ApiClient, ApiError
+
+        client = ApiClient(base_url=self.base_url_le.text().strip(), api_key=self.api_key_le.text())
+        try:
+            client.check_health()
+        except (ApiError, requests.exceptions.RequestException) as e:
+            self.status_lbl.setText(f"Couldn't connect: {e}")
+            return
+        self.status_lbl.setText("Connected.")
+
+    def base_url(self):
+        return self.base_url_le.text().strip()
+
+    def api_key(self):
+        return self.api_key_le.text()

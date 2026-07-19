@@ -36,6 +36,16 @@ def test_configured_base_url_is_passed_to_api_client(monkeypatch, tmp_path):
     assert client.base_url == "http://192.168.1.50:5000"
 
 
+def test_configured_api_key_is_passed_to_api_client(monkeypatch, tmp_path):
+    monkeypatch.setattr("shared.backend_config.BACKEND_CONFIG_PATH", tmp_path / ".backend_config.json")
+    save_backend_config({"backend": "server", "api_key": "secret-token"})
+
+    client = create_client()
+
+    assert isinstance(client, ApiClient)
+    assert client.api_key == "secret-token"
+
+
 def test_a_corrupt_config_file_falls_back_to_defaults(monkeypatch, tmp_path):
     config_path = tmp_path / ".backend_config.json"
     config_path.write_text("{not valid json")

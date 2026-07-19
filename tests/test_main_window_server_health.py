@@ -3,6 +3,7 @@
 import types
 
 import views.main_window as mw
+from shared.dialogs import ServerConnectionDialog
 
 
 class FakeClassManager:
@@ -56,3 +57,23 @@ def test_indicator_updates_on_recheck(qtbot, monkeypatch):
     window.update_server_health_indicator()
 
     assert window.server_health_lbl.text() == "● Offline"
+
+
+def test_server_connection_button_rebuilds_managers_and_saves_on_accept(qtbot, monkeypatch, tmp_path):
+    window = build_window(qtbot, monkeypatch, healthy=True)
+    original_class_manager = window.class_manager
+    original_account_manager = window.account_manager
+
+    monkeypatch.setattr(mw, "load_backend_config", lambda: {"backend": "server", "base_url": "http://127.0.0.1:5000", "api_key": ""})
+    saved = {}
+    monkeypatch.setattr(mw, "save_backend_config", lambda config: saved.update(config))
+    monkeypatch.setattr(ServerConnectionDialog, "exec_", lambda self: ServerConnectionDialog.Accepted)
+    monkeypatch.setattr(ServerConnectionDialog, "base_url", lambda self: "http://192.168.1.42:5000")
+    monkeypatch.setattr(ServerConnectionDialog, "api_key", lambda self: "secret-token")
+
+    window.server_connection_btn.click()
+
+    assert saved["base_url"] == "http://192.168.1.42:5000"
+    assert saved["api_key"] == "secret-token"
+    assert window.class_manager is not original_class_manager
+    assert window.account_manager is not original_account_manager

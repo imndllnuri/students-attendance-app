@@ -147,20 +147,26 @@ plaintext passwords, which this one deliberately does not).
 These are known, intentional simplifications for the current prototype
 stage, not oversights — tracked in `ROADMAP.md` where relevant:
 
-- `services/api_client.py`'s `base_url` is configurable via
-  `.backend_config.json` (see above) but still defaults to
-  `"http://127.0.0.1:5000"` if unconfigured or constructed directly.
-- `server/db.py`'s `DB_PATH` is a module-level constant pointing at
-  `server/attendance.db` next to the code. Tests override it via
-  `monkeypatch` (see `tests/conftest.py`); production has no equivalent
-  override mechanism yet.
-- No sessions, auth tokens, or CSRF protection — the server trusts every
-  request from whoever can reach port 5000. Fine for a single instructor
-  running both processes on one laptop; not fine for any shared/networked
-  deployment.
-- `app.run(debug=True)` in `server/app.py`'s `__main__` block is
-  development-only (Flask's debug reloader/debugger should never be exposed
-  on a network).
+- `services/api_client.py`'s `base_url` (and, since the LAN-deployment work
+  below, `api_key`) are configurable via `.backend_config.json` (see above)
+  but still default to `"http://127.0.0.1:5000"` / no key if unconfigured
+  or constructed directly.
+- `server/db.py`'s `DB_PATH` defaults to `server/attendance.db` next to the
+  code, but is overridable via the `TAPIN_DB_PATH` env var (tests still
+  override it directly via `monkeypatch`, see `tests/conftest.py`).
+- Auth is opt-in via the `TAPIN_API_KEY` env var: unset (the default), the
+  server behaves exactly as before — every request from whoever can reach
+  the port is trusted, fine for a single instructor running both processes
+  on one laptop. Set, every route except `/health` requires a matching
+  `X-API-Key` header. This is a single shared secret, not sessions/JWT/CSRF
+  protection — proportional to a small single-instructor-class LAN app, not
+  a public service.
+- `app.run(debug=True)` in `server/app.py`'s `__main__` block remains
+  development-only (host/port/debug are now also env-configurable via
+  `TAPIN_HOST`/`TAPIN_PORT`/`TAPIN_DEBUG`, but the defaults reproduce
+  today's behavior unchanged). The production path is `server/wsgi.py`
+  under gunicorn — see `DEPLOYMENT.md` for running the server as an
+  always-on LAN service on its own machine.
 
 ## Hardware integration point
 

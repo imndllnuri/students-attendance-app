@@ -6,6 +6,24 @@ YYYY-MM-DD.
 
 ## [Unreleased]
 
+### Added
+- **Always-on LAN server deployment.** `server/wsgi.py` (gunicorn entry
+  point) + `requirements-server.txt` (Flask/gunicorn only, no GUI deps) +
+  `deploy/tapin.service` (systemd unit) + `deploy/tapin.env.example` let the
+  server run continuously on a dedicated machine instead of alongside the
+  GUI on one laptop. Opt-in shared-secret auth (`TAPIN_API_KEY`, `X-API-Key`
+  header, no-op unless configured) and env-configurable `DB_PATH`/host/port
+  (`TAPIN_DB_PATH`/`TAPIN_HOST`/`TAPIN_PORT`/`TAPIN_DEBUG`) make it safe to
+  expose beyond localhost. `ApiClient`/`.backend_config.json` gained an
+  `api_key` field to match. See `DEPLOYMENT.md` (terse reference) and
+  `old-pc-server.md` (full step-by-step walkthrough, hardware included).
+- **`ServerConnectionDialog`** (`shared/dialogs.py`): lets the GUI point at
+  a server URL + API key and test the connection before saving, reachable
+  from a new gear icon on the login screen (needed since `AccountManager()`
+  is built before login, and the only prior Settings screen lived inside
+  `MainWindow`) and from a new "Server Connection" card in Settings →
+  General.
+
 ### Changed
 - **Take Attendance is no longer a separate window.** `TakeAttendance` changed from a `QDialog`
   shown via `.show()` to a `QWidget` embedded as a `MainWindow.stackedWidget` page, exactly like

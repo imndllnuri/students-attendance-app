@@ -36,7 +36,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
 from services.api_client import ApiError
+from shared.backend_config import load_backend_config, save_backend_config
 from shared.class_order import load_class_order, save_class_order
+from shared.dialogs import ServerConnectionDialog
 from shared.font_scale import SCALE_LABELS, load_font_scale, point_size_for_scale, save_font_scale
 from shared.i18n import LANGUAGES, load_language_preference, save_language_preference, t
 from shared.list_density import load_list_density, save_list_density
@@ -183,6 +185,8 @@ class MainWindow(QMainWindow):
         self.import_settings_btn.clicked.connect(self.import_settings)
         set_dynamic_property(self.export_settings_btn, "variant", "secondary")
         set_dynamic_property(self.import_settings_btn, "variant", "secondary")
+        self.server_connection_btn.clicked.connect(self.show_server_connection_dialog)
+        set_dynamic_property(self.server_connection_btn, "variant", "secondary")
         self._settings_password_toggle = self.new_password_le.addAction(
             qta.icon("fa5s.eye", color="#6B6B76"), QLineEdit.TrailingPosition
         )
@@ -360,6 +364,17 @@ class MainWindow(QMainWindow):
             "Settings imported. The language change (if any) applies on next launch.",
         )
 
+    def show_server_connection_dialog(self):
+        config = load_backend_config()
+        dialog = ServerConnectionDialog(self, config["base_url"], config.get("api_key", ""))
+        if dialog.exec_() == ServerConnectionDialog.Accepted:
+            config["base_url"] = dialog.base_url()
+            config["api_key"] = dialog.api_key()
+            save_backend_config(config)
+            self.class_manager = ClassManager()
+            self.account_manager = AccountManager()
+            self.update_server_health_indicator()
+
     def _setup_icons(self):
         self.sidebar_icon_lbl.setPixmap(
             QPixmap("resources/images/app_icon.png").scaled(
@@ -424,7 +439,8 @@ class MainWindow(QMainWindow):
         for frame in (
             self.settings_language_card,
             self.settings_session_card, self.settings_typography_card,
-            self.settings_backup_card, self.settings_personal_info_card,
+            self.settings_backup_card, self.settings_connection_card,
+            self.settings_personal_info_card,
             self.settings_change_password_card, self.settings_recent_logins_card,
             self.settings_security_questions_card, self.settings_danger_zone_card,
         ):

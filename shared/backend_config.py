@@ -16,6 +16,7 @@ BACKEND_CONFIG_PATH = Path(__file__).resolve().parent.parent / ".backend_config.
 DEFAULT_CONFIG = {
     "backend": "server",
     "base_url": "http://127.0.0.1:5000",
+    "api_key": "",
     "local_data_dir": "local_data",
 }
 
@@ -48,4 +49,4 @@ def create_client():
         from services.local_storage_client import LocalStorageClient
         return LocalStorageClient(data_dir=config["local_data_dir"])
     from services.api_client import ApiClient
-    return ApiClient(base_url=config["base_url"])
+    return ApiClient(base_url=config["base_url"], api_key=config.get("api_key", ""))

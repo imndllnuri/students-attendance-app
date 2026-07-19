@@ -1,3 +1,5 @@
+import hmac
+import os
 import threading
 import uuid
 from collections import defaultdict
@@ -9,6 +11,23 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from server.db import backup_database, get_connection, init_db
 
 app = Flask(__name__)
+
+API_KEY = os.environ.get("TAPIN_API_KEY", "")
+_AUTH_EXEMPT_PATHS = {"/health"}
+
+
+@app.before_request
+def _require_api_key():
+    """Opt-in shared-secret auth for LAN deployments (see DEPLOYMENT.md).
+
+    A no-op unless TAPIN_API_KEY is set, so local dev and the existing test
+    suite are unaffected by default. When set, every route except /health
+    must send a matching X-API-Key header."""
+    if not API_KEY or request.path in _AUTH_EXEMPT_PATHS:
+        return
+    provided = request.headers.get("X-API-Key", "")
+    if not hmac.compare_digest(provided, API_KEY):
+        return jsonify({"error": "Unauthorized"}), 401
 
 
 def log_audit(conn, user_id, action, details=""):
@@ -719,4 +738,8 @@ def _schedule_periodic_backups(interval_seconds=BACKUP_INTERVAL_SECONDS):
 if __name__ == "__main__":
     init_db()
     _schedule_periodic_backups()
-    app.run(debug=True)
+    app.run(
+        host=os.environ.get("TAPIN_HOST", "127.0.0.1"),
+        port=int(os.environ.get("TAPIN_PORT", "5000")),
+        debug=os.environ.get("TAPIN_DEBUG", "true").lower() == "true",
+    )

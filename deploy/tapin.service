@@ -1,0 +1,30 @@
+# systemd unit for running the TapIn server as an always-on LAN service.
+# See DEPLOYMENT.md / old-pc-server.md for the full setup walkthrough.
+#
+# Install:
+#   sudo cp deploy/tapin.service /etc/systemd/system/tapin.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now tapin
+#
+# The --bind address below is deliberately 0.0.0.0, not 127.0.0.1 - that's
+# what lets other machines on the LAN reach it. Restrict actual exposure at
+# the firewall (see DEPLOYMENT.md), not by narrowing this bind address.
+
+[Unit]
+Description=TapIn attendance server
+After=network.target
+
+[Service]
+Type=simple
+User=tapin
+Group=tapin
+WorkingDirectory=/opt/tapin
+EnvironmentFile=/etc/tapin/tapin.env
+ExecStart=/opt/tapin/.venv/bin/gunicorn --workers 1 --threads 4 --bind 0.0.0.0:5000 server.wsgi:app
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
