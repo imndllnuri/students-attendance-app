@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TapIn — Offline RFID attendance for classrooms</title>
+<meta name="description" content="TapIn records class attendance from RFID cards and keeps every class as ordinary files in a folder you choose. No server, no account, no internet needed. Free for Windows, Debian/Ubuntu and Linux.">
+<link rel="icon" href="images/app-icon.png">
+
+<meta property="og:title" content="TapIn — Offline RFID attendance for classrooms">
+<meta property="og:description" content="Take attendance from RFID cards in seconds. Everything stays in a folder on your own machine.">
+<meta property="og:type" content="website">
+<!-- Absolute: a relative path here gives link scrapers nothing to fetch,
+     and the shared card comes out blank. -->
+<meta property="og:url" content="https://imndllnuri.github.io/students-attendance-app/">
+<meta property="og:image" content="https://imndllnuri.github.io/students-attendance-app/images/dashboard.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="chrome">
+  <div class="shell">
+    <nav class="nav">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round">
+            <path d="M5 12.5a9.5 9.5 0 0 1 14 0"/><path d="M8 16a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19.2" r="1.1" fill="#fff" stroke="none"/>
+          </svg>
+        </span>
+        <span class="brand-word">Tap<em>In</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#tour">Tour</a>
+        <a href="#hardware">Hardware</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/imndllnuri/students-attendance-app/releases">Releases</a>
+      </div>
+    </nav>
+  </div>
+
+  <header class="hero shell" id="top">
+    <div class="hero-copy">
+      <p class="eyebrow hero-eyebrow">Free · No account · No licence key</p>
+      <h1>Attendance in a tap. Records in your own folder.</h1>
+      <p class="hero-lede">
+        TapIn takes class attendance from RFID cards or by hand, and stores every
+        class as ordinary <code>.json</code> and <code>.xlsx</code> files in a folder
+        you pick. No server. No account. No internet needed.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#download">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
+          Download TapIn
+        </a>
+        <a class="btn btn-ghost-dark" href="#tour">See it working</a>
+      </div>
+      <p class="hero-note">Windows installer · Debian/Ubuntu package · Linux &amp; macOS archives</p>
+    </div>
+  </header>
+</div>
+
+<main>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="features">
+  <div class="section-head">
+    <p class="eyebrow">What it does</p>
+    <h2>Built for one person running a real classroom</h2>
+    <p>
+      Not a platform to onboard onto. A desktop app you install, point at a folder,
+      and use for the term.
+    </p>
+  </div>
+
+  <div class="grid grid-3">
+    <article class="card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a9.5 9.5 0 0 1 14 0"/><path d="M8 16a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19.2" r="1.1" fill="currentColor" stroke="none"/></svg></div>
+      <h3>Tap to record</h3>
+      <p>
+        A student taps their card and the reader shows their name back. The app marks
+        them Present or Late against the session's own start time and threshold.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg></div>
+      <h3>Your files, not our database</h3>
+      <p>
+        A vault is a plain folder of JSON and XLSX. Back it up, copy it to a USB stick,
+        open the spreadsheet in Excel. Nothing is locked in a format only TapIn reads.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M14 3.3A9 9 0 0 1 20.7 10H14z"/></svg></div>
+      <h3>Statistics that answer questions</h3>
+      <p>
+        Per-class breakdown and trend, a heatmap across sessions, and a comparison
+        across every class you teach — plus who is below your attendance policy.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></div>
+      <h3>Export anything</h3>
+      <p>
+        The roster, the full attendance grid, one student's history, a PDF class report,
+        or a signed-looking certificate of attendance for a single student.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+      <h3>No reader? Still works</h3>
+      <p>
+        Manual entry, "mark all present", and bulk-marking absentees all work with no
+        hardware at all. The reader makes it faster; it is not a requirement.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.9 2.6 15.1 0 18M12 3c-2.6 2.9-2.6 15.1 0 18"/></svg></div>
+      <h3>English and Turkish</h3>
+      <p>
+        The whole interface, including dates and weekday names, switches between
+        English and Turkish from Settings.
+      </p>
+    </article>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="tour">
+  <div class="section-head">
+    <p class="eyebrow">Tour</p>
+    <h2>Every screen, as it really looks</h2>
+    <p>These are captures of the running app, not mockups.</p>
+  </div>
+
+  <div class="tour-tabs" role="tablist" aria-label="Screenshot tour"></div>
+  <div class="tour-panel" id="tour-panel"></div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="hardware">
+  <div class="section-head">
+    <p class="eyebrow">Hardware</p>
+    <h2>How the reader fits in</h2>
+    <p>
+      TapIn works with an ESP32-based RFID reader over USB, or over the reader's
+      own WiFi hotspot. It is optional — manual entry and bulk marking work with
+      no hardware at all.
+    </p>
+  </div>
+
+  <div class="wire-flow">
+    <div class="wire-node"><b>ESP32 + RC522</b><span>Reads the card, sends the serial number</span></div>
+    <div class="wire-node"><b>USB cable or WiFi</b><span>Cable by default; the board can host its own hotspot</span></div>
+    <div class="wire-node"><b>TapIn</b><span>Resolves the card to a student, records the session</span></div>
+    <div class="wire-node"><b>Your vault folder</b><span>Plain files on your own disk</span></div>
+  </div>
+
+  <article class="card split">
+    <div>
+      <h3>The board only ever sends a number</h3>
+      <p>
+        The reader has no roster and no idea who anyone is. It sends a card's
+        serial number; the app looks up who that is and sends the name back for
+        the reader's screen. Names never live on the device, so a reader that is
+        lost or taken apart gives up nothing about your students.
+      </p>
+    </div>
+    <pre><code>board &#8594; app   04A3B2C1
+app &#8594; board   OK:20210042|Nisa Aktas
+app &#8594; board   INVALID</code></pre>
+  </article>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="download">
+  <div class="section-head">
+    <p class="eyebrow">Download</p>
+    <h2>Get TapIn</h2>
+    <p>
+      Pick your system below. The Windows build is a real installer — it puts TapIn in
+      your Start menu and adds an uninstall entry, rather than dropping a loose
+      executable in your Downloads folder.
+    </p>
+  </div>
+
+  <div class="dl-bar">
+    <label for="version-select">Version</label>
+    <select id="version-select" aria-label="Choose a version"></select>
+    <span id="release-date" class="dl-meta"></span>
+  </div>
+
+  <div class="grid grid-4" id="download-cards"></div>
+  <div class="dl-status" id="download-status" hidden></div>
+
+  <details class="dl-older" id="older-releases" hidden>
+    <summary>All released versions</summary>
+    <div class="table-wrap">
+      <table id="older-table">
+        <thead><tr><th>Version</th><th>Released</th><th>Files</th><th>Notes</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="install">
+  <div class="section-head">
+    <p class="eyebrow">Installing</p>
+    <h2>First run, step by step</h2>
+  </div>
+
+  <div class="grid grid-3">
+    <article class="card">
+      <div class="dl-os" style="margin-bottom:16px">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.2 4.5v6.9H3zM11.4 4.3 21 3v8.4h-9.6zM3 12.6h7.2v6.9L3 18.5zM11.4 12.6H21V21l-9.6-1.3z"/></svg>
+        <h3>Windows 10/11</h3>
+      </div>
+      <ol class="steps">
+        <li><strong>Run the setup file</strong><span>TapIn-x.y.z-setup.exe</span></li>
+        <li><strong>Click through the wizard</strong><span>Installs for your user only — no administrator password needed</span></li>
+        <li><strong>Launch from the Start menu</strong><span>Uninstall from Settings → Apps like any other program</span></li>
+      </ol>
+      <p class="dl-note" style="margin-top:16px">
+        Windows SmartScreen may warn on first run because the installer is not
+        code-signed. Choose <em>More info → Run anyway</em>.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="dl-os" style="margin-bottom:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3.5c0 2.5-2 3.6-2 6.5 0 2.4-2.5 5-2.5 7.5C4.5 20 7.5 21 12 21s7.5-1 7.5-3.5c0-2.5-2.5-5.1-2.5-7.5 0-2.9-2-4-2-6.5C15 2.1 13.7 1.5 12 1.5S9 2.1 9 3.5Z"/><circle cx="10.2" cy="7.4" r=".9" fill="currentColor"/><circle cx="13.8" cy="7.4" r=".9" fill="currentColor"/></svg>
+        <h3>Debian / Ubuntu</h3>
+      </div>
+      <ol class="steps">
+        <li><strong>Install the package</strong><span>Double-click it, or use the command below</span></li>
+        <li><strong>Find TapIn in your applications menu</strong><span>Or run <code>tapin</code> in a terminal</span></li>
+        <li><strong>Remove it any time</strong><span><code>sudo apt remove tapin</code></span></li>
+      </ol>
+      <pre style="margin-top:16px"><code>sudo apt install ./tapin_*_amd64.deb</code></pre>
+    </article>
+
+    <article class="card">
+      <div class="dl-os" style="margin-bottom:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <h3>Other Linux &amp; macOS</h3>
+      </div>
+      <ol class="steps">
+        <li><strong>Unzip the archive</strong><span>It carries its own Python and Qt</span></li>
+        <li><strong>Run the launcher</strong><span><code>./TapIn/TapIn</code>, or open TapIn.app on macOS</span></li>
+        <li><strong>Keep the folder together</strong><span>The app reads files next to it, so move the whole folder, not just the binary</span></li>
+      </ol>
+      <p class="dl-note" style="margin-top:16px">
+        These are archives, not installers — there is no Start-menu entry or uninstaller.
+        macOS is unsigned, so allow it under System Settings → Privacy &amp; Security.
+      </p>
+    </article>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Then, on first launch</h3>
+    <ol class="steps" style="margin-top:14px">
+      <li><strong>Choose a vault folder</strong><span>An empty folder anywhere you like. Everything TapIn stores goes here — put it in your usual backed-up location.</span></li>
+      <li><strong>Add a class</strong><span>Code, name, weekly schedule and attendance policy. Import the roster from CSV or Excel, or type it in.</span></li>
+      <li><strong>Bind cards</strong><span>Add a student and scan their card in one step, or bind cards to an existing roster from the class screen.</span></li>
+      <li><strong>Take attendance</strong><span>Press Start Attendance and let students tap. Submit when the session ends.</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="privacy">
+  <div class="section-head">
+    <p class="eyebrow">Privacy</p>
+    <h2>Where the data goes</h2>
+  </div>
+  <div class="grid grid-3">
+    <article class="card">
+      <span class="tag tag-ok">By design</span>
+      <h3 style="margin-top:12px">Nothing leaves your machine</h3>
+      <p>
+        TapIn has no telemetry, no analytics and no accounts. Out of the box the only
+        network connection it opens is to your own card reader, on your own local
+        network, and only if you have configured the WiFi reader. Physical access to
+        the vault folder is the entire access model — protect it the way you would
+        protect a paper gradebook.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-warn">One exception</span>
+      <h3 style="margin-top:12px">The update check is off until you switch it on</h3>
+      <p>
+        Settings has a switch called <strong>Check for New Versions</strong>, and it
+        ships off. Turn it on and TapIn asks github.com once at startup for the version
+        number of the newest release, then tells you in Notifications if yours is older.
+        The request carries no student data, no vault path and no identifier — it reads
+        the same public page anyone can open in a browser. Nothing is downloaded or
+        installed. Leave the switch off and TapIn never contacts github.com at all.
+      </p>
+    </article>
+    <article class="card">
+      <span class="tag tag-warn">Worth knowing</span>
+      <h3 style="margin-top:12px">Uninstalling never deletes your records</h3>
+      <p>
+        Your vault is a folder you chose, so removing TapIn leaves it exactly where it
+        is. That is deliberate: quietly deleting a term of attendance records because
+        someone uninstalled an app would be indefensible. Delete the folder yourself
+        when you actually want it gone.
+      </p>
+    </article>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="shell" id="faq">
+  <div class="section-head">
+    <p class="eyebrow">FAQ</p>
+    <h2>Common questions</h2>
+  </div>
+
+  <div class="faq">
+    <details class="qa">
+      <summary>Do I need the RFID reader to use TapIn?</summary>
+      <p>No. Manual Attendance Entry, "Mark All Present" and bulk absence marking all work with no hardware. The reader makes a large class faster; it is not required for any feature.</p>
+    </details>
+    <details class="qa">
+      <summary>Can two people use the same vault?</summary>
+      <p>Not at the same time. A vault is locked while TapIn has it open, so a second instance is refused rather than allowed to corrupt it. Sharing a vault on a network drive between two people at once is not supported.</p>
+    </details>
+    <details class="qa">
+      <summary>What happens if a student loses their card?</summary>
+      <p>Open the class, double-click the student, and choose Remove Card. The card stops being recognised in every class that student is enrolled in — not just the one you are looking at — and can then be issued to someone else.</p>
+    </details>
+    <details class="qa">
+      <summary>One student is in three of my classes. Do I register their card three times?</summary>
+      <p>No. A card belongs to a person, so registering it once writes it to every roster row that shares that student number. The reverse is enforced too: a card already held by a different student is refused rather than silently reassigned.</p>
+    </details>
+    <details class="qa">
+      <summary>Can I move my vault to another computer?</summary>
+      <p>Yes — copy the folder. There is no license key, no activation and no machine binding. Point TapIn at the copied folder on the new machine and everything is there.</p>
+    </details>
+    <details class="qa">
+      <summary>Will TapIn tell me when a new version is out?</summary>
+      <p>Only if you ask it to. Settings → Updates has a <strong>Check for New Versions</strong> switch that is off by default. With it on, TapIn checks this project's public releases page once at startup and puts a line in Notifications when a newer version exists. It never downloads or installs anything by itself — you come back here and run the installer when you want to. With it off, no check is made.</p>
+    </details>
+
+    <details class="qa">
+      <summary>Does the WiFi reader need internet?</summary>
+      <p>No, and it does not connect to your institution's network either. The board hosts its own small hotspot that your laptop joins directly. That does mean the laptop has no internet while scanning.</p>
+    </details>
+    <details class="qa">
+      <summary>Is my Excel file safe to open while TapIn is running?</summary>
+      <p>Opening it is fine. Keeping it open while TapIn tries to save is not — on Windows, Excel locks the file. TapIn queues the submission and retries rather than losing it, but closing the spreadsheet first avoids the round trip.</p>
+    </details>
+    <details class="qa">
+      <summary>What does it cost?</summary>
+      <p>Nothing. TapIn is free to download and use — no subscription, no account and no licence key.</p>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="shell foot-grid">
+    <div>
+      <a class="brand" href="#top" style="margin-bottom:8px">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round">
+            <path d="M5 12.5a9.5 9.5 0 0 1 14 0"/><path d="M8 16a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19.2" r="1.1" fill="#fff" stroke="none"/>
+          </svg>
+        </span>
+        <span class="brand-word">Tap<em>In</em></span>
+      </a>
+      <div>Built for the COMP413 Internet of Things course at Abdullah Gül University.</div>
+    </div>
+    <div class="foot-right">
+      <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">User guide</a>
+      <a href="https://github.com/imndllnuri/students-attendance-app/issues">Report a problem</a>
+    </div>
+  </div>
+</footer>
+
+<script src="tour.js"></script>
+<script src="downloads.js"></script>
+</body>
+</html>

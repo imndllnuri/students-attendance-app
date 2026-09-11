@@ -1,0 +1,513 @@
+/* TapIn website.
+ *
+ * The palette is not chosen here - it is lifted from shared/palette.py,
+ * the app's own design tokens, so the site and the product read as one
+ * thing. Same with the typeface: theme.qss asks for DM Sans, so the site
+ * loads DM Sans rather than approximating it.
+ */
+
+:root {
+  --ink:            #12141C;  /* bg_sidebar - the app's dark chrome */
+  --ink-soft:       #1B202C;  /* bg_sidebar_hover */
+  --ink-line:       #2A3040;
+  --on-ink:         #C7CCDA;  /* text_sidebar */
+  --on-ink-muted:   #767D91;  /* text_sidebar_muted */
+
+  --page:           #EEF0F5;  /* bg_app */
+  --card:           #FFFFFF;  /* bg_card */
+  --hover:          #F4F5F9;  /* bg_hover */
+  --text:           #1B1E2B;  /* text_primary */
+  --muted:          #5A6377;  /* text_secondary, darkened for prose */
+  --muted-soft:     #8A93A7;  /* the app's own text_secondary, for labels */
+  --border:         #E4E7ED;
+  --border-strong:  #D4D8E2;
+
+  --accent:         #7C6EF7;
+  --accent-end:     #6D8CFA;
+  --accent-hover:   #6C5CE1;
+  --accent-subtle:  #EEECFE;
+  --wordmark:       #9D90FA;
+
+  --success:        #16A34A;
+  --success-tint:   #DCFCE7;
+  --success-text:   #166534;
+  --warning:        #B45309;
+  --warning-tint:   #FEF3C7;
+  --warning-text:   #92400E;
+
+  --radius:   14px;
+  --radius-s: 9px;
+  --shadow:   0 1px 2px rgba(27, 30, 43, .04), 0 8px 24px rgba(27, 30, 43, .06);
+  --shadow-l: 0 2px 6px rgba(27, 30, 43, .06), 0 24px 60px rgba(27, 30, 43, .13);
+
+  --ui: "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --measure: 66ch;
+  --shell: 1180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page:          #0E1017;
+    --card:          #161923;
+    --hover:         #1C2130;
+    --text:          #E8EAF0;
+    --muted:         #A8B0C2;
+    --muted-soft:    #949CB0;
+    --border:        #262B38;
+    --border-strong: #333A4B;
+    --accent-subtle: #201E3A;
+    --success-tint:  #12301F;
+    --success-text:  #7EE2A8;
+    --warning-tint:  #33240A;
+    --warning-text:  #F2C572;
+    --shadow:        0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+    --shadow-l:      0 2px 6px rgba(0, 0, 0, .5), 0 24px 60px rgba(0, 0, 0, .45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --page:          #0E1017;
+  --card:          #161923;
+  --hover:         #1C2130;
+  --text:          #E8EAF0;
+  --muted:         #A8B0C2;
+  --muted-soft:    #949CB0;
+  --border:        #262B38;
+  --border-strong: #333A4B;
+  --accent-subtle: #201E3A;
+  --success-tint:  #12301F;
+  --success-text:  #7EE2A8;
+  --warning-tint:  #33240A;
+  --warning-text:  #F2C572;
+  --shadow:        0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+  --shadow-l:      0 2px 6px rgba(0, 0, 0, .5), 0 24px 60px rgba(0, 0, 0, .45);
+}
+
+* { box-sizing: border-box; }
+
+/* Without this, `el.hidden = true` loses to any `display` rule set on the
+   element - the version picker is display:flex, so hiding it did nothing. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+h1, h2, h3 { text-wrap: balance; line-height: 1.15; margin: 0; }
+h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.02em; }
+h3 { font-size: 1.05rem; letter-spacing: -.01em; }
+p { margin: 0; }
+
+.eyebrow {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+
+/* ---------------- dark chrome: header + hero ---------------- */
+
+.chrome {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-block: 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #fff;
+  letter-spacing: -.02em;
+}
+.brand:hover { text-decoration: none; }
+.brand-mark {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-end));
+  display: grid; place-items: center;
+  flex: none;
+}
+.brand-mark svg { width: 17px; height: 17px; }
+.brand-word { display: inline; }
+.brand em { font-style: normal; color: var(--wordmark); }
+
+.nav-links {
+  display: flex;
+  gap: 22px;
+  margin-left: auto;
+  font-size: .93rem;
+}
+.nav-links a { color: var(--on-ink); }
+.nav-links a:hover { color: #fff; text-decoration: none; }
+
+/* Five links plus the wordmark do not fit a phone on one line, and a nav
+   that overflows makes the whole page scroll sideways. */
+@media (max-width: 760px) {
+  .nav { flex-wrap: wrap; gap: 10px; }
+  .nav-links {
+    margin-left: 0;
+    width: 100%;
+    gap: 16px;
+    font-size: .87rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+}
+
+/* Text only. The dashboard shot that used to sit beside this is still on
+   the page - it opens the tour, at a size you can actually read it. */
+.hero { padding-block: 64px 80px; }
+.hero-copy { max-width: 40rem; }
+
+.hero h1 {
+  font-size: clamp(2.3rem, 5.2vw, 3.4rem);
+  letter-spacing: -.035em;
+  color: #fff;
+  margin-bottom: 18px;
+}
+.hero-lede {
+  color: var(--on-ink);
+  font-size: 1.1rem;
+  max-width: 46ch;
+  margin-bottom: 26px;
+}
+.hero-eyebrow { color: var(--wordmark); margin-bottom: 14px; }
+
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 22px;
+  border-radius: var(--radius-s);
+  font-weight: 600;
+  font-size: .96rem;
+  font-family: inherit;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover { text-decoration: none; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-end));
+  color: #fff;
+}
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost-dark {
+  background: transparent;
+  border-color: var(--ink-line);
+  color: var(--on-ink);
+}
+.btn-ghost-dark:hover { background: var(--ink-soft); color: #fff; }
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.btn-ghost:hover { background: var(--hover); }
+
+.hero-note {
+  margin-top: 16px;
+  font-size: .85rem;
+  color: var(--on-ink-muted);
+}
+
+
+/* ---------------- sections ---------------- */
+
+section { padding-block: 72px; }
+.section-head { max-width: var(--measure); margin-bottom: 36px; }
+.section-head p { color: var(--muted); margin-top: 12px; }
+
+.grid { display: grid; gap: 18px; }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+/* Four download targets, stated as an explicit count. auto-fit picked
+   three and left macOS alone on a second row, because a card's own
+   min-content width (the monospace size line) beat the track minimum.
+   minmax(0, 1fr) is what lets a track go narrower than its content. */
+.grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1000px) {
+  .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .grid-4 { grid-template-columns: minmax(0, 1fr); }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.card h3 { margin-bottom: 8px; }
+.card p { color: var(--muted); font-size: .93rem; }
+
+.card-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+}
+.card-icon svg { width: 19px; height: 19px; }
+
+/* ---------------- screenshot tour ---------------- */
+
+.tour-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.tour-tab {
+  padding: 8px 15px;
+  border-radius: 99px;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  color: var(--muted);
+  font: inherit;
+  font-size: .89rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tour-tab:hover { background: var(--hover); color: var(--text); }
+.tour-tab[aria-selected="true"] {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tour-panel { display: grid; gap: 14px; }
+.tour-frame {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: auto;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.tour-frame img { min-width: 720px; }
+.tour-caption { color: var(--muted); font-size: .93rem; max-width: var(--measure); }
+
+/* ---------------- downloads ---------------- */
+
+.dl-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.dl-bar label { font-size: .88rem; color: var(--muted); font-weight: 600; }
+select {
+  font: inherit;
+  font-size: .92rem;
+  padding: 9px 13px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  color: var(--text);
+}
+
+.dl-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dl-card.recommended { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+
+.dl-os { display: flex; align-items: center; gap: 11px; }
+.dl-os svg { width: 24px; height: 24px; color: var(--text); flex: none; }
+.dl-os h3 { font-size: 1.08rem; }
+
+.tag {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  /* The download cards are column flex containers, which would otherwise
+     stretch a pill to the card's full width. */
+  align-self: flex-start;
+}
+.tag-accent { background: var(--accent-subtle); color: var(--accent); }
+.tag-ok { background: var(--success-tint); color: var(--success-text); }
+.tag-warn { background: var(--warning-tint); color: var(--warning-text); }
+
+.dl-kind { font-size: .93rem; color: var(--text); font-weight: 600; }
+.dl-meta { font-size: .82rem; color: var(--muted-soft); font-family: var(--mono); }
+.dl-note { font-size: .85rem; color: var(--muted); }
+.dl-card .btn { justify-content: center; margin-top: auto; }
+
+.dl-status {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
+  font-size: .95rem;
+  background: var(--card);
+}
+
+.dl-older { margin-top: 26px; }
+.dl-older summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .93rem;
+  color: var(--text);
+}
+.table-wrap { overflow-x: auto; margin-top: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: .89rem; min-width: 520px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* ---------------- install steps + code ---------------- */
+
+.steps { counter-reset: step; display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 13px;
+  align-items: start;
+  font-size: .94rem;
+}
+.steps li::before {
+  content: counter(step);
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  display: grid; place-items: center;
+  font-size: .8rem;
+  font-weight: 700;
+}
+/* The number, the label and the detail are three items in a two-column
+   grid, so without this the detail wraps into the 28px number column and
+   breaks one word per line. */
+.steps li > strong,
+.steps li > span { grid-column: 2; }
+.steps strong { display: block; }
+.steps span { color: var(--muted); font-size: .89rem; }
+
+pre {
+  margin: 0;
+  padding: 15px 17px;
+  border-radius: var(--radius-s);
+  background: var(--ink);
+  color: #DDE2EE;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: .84rem;
+  line-height: 1.65;
+}
+code { font-family: var(--mono); font-size: .88em; }
+p code, li code, td code {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+
+/* ---------------- hardware ---------------- */
+
+/* One card at the shell's full width would sit sparse: text on the left,
+   the wire protocol on the right, collapsing to a stack on narrow screens. */
+.card.split {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 820px) {
+  .card.split { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; }
+}
+
+.wire-flow {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 22px;
+}
+.wire-node {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 15px 17px;
+}
+.wire-node b { display: block; font-size: .94rem; }
+.wire-node span { color: var(--muted); font-size: .82rem; }
+
+/* ---------------- faq ---------------- */
+
+.faq { display: grid; gap: 10px; }
+details.qa {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 16px 20px;
+}
+details.qa summary { cursor: pointer; font-weight: 600; font-size: .96rem; }
+details.qa p { color: var(--muted); font-size: .92rem; margin-top: 10px; max-width: var(--measure); }
+
+/* ---------------- footer ---------------- */
+
+footer {
+  background: var(--ink);
+  color: var(--on-ink-muted);
+  padding-block: 40px;
+  font-size: .88rem;
+}
+.foot-grid { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+footer a { color: var(--on-ink); }
+.foot-right { margin-left: auto; display: flex; gap: 20px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
