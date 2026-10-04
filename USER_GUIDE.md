@@ -1,875 +1,674 @@
-# TapIn — Complete Feature & Hardware Guide
-
-This document explains, in full detail, everything the TapIn student-attendance
-application does — every screen, every button, every setting — and everything
-about the physical RFID hardware that goes with it: what it's made of, how it's
-wired, how its firmware behaves, and how it talks to the app. It's written to
-be usable by a non-technical reader (e.g. handing the whole project to a
-teacher) while still being precise enough for anyone who needs to maintain or
-extend the code later.
-
-It's split into two parts:
-
-- **Part 1 — Software** walks through every screen of the desktop application.
-- **Part 2 — Hardware** covers the RFID reader, the microcontroller, the
-  wiring, the LEDs, the firmware, and how it all connects to the app.
-
----
-
-# Part 1 — Software
-
-## 1. What TapIn is
-
-TapIn is a desktop application that lets an instructor manage classes, keep
-a roster of students, and record attendance for each class session — either
-automatically, by having students tap an RFID card on a physical reader, or
-manually, by clicking through the app. It also produces statistics, charts,
-and reports about attendance over time.
-
-TapIn works the way Obsidian does: everything lives in one folder you pick
-(the **vault**), stored as plain JSON and Excel files you can open, back up,
-or move like any other folder. There is no server, no account, and no login
-screen — open the app and you're in. How the vault is organized on disk is
-covered in §13.
-
-### 1.1 First launch — choosing where your data lives
-
-The very first time TapIn is opened on a computer, a **"TapIn Vault"**
-dialog asks which folder should hold your classes, rosters, and attendance
-records. **"Open Folder as Vault"** opens a folder picker (defaulting to a
-`TapIn` folder in your home directory) — pick an empty folder for a fresh
-start, or an existing TapIn vault to reconnect to its data. If the folder
-you pick has files in it but none of TapIn's own, the app warns you before
-starting a fresh vault there, in case you picked the wrong folder.
-
-Closing the dialog without choosing defaults to that same `TapIn`
-home-directory folder, so the app is never left unusable. The choice isn't
-permanent: **Settings → Data Storage** reopens the same dialog any time.
-Switching vaults doesn't move or delete anything — it just points the app
-at a different folder, so the old vault stays exactly where it was if you
-want to switch back. The name of the open vault is always visible at the
-top of the sidebar (hover it for the full path).
-
-## 2. The first time the app opens
-
-There is no sign-in screen — the main window opens directly. On a brand-new
-install, a short **"How to Use TapIn"** tour walks through Dashboard, My
-Classes, Take Attendance, Statistics & Exports, and Data Storage, one screen
-at a time — click **Next** to move through it, or **Skip** at any point. It
-only shows once; you can bring it back any time from **Settings → Help →
-Show Tutorial Again**. If this is instead the first time you're opening a
-new *version* of the app, a **"What's New"** popup summarizes what changed
-since the last version you used — that one appears once per version, then
-won't show again until the next update.
-
-## 3. The Dashboard
-
-The Dashboard is the home screen when the app opens. It has:
-
-- **A greeting** ("Good morning/afternoon/evening") along
-  with today's date, so it's immediately obvious the app is showing
-  up-to-date information.
-- **Summary stat cards**: how many active classes you have, how many are
-  pinned, the total count including archived ones, a running total of
-  attended sessions across all your active classes with an overall
-  attendance rate, and an archived-classes count.
-- **Filter tabs**: "All Classes", "Active", "Pinned" — each shows a live
-  count and switches which classes are listed below.
-- **"Today's Classes"**: any class scheduled to meet on today's weekday,
-  each with a one-click **Take Attendance** button that jumps straight into
-  a live scanning session for that class.
-- **"Recently Viewed"**: the last five classes you opened *this session*
-  (this list resets every time you restart the app — it's not saved to
-  disk).
-- **Class cards**, grouped into Pinned / Active / Archived sections,
-  showing each class's name, code, schedule, and attendance rate at a
-  glance.
-- **"+ Create New Class"** and **"Import Classes"** buttons (see §5 and
-  §4.7).
-
-If you have no classes at all yet, the dashboard shows a friendly empty-state
-message instead of a blank page.
-
-## 4. My Classes — the full class list
-
-This is a more detailed, more controllable view of your classes than the
-Dashboard's cards.
-
-### 4.1 Sorting
-
-A dropdown lets you sort by:
-- **Class Name** (alphabetical)
-- **Day** (by the earliest day of the week each class meets)
-- **Custom Order** — switches the whole list into a drag-and-drop mode where
-  you manually reorder classes by dragging rows; your order is remembered
-  for next time.
-
-Pinned classes always float to the top regardless of which sort mode you
-pick.
-
-### 4.2 Archived classes
-
-A **"Show Archived"** checkbox switches the list to show only archived
-classes (classes you've hidden from your main list, but not deleted — see
-§4.5). From there, each archived class has an **Unarchive** button (bring it
-back) and a **Delete Permanently** button (irreversible — this actually
-erases the class and its attendance history).
-
-### 4.3 Compact view
-
-A **"Compact View"** checkbox tightens up the row spacing (hides the small
-schedule caption under each class name) if you have a lot of classes and want
-to see more at once without scrolling.
-
-### 4.4 Each class row shows
-
-- A colored accent bar (either a color you picked for that class, or one
-  automatically generated from its class code, so classes are visually easy
-  to tell apart)
-- A checkbox (for bulk actions — see §4.6)
-- The class name (click to open it)
-- Its weekly schedule, in short form
-- The class code as a small tag/pill
-- Attendance rate as a percentage, color-coded: red if it's below the
-  class's required attendance policy, yellow if it's close (within 10
-  percentage points above), green if it's comfortably above
-- A pin toggle (☆/★) to pin/unpin
-- An expandable "Properties" panel with more detail (see §4.5)
-
-### 4.5 The expandable "Properties" panel
-
-Clicking the small arrow on a class row expands a panel showing: section,
-full schedule, total sessions held, sessions attended, sessions missed, and
-whether it's archived — plus two buttons:
-
-- **Duplicate**: opens the class-creation wizard pre-filled with this
-  class's schedule and settings (but not its roster — see §5.9), so you can
-  quickly set up a new section without re-entering everything.
-- **Archive / Unarchive**: hides the class from your main list without
-  deleting anything. A confirmation dialog explains that its data is kept
-  and it can be restored later. Archiving is meant for "I'm done teaching
-  this for now" — not deletion.
-
-### 4.6 Bulk actions and export
-
-Checking the box on multiple rows lets you **"Archive Selected"** in one
-action (with a confirmation showing how many classes will be archived).
-
-**"Export Class List"** saves every class's key details (code, name,
-section, attendance policy, late threshold, weeks, hours, schedule) to a CSV
-file you choose — useful for record-keeping outside the app.
-
-### 4.7 Importing classes from a spreadsheet
-
-The **"Import Classes"** button lets you bulk-create classes from a
-spreadsheet, provided it has exactly these column headers: `class_code`,
-`class_name`, `section`, `attendance_policy`, `late_threshold`,
-`total_weeks`, `total_hours`, `weekly_hours`. Note this only creates the
-classes themselves — schedules and rosters aren't imported this way and need
-to be added afterward per class. If any row fails (e.g. a duplicate class
-code), you get a clear report of which ones failed and why, without losing
-the ones that succeeded.
-
-## 5. Creating, editing, and duplicating a class
-
-Clicking **"+ Create New Class"** (or "Edit"/"Duplicate" from elsewhere in
-the app) opens a step-by-step wizard.
-
-### 5.1 Step 1 — Class Info
-
-- Class code (e.g. "COMP101") — must be unique among your own classes (two
-  different instructors *can* use the same code, since it's checked per
-  instructor, not globally)
-- Class name
-- Section
-- Attendance policy — the minimum attendance percentage required to pass
-  (e.g. 70%)
-- Late threshold — how many minutes after a session's start time a scan
-  still counts, but as "Late" instead of "Present"
-- Number of weeks, total hours, and weekly hours for the term
-- An optional custom color for the class (via a color picker), or you can
-  reset it back to an automatic color derived from the class code
-
-### 5.2 Step 2 — Schedule
-
-For each weekday (Monday through Friday — weekends aren't supported), you can
-enable that day and add one or more time slots (start and end time). A class
-can meet more than once on the same day if needed (e.g. a morning and an
-afternoon section).
-
-### 5.3 Step 3 — Roster (only when editing an existing class)
-
-When creating a brand-new class, there's no roster step — instead you can
-optionally upload a spreadsheet of students right there in Steps 1–2 (see
-§5.4), since a new class doesn't have a saved ID yet to attach students
-to individually.
-
-When *editing* an existing class, a Roster step appears where you can add
-students one at a time (student number + name) or remove a selected student
-(which also deletes their attendance history for this class — you're warned
-before this happens).
-
-### 5.4 Uploading a roster spreadsheet (only when creating a new class)
-
-You can load a `.csv`, `.xlsx`, `.xls`, or `.ods` file. This parser expects a
-specific institutional template format (it skips the first 8 rows as a
-header block, then reads specific columns for student number and name) — if
-your spreadsheet doesn't match that shape, you may need to add students
-individually instead, or reformat the file. If the same student number
-appears twice, you're warned and asked whether to continue anyway.
-
-### 5.5 Finishing up
-
-The last step has a **"Create Class"** (or **"Save Changes"** when editing)
-button. Every field is validated before submission — you can't submit with a
-missing field, and numeric fields (attendance policy, hours, threshold,
-weeks) must actually be valid numbers.
-
-### 5.6 The "Danger Zone" (editing an existing class only)
-
-At the bottom of the edit wizard:
-
-- **Archive Class** — same as the archive action described in §4.5.
-- **Delete Class Permanently** — this is deliberately hard to trigger by
-  accident: you must type the exact class name to confirm before anything
-  is deleted. This erases the class and every attendance record tied to it,
-  with no way to undo it afterward.
-
-## 6. The Class Detail page
-
-Opening a class (by clicking its name anywhere in the app) brings you to its
-detail page, which has several sections.
-
-### 6.1 Class Details card
-
-Shows the class name, code, section, attendance policy, late threshold,
-number of weeks, total/weekly hours, and a visual grid of the weekly
-schedule.
-
-### 6.2 Roster & Attendance table
-
-This is the main spreadsheet-style table: one row per student, with columns
-for their student number, name, total hours not attended, total hours
-attended, and then one additional column for every past session that's been
-held.
-
-Each session column shows a small colored checkbox rather than plain text:
-- **Green, checked** = Present
-- **Yellow, checked** = Late
-- **Red, unchecked** = Absent
-
-The "Not Attended Hours" column itself is also color-tinted per student —
-green if they're comfortably fine, yellow once they're getting close to the
-attendance-policy failure point, red once they've reached or passed it —
-giving you an at-a-glance sense of who's at risk without reading numbers.
-
-An **"At-Risk"** panel automatically lists any student who's crossed that
-yellow/red threshold, sorted worst-first, so you don't have to scan the
-whole table to notice.
-
-A summary strip at the top shows your overall class attendance rate as both
-a percentage and a progress bar.
-
-**Double-clicking** a cell does one of two things depending on which column:
-- Double-clicking a student's number, name, or hours cell opens a detail
-  popup for that one student: the card bound to them, their full attendance
-  history session by session, an "Export CSV" option to save just that
-  history to a file, and a "Remove Card" button if they have a card (§6.9).
-- Double-clicking one of the session (checkbox) columns opens a small dialog
-  letting you **correct** that specific attendance record — useful if a scan
-  was marked wrong during a live session and needs fixing afterward. You
-  pick the corrected status (Present/Late/Absent) from a dropdown.
-
-### 6.3 Class Notes
-
-A free-text notes box tied to the class, with a **Save Notes** button. Use
-this for anything you want to remember about the class that doesn't fit
-anywhere else structured.
-
-### 6.4 Merge Students
-
-If a student accidentally got added to the roster twice (e.g. with two
-different cards, or a typo'd name creating a duplicate entry), **"Merge
-Students"** lets you pick which entry to keep and which to remove — all
-attendance history from the removed entry is moved onto the kept one before
-the duplicate is deleted, so no history is lost.
-
-### 6.5 Copy Roster From Class
-
-Rather than duplicating an entire class, **"Copy Roster From Class"** lets
-you pull just the student list from one of your *other* classes (including
-archived ones) into this one — useful when the same group of students is
-also in a second class.
-
-### 6.6 Export Roster
-
-Saves just the student number + name list (not attendance history) to an
-Excel or CSV file.
-
-### 6.6a Export Attendance Grid
-
-Saves the entire Roster & Attendance table exactly as shown on screen
-(§6.2) — every student, every session, and their Present/Late/Absent
-status — to an Excel or CSV file. Use this instead of Export Roster when
-you need the full attendance picture, not just the class list: for
-handing to a department office, archiving a semester's records outside
-the app, or double-checking totals in a spreadsheet.
-
-### 6.7 Edit Card Binding
-
-This is the proper way to (re)assign a physical RFID card to a specific
-student **outside** of a live attendance session. You'd use this when:
-
-- A student loses their card and gets a new one
-- A card was accidentally bound to the wrong student and needs correcting
-- You're setting up cards ahead of time, before the first attendance session
-
-How it works: pick the student from a list, and if they already have a card
-registered, you're asked to confirm you want to replace it. Then the app
-shows "Tap the new card on the reader now..." and waits (with a Cancel
-button available) for you to physically tap the card. Once it reads a card,
-it checks that this exact card isn't already registered to a *different*
-student in the class (if it is, it refuses and tells you who has it, so you
-don't accidentally give two students the same card) — then saves the new
-binding.
-
-This matters because of a related behavior in Take Attendance, explained
-next: once *every* student in a class has a card, tapping an unrecognized
-card during a live session is now treated as an **invalid card**, not an
-invitation to register a new student (see §7.4). So after initial setup,
-the card actions on this screen (§6.7–§6.9) are the only places to change
-a card assignment.
-
-Whichever reader you have set up is the one used here. If you are on the
-WiFi reader (`.hardware_config.json`, see §11), the scan talks to it over
-WiFi — you do not need a USB cable plugged in.
-
-### 6.8 Add Student
-
-**"Add Student"** adds one student to the roster and binds their card in
-the same pass — the flow for a student standing at the reader right now.
-(For a whole class list at once, use the roster import in the Edit Class
-wizard instead.)
-
-Fill in the student number and name, leave **"Scan a card for this student
-now"** ticked, and press OK. The app adds the student, then asks you to
-tap their card.
-
-**The student is added before the reader is ever touched**, so anything
-that goes wrong with the scan still leaves them on the roster:
-
-| What happens | Result |
+**TapIn user guide**, for TapIn 3
+
+This guide shows how to use TapIn: classes, students, attendance, statistics, settings and the card reader. It is written for teachers, so you need no technical skills. The last chapter is for anyone who builds the reader.
+
+The same guide is inside the app, under Settings → Help & about → User guide.
+
+# Start here
+
+### What TapIn is
+
+TapIn helps you take attendance for the classes you teach and keep a clean record of it.
+
+- You can take attendance by hand, or with an RFID card reader: students tap a card and are marked as they go.
+- Everything stays on your computer. There is no account, no login and no server.
+- Your data lives in one folder that you choose, as ordinary `.json` and Excel (`.xlsx`) files. You can back it up or move it like any other folder.
+
+The card reader is optional. Every screen works without it.
+
+### Install
+
+| System | File | Notes |
+|---|---|---|
+| Windows 10 or 11, 64-bit | `TapIn-x.y.z-setup.exe` | Installs for your user. No administrator password is needed. Windows SmartScreen may warn on the first run because the installer is not code-signed: choose More info, then Run anyway. |
+| macOS, Apple Silicon (M1 or newer) | `TapIn-x.y.z-macos.zip` | Unzip it, move TapIn to Applications, open it. macOS blocks the first launch because the app is not signed by Apple: open System Settings → Privacy & Security and choose Open Anyway. There is no Intel build yet. |
+| Debian or Ubuntu, 64-bit | `tapin_x.y.z_amd64.deb` | Run `sudo apt install ./tapin_*_amd64.deb`. This adds a menu entry and a `tapin` command. |
+
+TapIn 3 opens data folders made by TapIn 2, so an upgrade keeps your classes.
+
+### Your first five minutes
+
+1. Start TapIn and choose where to keep your data (see Your data folder).
+2. Create a class: press Ctrl+N, or press New class. Give it a code, a name and a schedule.
+3. Add students: type them in, or upload your university's student list.
+4. Open the class and press Take attendance. Mark the students, then press Submit.
+5. Open Statistics to see how the class is doing.
+
+### The first time TapIn opens
+
+A short tour walks through the main screens. Press Next to move on, or Skip at any time. You can see it again from Settings → Help & about → Show the tour.
+
+After an update, a "What's new" box appears once for that version.
+
+# Your data folder
+
+Your classes, students and attendance live in one folder, which TapIn calls the data folder. Nothing is stored anywhere else.
+
+### The first time
+
+TapIn asks "Where should TapIn keep your data?"
+
+- **Choose a folder** opens a folder picker. Pick an empty folder to start fresh, or an existing TapIn data folder to carry on with its classes.
+- **Use ~/TapIn** makes a folder called `TapIn` inside your home folder.
+
+### Every time after that
+
+TapIn opens the folder you used last, and does not ask. You see the launch screen only when no folder is saved yet, or when the saved folder cannot be opened.
+
+### The launch screen
+
+The launch screen is called "Open a data folder". It lists the folders TapIn has opened before.
+
+- A folder that has gone is marked "folder not found".
+- A folder that is open somewhere else is marked "In use".
+- Pick a folder and press Open, or press Choose another folder…, or Quit.
+
+### When a folder will not open
+
+| What TapIn says | What to do |
 |---|---|
-| You tap a fresh card | Student added, card bound |
-| You press Cancel at the scan prompt | Student added, no card |
-| The card already belongs to someone else | Student added, no card — the app names who has it |
-| No reader is connected | Student added, no card |
-
-In every one of those cases the message says the student is on the roster
-without a card, and you can bind one later with Edit Card Binding. Nothing
-is silently undone.
-
-A student number already on this class's roster is refused before anything
-is added — two rows sharing a number would give one card two students to
-resolve to, and the reader only ever sends the card.
-
-### 6.9 Removing a Card Binding
-
-Double-click a student's **number or name** in the roster table to open
-their detail view (§6.2). It shows the card currently bound to them, and
-a red **"Remove Card"** button when there is one.
-
-Use it when a card is lost or stolen. After you confirm:
-
-- The card stops being recognised **in every class that student is
-  enrolled in**, not just this one. That is the point — a card is bound to
-  a person, so a lost card left working anywhere is a lost card that still
-  works.
-- **Attendance already recorded is not touched.** Removing a binding
-  changes who can tap in from now on, nothing in the past.
-- The card is freed, so it can be given to a different student afterwards.
-
-The button only appears when the student actually has a card, so there is
-never a confirmation for a delete that would do nothing.
-
-## 7. Take Attendance — the live scanning session
-
-Clicking **"Take Attendance"** on a class opens a dedicated screen for
-recording that day's attendance.
-
-### 7.1 Starting a session
-
-The screen tries to connect to the RFID reader as soon as it opens. Click
-**"Start Attendance"** to begin actively listening for card taps. If the
-reader can't be found or connected to, you'll see a clear error message, but
-manual entry (§7.6) still works even without hardware connected.
-
-### 7.2 The scan status indicator
-
-A status card at the top of the screen shows what's currently happening:
-a plain dot while idle, a checkmark when a scan succeeds, an exclamation
-mark for a warning (like "already recorded"), or an X for an error (like an
-invalid card). Each new event also does a brief fade animation so it's
-noticeable even if you're mostly watching students instead of the screen.
-
-### 7.3 What happens when a recognized card is tapped
-
-The app looks up the card against the roster. If it matches a student, their
-attendance is recorded immediately: the app compares the current time
-against the session's scheduled start time (plus the late threshold — see
-§7.5) to decide automatically whether they're "Present" or "Late", and adds
-a row to the on-screen table.
-
-### 7.4 What happens when an unrecognized card is tapped
-
-Two different things can happen, depending on the state of the roster:
-
-- **If some students in this class still don't have a card assigned yet**,
-  the app treats this as "a new student's first tap" — it asks you to pick
-  which student this card belongs to from a list, and binds it going
-  forward. If that student already had a *different* card bound, you're
-  asked to confirm before overwriting it.
-- **If every student already has a card assigned**, the app treats an
-  unrecognized card as **invalid** — it does *not* offer to register it to
-  anyone. This is deliberate: once your roster is fully set up, a stray
-  unrecognized card almost certainly means a lost/foreign card or a bad
-  read, not a new student who needs registering. The screen shows an error
-  message naming the unrecognized card ID, and — if you have the RGB LED
-  hardware described in Part 2 — the reader itself lights up red to give
-  immediate physical feedback, without you needing to look at the screen at
-  all.
-
-If you need to bind a card after this point, use Edit Card Binding on the
-class's roster page (§6.7) instead.
-
-### 7.5 Late threshold override
-
-By default, a scan counts as "Late" once more minutes have passed since the
-session's scheduled start than the class's configured late threshold. You
-can override this just for the current session by typing a different number
-of minutes into a field on this screen — handy for a one-off situation (e.g.
-"give everyone an extra 5 minutes today because of a fire drill") without
-permanently changing the class's settings.
-
-### 7.6 If the reader isn't working — manual entry options
-
-- **Manual Attendance Entry**: pick a student from a dropdown, then pick
-  their status (Present/Late/Absent) from another dropdown. This works
-  identically to a card scan but doesn't require any hardware.
-- **Mark All Present**: instantly marks every student who hasn't been
-  recorded yet in this session as Present, all at once — useful for very
-  small classes or quick sessions.
-- **Mark Selected Absent**: opens a list of not-yet-recorded students where
-  you can multi-select several at once and mark them all Absent in one
-  step — for example, if you know in advance which students told you
-  they'd be missing.
-- **Undo Last Scan**: removes the single most recent entry, in case of a
-  mis-tap or mis-click.
-
-### 7.7 Session templates
-
-If you always use the same time slot and late-threshold override for a
-class, you can click **"Save as Template"** once, and the app will
-automatically pre-fill those same settings every time you open Take
-Attendance for that class going forward — saving you from re-selecting them
-every session.
-
-### 7.8 Submitting the session
-
-Nothing is permanently saved until you click **"Submit Attendance"**. Up
-until then, everything is "staged" — visible in the on-screen table, but not
-yet written to the vault, so you can freely undo/correct mistakes.
-
-If the save fails when you submit (e.g. the class's Excel workbook is open
-in another program, or a disk error), your records aren't lost — they're
-kept in a small local queue file and saved automatically the next time you
-start the app. You'll see a clear "Saved For Retry" message explaining this
-at the time.
-
-If you try to leave the Take Attendance screen with unsubmitted records
-still staged, the app stops you and asks to confirm before discarding them.
-
-### 7.9 Exporting
-
-**"Export to Excel"** on this screen exports the *already-submitted* session
-for the currently selected date (not the in-progress unsubmitted table) —
-useful for printing or emailing a record of a specific day's attendance.
-
-## 8. Statistics
-
-The Statistics page turns raw attendance records into charts.
-
-- **Pick a class** from a dropdown to see its default view: a pie chart of
-  Present/Late/Absent counts, next to a line chart showing the attendance
-  rate trend over time, session by session.
-- **Compare Classes**: a bar chart comparing overall attendance rate across
-  every one of your classes side by side.
-- **Attendance Heatmap**: for one class, a grid showing average attendance
-  rate broken down by day-of-week and time slot — useful for spotting
-  patterns like "Friday afternoon sessions always have worse attendance."
-- **Export Chart**: saves whatever chart is currently on screen as an image
-  (PNG) or PDF.
-- **Export PDF Report**: generates a complete one-page PDF combining the
-  class's key numbers, both charts, and the list of at-risk students — a
-  ready-to-share summary document.
-
-## 9. Settings
-
-Settings has three tabs.
-
-### 9.1 General
-
-- **Language**: English or Turkish. Changing this requires restarting the
-  app for it to fully take effect everywhere (some parts of the app are
-  translated; a restart applies the change consistently).
-- **Session timeout**: how many minutes of inactivity (no mouse movement,
-  clicks, or key presses anywhere in the app) before you're automatically
-  logged out, for security if you walk away from the computer. Options are
-  5, 15, 30 minutes, or "Never."
-- **Font size**: Small, Normal, Large, or Extra Large — applies instantly
-  across the whole app, useful for readability on a projector or for
-  accessibility.
-- **Export/Import Settings**: saves your current preferences (language,
-  timeout, list density, font size) to a file, or loads them back from one —
-  handy for copying your setup to a different computer.
-- **Data Storage**: shows which folder is the current vault, with a
-  button that reopens the vault picker from first launch (§1.1) — switch
-  to a different vault any time, without losing existing data in either
-  folder.
-- **Updates**: a **Check for New Versions** switch, **off by default**.
-  Left off, TapIn opens no internet connection at all. Turned on, it asks
-  github.com once each time it starts for the version number of the newest
-  release, and adds a line to Notifications (§10) if yours is older. That
-  request sends no student data, no vault path and no identifier — it reads
-  the same public page anyone can open in a browser. Nothing is downloaded
-  or installed either way; you decide whether to fetch the new installer.
-- **Help**: a **Show Tutorial Again** button that reopens the "How to Use
-  TapIn" tour from §2.4 any time you want a refresher.
-
-## 10. Notifications
-
-A bell icon shows a small number badge whenever there's something worth
-knowing about — students who've become "at risk" of failing the attendance
-policy, roster-import problems, or a report that offline-queued attendance
-records were just successfully resubmitted. Clicking the bell shows the full
-list, newest first, with a "Clear All" option. Notifications only exist for
-the current app session — they're not saved between restarts, and there's no
-email or text-message integration; it's purely an in-app feed.
-
-## 11. Search
-
-Typing into the search bar (or pressing Ctrl+F) and hitting Enter searches
-across class names, class codes, and every roster student's name across all
-your classes — so you can quickly jump to a class by remembering a student's
-name, not just the class name itself.
-
-## 12. Guardrails against accidents
-
-Beyond the configurable inactivity timeout (§9.1, which simply closes the
-app after N idle minutes), every action that could cause real damage —
-deleting a class, merging students, permanently removing a roster entry —
-requires an explicit confirmation step with the confirming button styled
-red, and the most destructive one (deleting a class) requires you to type
-the exact class name rather than just clicking "Yes," specifically so it's
-very hard to trigger by an accidental click.
-
-## 13. How and where your data is actually stored
-
-Everything TapIn knows lives in the vault — the one folder you picked at
-first launch (§1.1). There is no database and no server process; the vault
-is plain files, understandable even outside the app.
-
-**What's in the vault.**
-
-- `README.txt` — a plain-language explanation of everything below, written
-  automatically the first time the folder is used, so it's understandable
-  even if someone opens the folder outside the app.
-- `_index.json` and `_meta.json` — small internal bookkeeping files (which
-  class maps to which file name, and a running student-ID counter). You
-  shouldn't need to touch these.
-- `classes/` — one `.json` file (class settings) and one `.xlsx` file
-  (roster + attendance) per class, named after the class code (e.g.
-  `comp101.xlsx`) rather than an unreadable internal ID. The `.xlsx` file
-  can be opened directly in Excel any time you want to look at the raw
-  data — its "Roster" sheet lists students and their RFID cards, and its
-  "Attendance" sheet lists every recorded scan. Avoid editing it by hand
-  while TapIn is running, since a save from the app could overwrite
-  changes made outside it.
-- `.lock` — marks the vault as "currently open," so a second copy of TapIn
-  (or the same synced folder opened on two computers at once) can't
-  silently race the first one's saves. It's removed automatically when
-  TapIn closes normally; if TapIn ever says the vault is already open but
-  nothing is actually running (e.g. after a crash), it's safe to delete
-  this one file by hand.
-
-**Moving or backing up your data.** Because it's all plain files, the whole
-vault can be copied, zipped up, or moved like any other folder — that's
-your backup. If you move it, tell TapIn its new location afterward from
-**Settings → Data Storage** (§9.1), so it can find it again; moving the
-folder without updating this setting just means TapIn creates a fresh,
-empty vault in the old location instead of seeing your existing data.
-
-If a submitted attendance session can't be saved right away (e.g. the
-class's workbook is open in Excel), it's automatically kept in a small
-queue file and saved the next time the app starts — you never have to
-manually retry a failed submission.
-
----
-
-# Part 2 — Hardware
-
-This section explains the physical RFID card-reading hardware: what it is,
-how it's wired, what its status LEDs mean, how its firmware behaves, and
-exactly how it communicates with the software described in Part 1.
-
-## 14. What the hardware is made of
-
-Two small boards, connected together, plus three LEDs:
-
-1. **An RC522 RFID reader module** — a small board with a Mifare RC522 chip
-   on it, which can read the unique ID ("UID") off a 13.56MHz RFID card or
-   keyfob when it's held close (a few centimeters) to the board's antenna
-   coil.
-2. **An ESP32 development board** — a small microcontroller board (in this
-   project's case, a "DevKitC"-style ESP32-32 board with 4MB flash) that
-   runs a small program (the "firmware") controlling the RC522 and talking
-   to the computer over a USB cable.
-3. **Three LEDs (green, yellow, red)**, each wired through its own
-   resistor, used as a simple traffic-light-style status indicator so you
-   can tell what's happening without needing to look at a screen.
-
-The ESP32 connects to the computer with a standard USB cable, and the
-computer sees it as a serial (COM-port-style) device — this project's board
-uses a "CP2102 USB to UART Bridge Controller" chip internally to make that
-work, which is why it shows up with that name if you look at connected
-devices.
-
-## 15. Wiring — RC522 to ESP32
-
-The RC522 talks to the ESP32 over a protocol called SPI (a common
-short-distance chip-to-chip communication standard). Here's exactly which
-pin connects to which:
-
-| RC522 pin  | ESP32 pin | Notes |
-|------------|-----------|-------|
-| 3.3V       | 3V3       | **Not 5V** — the RC522 chip is 3.3V-only and can be damaged by 5V |
-| RST        | GPIO 21   | Reset line |
-| GND        | GND       | Ground — shared reference, required |
-| MISO       | GPIO 19   | Data: RC522 → ESP32 |
-| MOSI       | GPIO 23   | Data: ESP32 → RC522 |
-| SCK        | GPIO 18   | Clock signal |
-| SDA (SS)   | GPIO 5    | Chip-select line |
-| IRQ        | *(not connected)* | Not used by this project's firmware |
-
-## 16. Wiring — the status LEDs
-
-Each LED is wired the same way: its long leg (the **anode**, the `+` side)
-goes through a resistor to a GPIO pin on the ESP32; its short leg (the
-**cathode**, the `-` side) goes to GND.
-
-| LED color | ESP32 pin | Resistor |
-|-----------|-----------|----------|
-| Green     | GPIO 4    | 220–330Ω |
-| Yellow    | GPIO 16   | 220–330Ω |
-| Red       | GPIO 17   | 220–330Ω |
-
-The resistor is required on every LED — without it, too much current flows
-through the LED and it can burn out or damage the GPIO pin. All three LEDs
-can share a single ground connection back to the ESP32's GND pin (they don't
-each need their own separate wire to GND — a shared ground rail on a
-breadboard works fine, since the whole rail is one electrically connected
-strip).
-
-If an LED doesn't light up when you'd expect it to, it's almost always
-simply plugged in backwards (reversed anode/cathode) — pulling it out and
-flipping it around is completely safe and usually fixes it.
-
-## 17. What each LED means
-
-- **Yellow (solid, when nothing else is happening)**: idle — the reader is
-  powered on and actively listening for a card, but nothing is currently in
-  range.
-- **Green**: a card was successfully read, *and* the software confirmed it
-  belongs to a student in the currently active class — attendance was
-  recorded.
-- **Red**: one of two situations —
-  1. A card was detected but the reader failed to complete a clean read of
-     it (for example, it was pulled away too quickly, or there was a
-     collision from two cards being too close together at once); or
-  2. The card was read successfully, but the software rejected it as
-     **invalid** — meaning it doesn't belong to any student in this class
-     and every student already has a card assigned (see §7.4 in Part 1).
-
-Every green or red result stays lit for about 0.7 seconds so it's actually
-visible, rather than flashing by too quickly to notice. On every scan, the
-LED briefly shows green first (confirming the physical read itself
-succeeded), and only switches to red afterward if the software specifically
-rejects the card — so seeing a very brief green flash before red is normal
-and expected, not a malfunction.
-
-## 18. How the firmware behaves, step by step
-
-The firmware is a small program (an "Arduino sketch," written in C++) that
-runs continuously on the ESP32. Its source file is
-`firmware/rc522_serial_reader/rc522_serial_reader.ino` in this repository.
-Here's what it does, in order, every time it's powered on:
-
-1. **On startup**: it starts a serial connection to the computer at 9600
-   baud (a specific communication speed both sides need to agree on), turns
-   on the yellow "idle" LED, and initializes the RC522 chip.
-2. **Self-test**: it reads a special "version" register from the RC522 chip
-   over SPI. A real, correctly-wired RC522 always replies with `0x91` or
-   `0x92`. If it instead reads `0x00` or `0xFF`, that's a strong sign the
-   SPI wiring is wrong or loose — even if both boards' power lights are on
-   (those only confirm 3.3V power is present, not that the data lines are
-   actually working). This result is printed over the serial connection so
-   it can be seen from a computer, and also determines nothing about the
-   LEDs directly — it's just a diagnostic message for troubleshooting.
-3. **Main loop, repeating forever**:
-   - If no card is currently in range: show yellow, wait briefly, check
-     again. (This also clears its memory of "the last card seen," which
-     matters for step 5 below.)
-   - If something is in range but the read doesn't complete cleanly: show
-     red, and hold that for about 0.7 seconds before checking again.
-   - If a card is read successfully: show green, and if this is a genuinely
-     new tap (see step 5), send its unique ID to the computer as a line of
-     text, then continue to step 4.
-4. **Waiting for the computer's verdict**: after sending a new card's ID,
-   the firmware waits up to about 0.7 seconds to see if the computer sends
-   back the exact text `INVALID`. If it does, the LED switches from green
-   to red for the remainder of that window. If nothing comes back in time
-   (or anything other than exactly `INVALID` arrives), the LED just stays
-   green. This is what lets the *software's* decision (recognized vs.
-   unrecognized-and-rejected) control the *hardware's* red/green result,
-   not just whether the RC522 could physically read the card.
-5. **Not spamming the same card twice**: if the *exact same* card is still
-   sitting on the reader continuously, the firmware won't send its ID again
-   and again — it remembers the last card it saw and skips re-sending while
-   that same card stays in place. But the moment the card is actually lifted
-   off the reader (even briefly), that memory is cleared, so tapping the
-   *same* card again later is always treated as a fresh, independent tap
-   that gets its own fresh green-then-maybe-red evaluation. This distinction
-   matters: without it, a card that was rejected once would incorrectly show
-   green forever afterward, even on repeat taps.
-
-The firmware is intentionally designed to work fine completely on its own —
-if you power it up without the TapIn software running at all (for example,
-just to test it), it will still light up green on every successful read,
-since nothing ever tells it otherwise. The "wait for INVALID" behavior only
-changes the outcome when the software is actually connected and actively
-disagreeing with a read.
-
-## 19. How the app and the hardware talk to each other
-
-This is a simple one-line-at-a-time text protocol over the serial (USB)
-connection, running at 9600 baud:
-
-- **Hardware → software**: every time a new card is tapped, the ESP32 sends
-  one line of plain text: the card's unique ID, written as hexadecimal
-  digits with no spaces or separators (for example, `8A9BD106`), followed by
-  a newline character.
-- **Software → hardware**: if the software determines that ID doesn't
-  belong to any student and the whole roster is already fully assigned, it
-  writes back the exact text `INVALID` followed by a newline, within about
-  0.7 seconds of receiving the card's ID. Otherwise, it sends nothing back
-  at all for that scan.
-
-That's the entire protocol — it's deliberately minimal. The software side of
-this lives in `views/take_attendance_window.py` (specifically the
-`check_rfid()` and `process_card()` methods) and `services/card_reader.py`;
-the hardware side lives entirely in the one firmware file mentioned above.
-
-### The two "backend" options in software
-
-The software actually supports two different ways of receiving card scans,
-selected via a small configuration file (`.hardware_config.json`) — not
-currently exposed as a visible toggle in the app's own Settings screen:
-
-- **`"serial"` (the default, and what this project's hardware uses)**: a
-  wired USB connection exactly as described above.
-- **`"esp8266"`**: an alternate, WiFi-based option where a different piece
-  of hardware (an ESP8266 board) connects over the network instead of a USB
-  cable, and sends card IDs the same way but over a TCP network connection
-  instead of serial. This project's actual physical hardware (RC522 +
-  ESP32) uses the serial option; the WiFi option exists in the software as a
-  working alternative, but the ESP8266 hardware side of it isn't part of
-  this specific build.
-
-## 20. Compiling and flashing the firmware
-
-You don't need the full Arduino IDE desktop application to work with this
-firmware — everything can be done from the command line using a tool called
-`arduino-cli`, and this project also includes a small wrapper script,
-`arduino-flash`, that's already installed and makes the common commands
-short and easy to remember from anywhere on the computer:
-
-```bash
-# Build only (check for compile errors, don't touch the board)
-arduino-flash compile /path/to/firmware/rc522_serial_reader
-
-# Build and upload to the board over USB
-arduino-flash upload /path/to/firmware/rc522_serial_reader
-
-# Watch what the board is printing over its serial connection
-# (useful for troubleshooting — shows the self-test result and any
-# card IDs / INVALID responses live)
-arduino-flash monitor
+| This folder is open on another computer | Close TapIn on that computer first, then try again. Two computers must not write to the same folder. If that computer is off or has crashed, delete the file called `.lock` in the data folder. |
+| This folder is already open in another TapIn on this computer | Close the other copy, then try again. TapIn shows its process number. |
+| That folder isn't there any more | If it is on a USB stick or a network drive, plug it in or connect, then try again. |
+| TapIn can't write to that folder | Choose a folder of your own, or ask for permission to write to it. |
+
+### Switching to another folder
+
+Open Settings → Data and press Choose folder… under "Switch data folder". You can also choose Switch data folder… in the folder menu at the top of the sidebar, or in the command palette (Ctrl+K); both take you to that place. Nothing in the folder you leave is moved or deleted, so you can switch back at any time.
+
+If you are in the middle of taking attendance, TapIn warns you that the scans you have not submitted would be lost.
+
+The top of the sidebar shows the name of the open folder. Click it for Show in folder, Switch data folder… and Data settings.
+
+### Keeping the folder safe
+
+- The files are not encrypted. Anyone who can open the folder can read the students' names, numbers and attendance. Keep the folder where only you can reach it.
+- Do not open the same folder on two computers at the same time, and take extra care if it sits in a synced folder such as OneDrive, Dropbox or iCloud. TapIn refuses to open a folder that another computer has open.
+
+# Getting around
+
+### The sidebar and the top bar
+
+The sidebar has Dashboard, Classes, Statistics, History and Settings, and a Quit button. A button on it collapses it to icons.
+
+The top bar has the search box and the bell for notifications.
+
+### Keyboard shortcuts
+
+On a Mac, use ⌘ in place of Ctrl.
+
+| Keys | What it does |
+|---|---|
+| Ctrl+1 | Dashboard |
+| Ctrl+2 | Classes |
+| Ctrl+3 | Statistics |
+| Ctrl+4 | Settings |
+| Ctrl+N | New class |
+| Ctrl+F | Go to the search box |
+| Ctrl+K | Command palette: type a class name or a command |
+
+History has no shortcut. The keys for Take attendance are listed in that chapter.
+
+### Search
+
+Type in the search box and press Enter. TapIn looks at class codes, class names, student names and student numbers. Results can show Active or Archived classes, and each result says what matched.
+
+### Notifications
+
+The bell shows a number when there is news. It lists:
+
+- Students who have become at risk in a class.
+- Attendance that could not be saved at the time and has now been saved.
+- A student list file that TapIn could not read.
+- A new TapIn version, if you turned update checks on.
+
+The list lasts only while TapIn is open. Press Clear all to empty it.
+
+### Leaving TapIn
+
+Press Quit in the sidebar, or close the window. If you have scans that are not submitted, TapIn asks first.
+
+TapIn can also close itself after a while without use. This protects a shared computer. Shortly before it closes, a box asks "Still there?" and counts down. Press Stay open to carry on. TapIn never closes by itself while scans are waiting to be submitted. You choose the time in Settings → General.
+
+# Dashboard
+
+The Dashboard is the home screen.
+
+- **A greeting and today's date.**
+- **New class** and **Import classes** buttons.
+- **Four tiles:** Active classes (with how many are pinned and archived), Attendance rate across your active classes, Records attended (present and late), and Students at risk. Press Review on that tile to see who they are.
+- **Today:** every class that meets on today's weekday. Each shows "Not taken yet" or "Taken", with how many students are recorded. A class that is on right now has a Now tag. Press Take attendance to start, or Open to see the class. A class with no students offers Add students.
+- **Recently viewed:** the last five classes you opened. The list starts empty again each time TapIn starts.
+- **Your classes:** cards in three groups, Pinned, Active and Archived. Use All, Active or Pinned to filter. Each card has a pin and a menu with Open, Take attendance, Statistics, Details, Duplicate and Archive.
+
+With no classes yet, the Dashboard shows a short message and a button to make your first one.
+
+# Classes
+
+The Classes page lists all your classes in one place.
+
+### The list
+
+- **Active or Archived** switches between the two lists.
+- **Sort by** Class code, Class name, Day, or Custom order.
+- **Compact view** shows each class on one line.
+- Each row shows the class name, section, schedule, and its attendance rate. The rate is red when it is under the class's policy, amber when it is within 10 points above the policy, and green otherwise.
+- The pin keeps a class at the top of the list.
+- Tick several rows to Archive them together.
+
+### Custom order
+
+Drag the handle of a row to move it. To use the keyboard instead, press Space or Enter on the handle to pick the class up, use the arrow keys to move it, Space or Enter to drop it, and Escape to cancel. Pinned classes always stay on top. Archived classes are sorted by class code.
+
+### Archiving and deleting
+
+**Archive** moves a class to the Archived list. Its students and attendance are kept. Use it when you have finished teaching a class for now. You can bring it back with Unarchive.
+
+**Delete permanently** erases the class's settings, students and all its attendance. It cannot be undone. To stop accidents, TapIn asks you to type the class name before it deletes anything. You find it in the Archived list, in the row menu, and in the class editor's Danger zone.
+
+### Import classes
+
+You can create many classes at once from a spreadsheet (`.xlsx`, `.xls` or `.csv`). The first row must name these columns:
+
+- `class_code`
+- `class_name`
+- `section`
+- `attendance_policy`
+- `late_threshold`
+- `total_weeks`
+- `total_hours`
+- `weekly_hours`
+
+A `term` column is optional. Other columns are ignored. The file made by Export list also works, so you can export, edit and import again.
+
+TapIn first shows a preview. Every row says Ready or "Can't be imported" and gives the reason. Rows with problems are skipped, and the rest are created. Fix the file and import it again to add the skipped ones.
+
+Only the classes are imported. Schedules and students are not, so set each class's days and times in its editor, then add its students.
+
+### Export list
+
+Export list saves your classes to a `.csv` file: code, name, section, policy, late threshold, weeks, hours and schedule. It exports the list you are looking at, Active or Archived.
+
+### The class editor
+
+New class, Edit class and Duplicate all open the same editor. It has four steps: Details, Schedule, Students, and Colour & review. The step bar at the top shows where you are.
+
+**Details**
+
+| Field | Meaning |
+|---|---|
+| Class code | A short code such as COMP101. It cannot be changed after the class is created. |
+| Class name | The full name. |
+| Section | The section letter or number. |
+| Term | Optional, for example Fall 2026. Two classes can share a code if their terms differ. |
+| Attendance policy | The lowest attendance percentage a student needs, from 0 to 100. |
+| Late after | How many minutes after a session starts a student still counts as Present. A whole number, 0 or more. |
+| Weeks | How many weeks the class runs. A whole number, 1 or more. |
+| Total hours | The hours for the whole class. Above 0. |
+| Weekly hours | The hours in a normal week. Above 0. |
+
+A class code must be unique for its term. If it is not, TapIn says so under the field.
+
+**Schedule**
+
+Switch on each day the class meets, from Monday to Sunday, then set the times. Press Add time to add a second slot on the same day. An end time must be after its start time, and two slots on one day cannot overlap. You can leave the schedule empty and add it later.
+
+**Students**
+
+Add students one at a time with their student number and their name and surname, or press Upload student list…. TapIn reads three kinds of file:
+
+- Your university's student list report, exactly as the university gives it.
+- A roster exported from TapIn.
+- Any sheet whose first two columns are headed "Student Number" and "Name Surname".
+
+Before anything is added, TapIn shows a preview: who will be added, who is already on the roster and is skipped, and any student number that appears more than once (only the first row of each is used).
+
+- When you create a new class, the students are saved together with the class when you press Create class.
+- When you edit an existing class, a change to the students is saved right away. Removing a student also deletes their attendance in this class, and TapIn warns you first.
+
+**Colour & review**
+
+Pick Automatic, one of nine colours, or Custom colour…. A review panel lists everything you set, with Edit buttons to jump back to a step. Press Create class, or Save changes when editing.
+
+**Duplicate**
+
+Duplicate copies a class's details, term, schedule and colour into the editor. You must give the copy its own code. It starts with no students.
+
+**Danger zone**
+
+When you edit a class, the Danger zone at the bottom has Archive class (or Restore class) and Delete permanently….
+
+If you leave the editor with changes that are not saved, TapIn asks whether to discard them.
+
+# A class page
+
+Open a class by pressing its name anywhere in the app.
+
+### The top of the page
+
+- A back button to Classes, and the class name and section.
+- **Edit class** and **Take attendance** buttons, and a **More** menu.
+- A strip with the class's settings: Policy, Late after, Weeks, Total hours and Weekly hours.
+- The class attendance rate, as a bar and as "attended / total sessions". It appears after the first session.
+
+### Students at risk
+
+When students are getting close to the limit, a panel says how many are at risk and lists them, worst first. Press Show to open the list.
+
+The limit is worked out from the class's Total hours and its Attendance policy:
+
+```
+failing limit = Total hours × (100 − policy) ÷ 100, rounded up
+at risk from  = half of the limit
 ```
 
-If you're already sitting inside the firmware's own folder
-(`firmware/rc522_serial_reader/`), you can drop the path argument entirely
-and just run `arduino-flash upload`. The board defaults are `/dev/ttyUSB0`
-for the port and 9600 baud for the monitor, both of which can be overridden
-with `--port` and `--baud` flags if needed.
+TapIn counts each missed session as one against this limit. For example, with 42 total hours and a 70% policy, the limit is 13 missed sessions, and a student is at risk from 7.
 
-If the Arduino IDE (the graphical application) is used instead: the same
-`.ino` file can simply be opened in it directly, with the board type set to
-an ESP32 Dev Module and the correct USB port selected — but be sure the
-Serial Monitor's own baud-rate dropdown is manually set to match (9600), as
-it doesn't automatically pick this up from the code and defaults to a
-different speed, which will show garbled text if left mismatched.
+In the table, the Missed number is coloured: green is safe, amber is at risk, red is failing risk.
 
-## 21. Testing the hardware without touching real hardware
+### The roster and attendance table
 
-This project also has a ready-to-use setup file
-(`firmware/rc522_serial_reader/diagram.json`) for **Wokwi**, a free
-browser-based circuit simulator that can run this exact firmware against a
-fully simulated ESP32, RC522 reader, and all three LEDs — including a
-clickable "scan" button on the simulated RC522 to test a virtual card tap —
-without needing any of the physical parts connected, or even present. This
-is useful for confirming firmware behavior changes are correct before
-touching the real board, or for a teacher/reviewer to see the whole thing
-working without needing physical hardware in front of them at all.
+One row for each student. The columns are Number, Name, Missed, Attended, and then one column for each session held. A session cell shows a tick for Present, a clock for Late, a cross for Absent, and is empty when nothing was recorded.
 
-## 22. Troubleshooting checklist
+To correct a record, double-click its cell, or select it and press Enter. Choose Present, Late or Absent and press Save. Choosing Absent removes the record. That session still counts as missed.
 
-- **Board doesn't show up at all when plugged in**: try a different USB
-  cable first — some cables only carry power, not data, and those will show
-  zero response whatsoever, which looks identical to "nothing plugged in"
-  from the computer's point of view. A working data cable will make the
-  board appear as a new device immediately.
-- **Both boards' power lights are on, but nothing seems to work**: a lit
-  power LED only confirms 3.3V is reaching the board — it says nothing
-  about whether the SPI data wiring (MISO/MOSI/SCK/SDA/RST) is actually
-  correct. Check the self-test message described in §18 step 2 — if it
-  reports `0x00` or `0xFF` instead of `0x91`/`0x92`, the wiring needs
-  rechecking, most commonly a loose breadboard connection.
-- **Text looks garbled when watching the board's output**: almost always a
-  baud-rate mismatch — make sure whatever you're using to view the output
-  (Arduino IDE's Serial Monitor, or `arduino-flash monitor`) is set to 9600,
-  matching the firmware. A short burst of odd characters right when the
-  board powers on or resets is normal (it's the board's own low-level boot
-  message, sent at a different fixed speed before the firmware itself takes
-  over) and can be ignored.
-- **The same card sometimes shows green, sometimes doesn't get a red result
-  when it should be rejected**: make sure the firmware is up to date — this
-  exact behavior was a bug that's since been fixed (see §18 step 5); if
-  it's still happening, the board may be running an older firmware version
-  and should be reflashed.
-- **Tapping a card seems to register against the wrong class entirely**:
-  only one class's Take Attendance session can actively be listening to the
-  hardware at a time — if you had a different class's Take Attendance
-  screen open earlier and didn't fully close it, the app now automatically
-  stops that older session's connection the moment a new one takes over, so
-  this shouldn't happen with current versions of the software; if it does,
-  it likely indicates the software needs updating.
+Right-click a cell, or press Shift+F10, for a menu with Student details and Correct attendance….
+
+You can move around the table with the arrow keys, Home and End, and PageUp and PageDown.
+
+### Student details
+
+Student details shows the student's card (or "No card"), how many sessions they attended and missed, their rate, and every session they were in. Press Export CSV to save that history. Press Remove card if the card is lost: it then stops working in every class that student is in. Attendance already recorded is not touched.
+
+### Schedule and notes
+
+The Schedule card shows the weekly times, with a button to add them if there are none.
+
+Notes is a free text box for the class: room changes, exam dates, anything to remember. It saves as you type.
+
+### The More menu
+
+| Item | What it does |
+|---|---|
+| Add student… | Adds one student, and can scan their card straight away. |
+| Edit card… | Gives a student a new card, or replaces a lost one. |
+| Merge students… | Joins two entries for the same person. |
+| Copy roster from another class… | Brings the students of another class into this one. |
+| Export roster… | Saves the student numbers and names as an Excel file. |
+| Export attendance grid… | Saves the whole table, every student and every session, as an Excel file. |
+| Export certificate… | Makes a one-page PDF for one student. |
+| Refresh | Reads the class files again. |
+
+**Add student.** Type the number and name. Leave "Scan their card now" ticked and press Add student; TapIn then asks you to tap the card on the reader. The student is added first, so if the scan fails they stay on the roster without a card. You can add the card later with Edit card. A student number that is already on the roster is refused. If the card belongs to someone else, TapIn tells you who.
+
+**Edit card.** Pick the student, press Scan card, then tap the new card. If the student already has a card, the button says Replace card and TapIn asks you to confirm, because the old card stops working in every class once the new one is saved.
+
+**Merge students.** For a person who is on the roster twice. Choose the entry to keep and the entry to remove. All the attendance of the removed entry moves to the kept one. If both have a record for the same session, the record of the kept entry stays. The removed entry is then deleted.
+
+**Copy roster.** Choose another class, including an archived one. TapIn shows how many students will be copied and skips anyone already on this roster.
+
+**Export certificate.** Choose a student and see a preview. The certificate says the student was enrolled in the class, how many sessions they attended out of the total with their rate, and whether they meet the attendance policy. Press Save PDF… to keep it.
+
+# Take attendance
+
+Open a class and press Take attendance. This screen records one session.
+
+### Set up the session
+
+- **Session date.** It starts on today. The calendar marks days that already have a saved session.
+- **Time slot.** The slots the class has on that weekday. If there are none, the screen says "No session" for that day. Pick another date, or press Edit class: it opens the class page with the schedule step of the editor ready, and when you come back to Take attendance the new slot is there.
+- **Time remaining** counts down to the end of the slot.
+- **Late after.** A student who is recorded more than this many minutes after the slot starts is marked Late. Type another number to change it for this session only. Press Save as default to keep the time slot and the late value for next time.
+- **The reader.** A small tag shows USB, Wi-Fi, Bluetooth or No reader.
+
+If the date is not today, TapIn tells you. On another day the clock time means nothing, so every card tap counts as Present.
+
+### Taking attendance with the reader
+
+1. Press **Start scanning**, or press Space.
+2. Students tap their cards. Each one appears in the list as it happens.
+3. Press **Stop scanning** (or Space) to pause. Pressing Start again carries on.
+
+If the reader is not found, the screen says so, and Set up reader opens the reader settings. You can still take attendance by hand.
+
+### What happens when a card is tapped
+
+| The card… | What happens |
+|---|---|
+| Belongs to a student in this class | The student is recorded as Present or Late. The reader shows their number and name, and its green light comes on. |
+| Belongs to a student who is already recorded | Nothing new is recorded. TapIn says they were already recorded. |
+| Belongs to a student who is not in this class | TapIn refuses it and says who the card belongs to and in which class. The reader's red light comes on and it beeps. |
+| Is registered to a student in another class, and that student is also in this class | TapIn recognises the card, links it to this class, and records the student. A card works in every class its owner is in. |
+| Is not registered to anyone, and some students here have no card | The "Register this card" box opens. Choose the student and press Register and record. Press Not now to skip it. |
+| Is not registered, and every student here already has a card | TapIn refuses it as an unknown card. The reader goes red and beeps. |
+
+If you register a card to a student who already has a different card, TapIn asks you to confirm the replacement first. The new card replaces the old one in every class.
+
+While a box is open, further taps wait in line ("2 more taps are waiting") and run afterwards. If the day has no session, or the class has no students, TapIn says so and records nothing.
+
+### Taking attendance by hand
+
+- **Manual entry** (or press M): choose a student and a status, then press Record.
+- **Mark all present:** marks everyone who is not recorded yet as Present.
+- **Mark absent…:** tick the students who are not here, then confirm. Each one gets an Absent record.
+- **Undo** (or Ctrl+Z): removes the most recent record.
+
+The roster panel shows who is recorded and who is still waiting. You can filter it by All, Waiting or Recorded. If the class has no students yet, it offers Add students, which opens the class page with the students step of the editor ready.
+
+### Keys on this screen
+
+| Keys | What it does |
+|---|---|
+| Space | Start or stop scanning |
+| M | Open Manual entry |
+| Ctrl+Z | Undo the last record |
+| Ctrl+Enter | Submit |
+
+### Submitting
+
+Nothing is saved until you press **Submit**. Until then, the records are only on the screen, so you can undo or fix mistakes. The button shows how many records are ready.
+
+If the class's Excel file is open in another program, or the disk has a problem, TapIn cannot save it. Your records are not lost: TapIn keeps them safely in the data folder and saves them by itself the next time it opens. A box called "Attendance saved for later" tells you so.
+
+**Export submitted** saves the sessions already submitted for the chosen date as an Excel file. It does not include records that are still waiting.
+
+### If something goes wrong during a session
+
+- **You try to leave with unsubmitted records.** TapIn asks "Leave without submitting?". Press Stay to go back.
+- **TapIn closes before you submit.** The next time you open that class's session, a box asks "Restore unsubmitted scans?". Restore brings them back. Saved drafts older than a week are deleted.
+- **The reader disconnects.** The screen says "Reader disconnected" and keeps your records. Fix the connection and press Reconnect.
+
+# The card reader
+
+The reader is a small box with an RFID card sensor, a screen, coloured lights and a buzzer. Students tap a card on it. It is optional: you can always take attendance by hand.
+
+A card belongs to one student, in every class that student is in. A student registers their card once.
+
+### Three ways to connect
+
+| | USB cable | Wi-Fi | Bluetooth |
+|---|---|---|---|
+| What you do | Plug it in | Join the reader's own Wi-Fi network | Pair it, then pick its port |
+| Where the reader sits | Next to the computer | Anywhere, on a power bank | Anywhere, on a power bank |
+| Set-up in TapIn | None | Test connection | Choose the port, Test connection |
+
+Choose the way in Settings → Card reader → Connection. USB and Wi-Fi are the ways to rely on. Bluetooth is new in TapIn 3 and has had less testing than the other two: it has been tried with a real reader on Linux, but not yet on Windows or macOS, so its steps may change. Try it before class, not during.
+
+### USB cable
+
+Nothing to set up. Plug the reader in with a USB cable. TapIn finds it when you open Take attendance. In Settings → Card reader, the USB panel shows what it found, and Check again looks once more.
+
+- Use a cable that carries data. Some cables only charge, and they look the same.
+- On Linux, your user must be in the `dialout` group to use a serial port. Run `sudo usermod -aG dialout $USER`, then log out and in again.
+- The reader's board usually has a CP2102 or a CH340 USB chip. Most systems already know them. If yours does not show the reader, install the driver from the chip's maker.
+
+### Wi-Fi
+
+The reader makes its own Wi-Fi network. It does not join yours.
+
+1. **Power the reader.** Plug it into a power bank or a USB charger. The white light comes on and the screen says "Ready to scan". It does not have to be plugged into the computer. That is the point of Wi-Fi mode.
+2. **Join the reader's network.** In your computer's Wi-Fi menu, connect to `TapIn-Reader` with the password `tapin12345`. This is the step people miss: until you are on that network, the computer cannot reach the reader.
+3. **Expect "no internet".** Your computer warns that this network has no internet. That is normal. The reader is not a router. If your computer keeps jumping back to your usual Wi-Fi, turn off "connect automatically" for that network while you take attendance.
+4. **Test the connection.** In Settings → Card reader, press Test connection. TapIn tries to reach the reader at `192.168.4.1` on port `8888`. Do this before class.
+5. **Take attendance** as usual.
+
+The address and the port are already filled in. Change them only if you changed them in the reader's firmware.
+
+### Bluetooth
+
+1. **Pair the reader.** Switch it on. Its screen says "Waiting for app". Open your computer's Bluetooth settings and pair with `TapIn-Reader`. There is no code to type. If your computer asks you to confirm a number, confirm it: the reader has no screen to compare it with.
+2. **Find the port.** Pairing gives the reader a serial port, and this depends on your system.
+
+| System | What to do |
+|---|---|
+| Windows | Windows makes two COM ports. Open Settings → Bluetooth & devices → More Bluetooth settings → COM Ports and use the one marked Outgoing. |
+| macOS | The port appears by itself. Choose `/dev/cu.TapIn-Reader`, not the `/dev/tty` one. |
+| Linux | No port appears by itself. Run `sudo rfcomm bind 0 <address>` once, where the address is the reader's Bluetooth address (`bluetoothctl devices` shows it). Then `/dev/rfcomm0` appears. You must do it again after a restart. |
+
+3. **Choose the port and test it.** In Settings → Card reader → Bluetooth, pick the port and press Test connection. Look again refreshes the list.
+
+The reader works over Bluetooth Classic, which only the original ESP32 board has.
+
+### What the reader shows
+
+| What you see | What it means |
+|---|---|
+| White light | The reader has power. |
+| Yellow light, "Ready to scan" | Listening for a card. |
+| "Checking card" | The card was read. The reader is waiting for TapIn's answer. |
+| Green light, a number and a name | The student was recorded. |
+| Red light, "Invalid card", three beeps | The card was refused. |
+| Red light, "Read error" | The card was moved too fast. Tap it again. |
+| "Waiting for app" | The Wi-Fi or Bluetooth reader is on, but TapIn is not connected to it yet. |
+
+The reader's screen has only 16 letters on each line and no Turkish letters, so TapIn shows names without accents there. The student's name in TapIn itself is not changed.
+
+Without TapIn, the reader still reads cards, but it cannot say whose card it is.
+
+# Statistics and history
+
+### Statistics
+
+Open Statistics to see how your classes are doing. At the top you choose what to show:
+
+- **Overview:** one class. Choose the class from the list.
+- **Compare classes:** every class side by side.
+- **Heatmap:** one class, by weekday and time.
+
+Archived classes are left out unless you turn on **Include archived**. Open class jumps to the class page.
+
+**Overview** has:
+
+- Tiles for the Present, Late and Absent records, and for the Attendance rate next to the class's policy. Absent counts students who were expected but not recorded as present or late.
+- A **Breakdown** ring showing the split.
+- An **Attendance trend** line, session by session, with the policy as a line to compare against. A short sentence under it says whether attendance rose or fell.
+- The **At-risk students** list, with the rule used.
+
+**Compare classes** shows one bar for each class that has attendance, sorted by class code. A class gets a bar after its first session.
+
+**Heatmap** shows the average attendance for each weekday and time slot. It helps you spot patterns, such as "Friday afternoons are always low".
+
+Each chart also has a written summary and a data table, for screen readers.
+
+**Export chart** saves the view you are looking at as a PNG or SVG picture. Choose Print-friendly light for a version with a white background.
+
+**Download report** saves a PDF report for the class. It shows the class's policy, late threshold, section, term, number of sessions and number of students, then the attendance rate, the breakdown, the trend, and a table of the at-risk students with how many sessions each has missed. It needs a class that has attendance.
+
+### History
+
+History is a calendar. A day with a recorded session is marked. Press a day to see the sessions on it, across all your active classes. Use the arrows to change month, Today to return to now, and "Go to the latest session" to jump to the last one. The page also says how many sessions the month has, and on how many days.
+
+History shows active classes only. Archived classes are not shown.
+
+# Settings
+
+Settings has five sections.
+
+### General
+
+| Setting | What it does |
+|---|---|
+| Language | English or Turkish. Changes every screen at once. |
+| Interface size | Small (90%), Normal (100%), Large (115%) or Extra large (130%). Makes text, buttons and lists larger or smaller together. |
+| Theme | Dark, Light or System. System follows your computer and changes while TapIn is open. |
+| Reduce transparency | Solid panels instead of glass, which can make text easier to read. |
+| Compact class list | Shows each class on one line in Classes. |
+| Close TapIn after inactivity | 5, 15 or 30 minutes, or Never. |
+
+### Data
+
+| Setting | What it does |
+|---|---|
+| Data folder | Shows the open folder. Copy path copies it. Show in folder opens it. |
+| Switch data folder | Opens another folder of classes. Nothing is moved or deleted. |
+| Backups | When TapIn opens a folder whose files have changed, it saves a zip copy in the `.backups` folder inside it. The newest 5 are kept. Open backups folder shows them. |
+| Settings file | Export settings saves your language, interface size, class list and inactivity choices into a file, to load on another computer with Import settings. The file is called `app_settings.json`. |
+
+### Card reader
+
+Connection (USB cable, Wi-Fi or Bluetooth) and the set-up for each. See The card reader.
+
+### Updates
+
+**Check for new versions** is off. See Privacy. When it is on, press Check now at any time. If a newer TapIn exists, Open download page takes you to it. TapIn never downloads or installs anything by itself.
+
+### Help & about
+
+Show the tour, User guide, FAQ, and Privacy & your data. It also shows your TapIn version.
+
+# Your files and backups
+
+### What is in the data folder
+
+```
+your-data-folder/
+├─ README.txt                 a plain explanation of this folder
+├─ classes/
+│  ├─ comp101.json            the class's settings and schedule
+│  └─ comp101.xlsx            its students and attendance
+├─ _index.json                which class is which file
+├─ _meta.json                 a counter TapIn uses for its own student IDs
+├─ _class_order.json          your custom class order
+├─ _session_templates.json    saved Take attendance defaults
+├─ _offline_queue.json        attendance waiting to be saved
+├─ .lock                      says the folder is open
+└─ .backups/                  zip copies, the newest 5
+```
+
+You can open each class's `.xlsx` file in Excel at any time. Its Roster sheet lists the students and their cards, and its Attendance sheet lists every record. Do not edit it while TapIn is running, because TapIn could overwrite your changes, and a file left open in Excel stops TapIn from saving.
+
+### Backups
+
+Copy the folder. That is the whole backup: there is no database or hidden state anywhere else. TapIn also makes its own zip copies in `.backups` (see Settings). To restore one, unzip it somewhere and point TapIn at that folder.
+
+### Moving the folder
+
+Copy or move the folder, then open it from Settings → Data → Switch data folder. There is no licence key, no activation and no link to one computer.
+
+### Where TapIn keeps its own settings
+
+Small settings files hold your language, your chosen data folder, your reader set-up and your recent folders. They hold no student data.
+
+| System | Folder |
+|---|---|
+| Windows | `%APPDATA%\TapIn` |
+| macOS | `~/Library/Application Support/TapIn` |
+| Linux | `~/.local/share/TapIn` |
+
+### Privacy
+
+- TapIn has no accounts, no cloud service and no analytics. It sends no usage data and no crash reports.
+- Out of the box, the only network connection it makes is to your own card reader, on the reader's own network.
+- The one exception is the Check for new versions switch, and it is off. If you turn it on, TapIn asks github.com once at startup for the newest version number. The request carries no student data, no folder path and no identifier.
+- TapIn stores each student's number and name, their attendance, and the ID of their card. It asks for nothing else: no email addresses, no photographs, no grades.
+- Attendance records are personal data about identifiable students. Your university probably has rules for handling them. TapIn keeps the data on your computer, and keeping it lawfully is up to you.
+- To delete data, delete a class, or delete the data folder. There is no other copy.
+
+# Fixing problems
+
+| Problem | What to try |
+|---|---|
+| "No card reader found" | Check the cable carries data, try another USB port, and press Check again in Settings → Card reader. On Linux, make sure you are in the `dialout` group (see The card reader). You can still take attendance by hand. |
+| Wi-Fi test says the computer is not on the reader's network | Join the `TapIn-Reader` network (password `tapin12345`) and test again. The "no internet" warning is expected. |
+| Wi-Fi test says nothing is answering | The reader is probably still starting, or it is running the USB firmware instead of the Wi-Fi one. Wait until its screen says "Ready to scan", then test again. |
+| Bluetooth test says the port is not on this computer | The reader may have been unpaired. On Linux, `rfcomm bind` is lost when the computer restarts. Pair it again, then pick the port. |
+| Bluetooth test cannot open the port | Switch the reader on, bring it within a few metres, and close any other program that uses it. Its screen should say "Waiting for app". |
+| "Reader disconnected" during a session | Your records are kept. Fix the connection, then press Reconnect. |
+| A card is refused | Read the message. It usually names the real owner, often a student handing over a friend's card. |
+| "This folder is open on another computer" | Close TapIn there first. If that computer is off or crashed, delete the `.lock` file in the data folder. |
+| "Attendance saved for later" | The class's Excel file is probably open in another program. Close it. TapIn saves the records the next time it opens. |
+| "Couldn't load the roster" | Close any program that has the class's `.xlsx` file open, then try again. |
+| A class import skips rows | Each skipped row says why. Fix the file and import just those rows. |
+| Students marked Late when they were on time | Check the time slot and the "Late after" minutes on the Take attendance screen, and the clock on your computer. |
+| TapIn closed by itself | The inactivity timer did it. Change it in Settings → General. |
+| Windows SmartScreen warns about the installer | The installer is not code-signed. Choose More info, then Run anyway. |
+| macOS will not open TapIn | Open System Settings → Privacy & Security and choose Open Anyway. |
+
+# Building the reader
+
+This chapter is for the person who builds the reader. Teachers do not need it.
+
+### The parts
+
+- An **ESP32 DevKit V1** board (30 pins). Only the original ESP32 can do Bluetooth.
+- An **RC522** RFID module, which reads 13.56 MHz cards.
+- A **16×2 LCD** with an I²C backpack (a PCF8574 board). It must be the backpack type, not a bare 6-wire screen.
+- **Four LEDs** (green, yellow, red, white), each with its own 220 Ω resistor.
+- A **buzzer** module.
+- For Wi-Fi or Bluetooth: a power bank, or a battery pack, and a latching on/off switch in the battery's plus wire. A push button that springs back will not work.
+
+### Wiring
+
+| ESP32 pin | GPIO | Goes to |
+|---|---|---|
+| D5 | 5 | RC522 SDA (SS) |
+| D18 | 18 | RC522 SCK |
+| D23 | 23 | RC522 MOSI |
+| D19 | 19 | RC522 MISO |
+| D21 | 21 | RC522 RST |
+| D32 | 32 | LCD SDA |
+| D22 | 22 | LCD SCL |
+| D4 | 4 | Green LED, through 220 Ω |
+| RX2 | 16 | Yellow LED, through 220 Ω |
+| TX2 | 17 | Red LED, through 220 Ω |
+| D26 | 26 | White LED, through 220 Ω |
+| D27 | 27 | Buzzer I/O |
+
+The RC522's IRQ pin is not connected.
+
+Each LED is wired the same way: the pin, then a resistor, then the long leg of the LED (the anode). The short leg goes to GND. Never connect an LED straight to a pin.
+
+### Power
+
+Two voltages are used, and mixing them up is the most common fault.
+
+| Rail | Feeds |
+|---|---|
+| 3V3 | The RC522 only. It is damaged by 5 V. |
+| VIN (5 V) | The LCD's VCC and the buzzer's VCC. The LCD is dim or blank on 3.3 V. |
+| GND | Everything. Use a breadboard rail to share it. |
+
+Two more things trip people up. The LCD's SDA goes to D32, not D21, because D21 is already the RC522's reset line. And the pins printed RX2 and TX2 on the board are GPIO 16 and 17.
+
+If the screen stays blank, the LCD's address may be `0x3F` instead of `0x27`. The address is set at the top of each sketch. The sketches run the screen at 400 kHz, which is four times faster than the usual speed. If the letters come out garbled on your wiring, set `LCD_I2C_HZ` at the top of the sketch to `100000`.
+
+The buzzer is an active-low, passive module. The sketches already drive it correctly, with three short pulses at 4500 Hz.
+
+### The three sketches
+
+Each connection has its own Arduino sketch. The wiring is the same for all three, so one board can run any of them.
+
+| Sketch | Connection |
+|---|---|
+| `rc522_serial_reader` | USB cable |
+| `rc522_wifi_reader` | Its own Wi-Fi network, `TapIn-Reader`, password `tapin12345`, address `192.168.4.1`, port `8888` |
+| `rc522_bluetooth_reader` | Bluetooth Classic, name `TapIn-Reader` |
+
+To load one:
+
+1. Install the Arduino IDE, and add the ESP32 board support (Espressif's "esp32" package). The sketches are built and tried with version 3.3.12.
+2. Install the libraries **MFRC522** and **LiquidCrystal_I2C** from the Library Manager.
+3. Open the sketch, choose the board "DOIT ESP32 DEVKIT V1" (or "ESP32 Dev Module") and the USB port, then press Upload.
+4. To watch it, open the Serial Monitor and set it to 9600 baud.
+
+The Bluetooth sketch is large. If the upload says "Sketch too big", choose Tools → Partition Scheme → "Huge APP".
+
+When the board starts, it prints a self-test line over USB: `RC522 version register: 0x91` or `0x92` means the RC522 is wired correctly. `0x00` or `0xFF` means the data wires are wrong or loose, even when the power lights are on. Check MOSI, MISO, SCK, SDA and RST.
+
+### How the reader and TapIn talk
+
+It is a simple text line in each direction, 9600 baud over USB. The Wi-Fi sketch sends the same lines over TCP, and the Bluetooth sketch sends them over the Bluetooth serial port.
+
+```
+reader to TapIn   04A3B2C1
+TapIn to reader   OK:2111051005|Grace Hopper
+TapIn to reader   INVALID
+TapIn to reader   MSG:No session|today
+```
+
+- The reader sends one line for each new tap: the card's ID, in capital hexadecimal letters, with no spaces. A card that stays on the reader is sent once. Lifting it and tapping again sends it again.
+- `OK:` is followed by the student number, a bar, and the name. The reader shows them on its two lines and lights green.
+- `INVALID` makes the reader show "Invalid card", light red, and beep.
+- `MSG:` shows two lines of text and lights yellow.
+- The reader sends card IDs only. Anything else on that line would be taken for a card.
+- The reader never waits for an answer. It keeps scanning and queues the answers, so students who tap one after another are all read.

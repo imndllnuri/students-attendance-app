@@ -4,194 +4,424 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TapIn — Offline RFID attendance for classrooms</title>
-<meta name="description" content="TapIn records class attendance from RFID cards and keeps every class as ordinary files in a folder you choose. No server, no account, no internet needed. Free for Windows, Debian/Ubuntu and Linux.">
-<link rel="icon" href="images/app-icon.png">
+<meta name="description" content="TapIn takes class attendance from RFID cards or by hand, and keeps every class as ordinary Excel and JSON files in a folder you choose. No server, no account, no internet needed. Free for Windows, macOS and Debian/Ubuntu.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#070b18" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f5fb" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
 <meta property="og:title" content="TapIn — Offline RFID attendance for classrooms">
-<meta property="og:description" content="Take attendance from RFID cards in seconds. Everything stays in a folder on your own machine.">
+<meta property="og:description" content="Take attendance from RFID cards in seconds. Everything stays in a folder on your own computer.">
 <meta property="og:type" content="website">
-<!-- Absolute: a relative path here gives link scrapers nothing to fetch,
-     and the shared card comes out blank. -->
+<!-- Absolute, and a PNG: a relative path gives link scrapers nothing to fetch, and some do not show WebP. -->
 <meta property="og:url" content="https://imndllnuri.github.io/students-attendance-app/">
-<meta property="og:image" content="https://imndllnuri.github.io/students-attendance-app/images/dashboard.png">
+<meta property="og:image" content="https://imndllnuri.github.io/students-attendance-app/images/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap">
+<!-- Before first paint: the visitor's saved theme choice, so a light page never flashes dark. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("tapin-site-theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+  document.documentElement.classList.add("js");
+})();
+</script>
+<link rel="preload" href="fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="i-bluetooth" viewBox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></symbol><symbol id="i-calendar-days" viewBox="0 0 24 24"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></symbol><symbol id="i-chart-column" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol><symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></symbol><symbol id="i-circle-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol><symbol id="i-command" viewBox="0 0 24 24"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></symbol><symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol><symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></symbol><symbol id="i-file-down" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></symbol><symbol id="i-file-text" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol><symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-hard-drive" viewBox="0 0 24 24"><path d="M10 16h.01"/><path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M21.946 12.013H2.054"/><path d="M6 16h.01"/></symbol><symbol id="i-id-card" viewBox="0 0 24 24"><path d="M13 19a4 4 0 00-8 0"/><path d="M16 10h2"/><path d="M16 14h2"/><circle cx="9" cy="12" r="3"/><rect x="2" y="5" width="20" height="14" rx="2"/></symbol><symbol id="i-languages" viewBox="0 0 24 24"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></symbol><symbol id="i-layers" viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></symbol><symbol id="i-life-buoy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol><symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol><symbol id="i-nfc" viewBox="0 0 24 24"><path d="M6 8.32a7.43 7.43 0 0 1 0 7.36"/><path d="M9.46 6.21a11.76 11.76 0 0 1 0 11.58"/><path d="M12.91 4.1a15.91 15.91 0 0 1 .01 15.8"/><path d="M16.37 2a20.16 20.16 0 0 1 0 20"/></symbol><symbol id="i-pencil-line" viewBox="0 0 24 24"><path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></symbol><symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol><symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></symbol><symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol><symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol><symbol id="i-type" viewBox="0 0 24 24"><path d="M12 4v16"/><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/><path d="M9 20h6"/></symbol><symbol id="i-undo-2" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></symbol><symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></symbol><symbol id="i-usb" viewBox="0 0 24 24"><circle cx="10" cy="7" r="1"/><circle cx="4" cy="20" r="1"/><path d="M4.7 19.3 19 5"/><path d="m21 3-3 1 2 2Z"/><path d="M9.26 7.68 5 12l2 5"/><path d="m10 14 5 2 3.5-3.5"/><path d="m18 12 1-1 1 1-1 1Z"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></symbol><symbol id="i-zap" viewBox="0 0 24 24"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></symbol></defs></svg>
+<a class="skip-link" href="#main">Skip to the content</a>
 
-<div class="chrome">
-  <div class="shell">
-    <nav class="nav">
-      <a class="brand" href="#top">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round">
-            <path d="M5 12.5a9.5 9.5 0 0 1 14 0"/><path d="M8 16a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19.2" r="1.1" fill="#fff" stroke="none"/>
-          </svg>
-        </span>
-        <span class="brand-word">Tap<em>In</em></span>
-      </a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#tour">Tour</a>
-        <a href="#hardware">Hardware</a>
-        <a href="#download">Download</a>
-        <a href="https://github.com/imndllnuri/students-attendance-app/releases">Releases</a>
-      </div>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="#top"><img src="images/app-icon-96.png" width="34" height="34" alt="">TapIn</a>
+    <nav class="nav-links" id="nav-links" aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#screens">Screens</a>
+      <a href="#how">How it works</a>
+      <a href="#reader">Reader</a>
+      <a href="#settings">Settings</a>
+      <a href="#download">Download</a>
+      <a href="#faq">FAQ</a>
     </nav>
-  </div>
-
-  <header class="hero shell" id="top">
-    <div class="hero-copy">
-      <p class="eyebrow hero-eyebrow">Free · No account · No licence key</p>
-      <h1>Attendance in a tap. Records in your own folder.</h1>
-      <p class="hero-lede">
-        TapIn takes class attendance from RFID cards or by hand, and stores every
-        class as ordinary <code>.json</code> and <code>.xlsx</code> files in a folder
-        you pick. No server. No account. No internet needed.
-      </p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#download">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
-          Download TapIn
-        </a>
-        <a class="btn btn-ghost-dark" href="#tour">See it working</a>
+    <div class="header-tools">
+      <div class="segmented theme-switch" role="radiogroup" aria-label="Theme" id="theme-switch" hidden>
+        <button type="button" class="segment" role="radio" aria-checked="false" data-theme-choice="dark" aria-label="Dark" title="Dark"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg></button>
+        <button type="button" class="segment" role="radio" aria-checked="false" data-theme-choice="light" aria-label="Light" title="Light"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg></button>
+        <button type="button" class="segment" role="radio" aria-checked="true" data-theme-choice="system" aria-label="System" title="System"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-monitor"/></svg></button>
       </div>
-      <p class="hero-note">Windows installer · Debian/Ubuntu package · Linux &amp; macOS archives</p>
+      <a class="btn btn-secondary gh-link" href="https://github.com/imndllnuri/students-attendance-app/releases">Releases</a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Menu"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
     </div>
-  </header>
-</div>
+  </div>
+</header>
 
-<main>
+<main id="main">
 
 <!-- ------------------------------------------------------------------ -->
-<section class="shell" id="features">
+<header class="hero shell" id="top">
+  <p class="eyebrow"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-nfc"/></svg> Offline RFID attendance for classrooms</p>
+  <h1>Attendance in a tap. <span class="grad">Records in your own folder.</span></h1>
+  <p class="lede">
+    TapIn takes class attendance from RFID cards or by hand, and keeps every class as ordinary
+    Excel and JSON files in a folder you choose. No server. No account. No internet needed.
+  </p>
+  <div class="cta-row">
+    <a class="btn btn-primary btn-lg" href="#download"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-download"/></svg> Download TapIn</a>
+    <a class="btn btn-secondary btn-lg" href="#screens">See every screen</a>
+  </div>
+  <div class="chip-row" aria-label="Where it runs">
+    <span class="pill">Windows 10/11</span>
+    <span class="pill">macOS (Apple Silicon)</span>
+    <span class="pill">Debian / Ubuntu</span>
+    <span class="pill pill-accent">English &amp; Türkçe</span>
+    <span class="pill pill-accent">Light &amp; dark</span>
+  </div>
+  <div class="hero-shot">
+    <div class="window">
+      <img class="shot-dark" src="images/dashboard-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The TapIn dashboard: counts of active classes, the attendance rate, records attended and students at risk; today's classes with a Take attendance button; and recently viewed classes."><img class="shot-light" src="images/dashboard-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The TapIn dashboard: counts of active classes, the attendance rate, records attended and students at risk; today's classes with a Take attendance button; and recently viewed classes.">
+    </div>
+  </div>
+</header>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block tight shell" aria-labelledby="new-title">
+  <div class="card whatsnew">
+    <div class="whatsnew-head">
+      <span class="pill pill-accent"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-zap"/></svg> New</span>
+      <h2 id="new-title">What's new in TapIn 3</h2>
+      <p>The whole app was rebuilt. Here is what changed the most.</p>
+    </div>
+    <ul class="whatsnew-list">
+      <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>A new look:</strong> one window, a sidebar for everything, and pages that fit a laptop screen.</span></li>
+      <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>Session history:</strong> a month at a glance, with every session you recorded in it.</span></li>
+      <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>Statistics:</strong> attendance over time, a weekday heatmap, class comparison and a printable report.</span></li>
+      <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>Import and export classes:</strong> bring classes in from a spreadsheet, and export your class list.</span></li>
+      <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>Taking attendance:</strong> scans land as you go, with an undo and one clear submit.</span></li>
+      <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>Settings in one place:</strong> language, theme, interface size, the card reader, backups and updates.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="features">
   <div class="section-head">
-    <p class="eyebrow">What it does</p>
+    <span class="kicker">What it does</span>
     <h2>Built for one person running a real classroom</h2>
-    <p>
-      Not a platform to onboard onto. A desktop app you install, point at a folder,
-      and use for the term.
-    </p>
+    <p>Not a platform to sign up for. A desktop app you install, point at a folder, and use for the term.</p>
   </div>
 
   <div class="grid grid-3">
-    <article class="card">
-      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a9.5 9.5 0 0 1 14 0"/><path d="M8 16a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19.2" r="1.1" fill="currentColor" stroke="none"/></svg></div>
+    <article class="card feature">
+      <span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-nfc"/></svg></span>
       <h3>Tap to record</h3>
-      <p>
-        A student taps their card and the reader shows their name back. The app marks
-        them Present or Late against the session's own start time and threshold.
-      </p>
+      <p>Students tap a card and the reader's screen shows their name back. TapIn marks each one Present, or Late once the session is past your <em>Late after</em> limit.</p>
     </article>
-
-    <article class="card">
-      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg></div>
-      <h3>Your files, not our database</h3>
-      <p>
-        A vault is a plain folder of JSON and XLSX. Back it up, copy it to a USB stick,
-        open the spreadsheet in Excel. Nothing is locked in a format only TapIn reads.
-      </p>
-    </article>
-
-    <article class="card">
-      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M14 3.3A9 9 0 0 1 20.7 10H14z"/></svg></div>
-      <h3>Statistics that answer questions</h3>
-      <p>
-        Per-class breakdown and trend, a heatmap across sessions, and a comparison
-        across every class you teach — plus who is below your attendance policy.
-      </p>
-    </article>
-
-    <article class="card">
-      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></div>
-      <h3>Export anything</h3>
-      <p>
-        The roster, the full attendance grid, one student's history, a PDF class report,
-        or a signed-looking certificate of attendance for a single student.
-      </p>
-    </article>
-
-    <article class="card">
-      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+    <article class="card feature">
+      <span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-pencil-line"/></svg></span>
       <h3>No reader? Still works</h3>
-      <p>
-        Manual entry, "mark all present", and bulk-marking absentees all work with no
-        hardware at all. The reader makes it faster; it is not a requirement.
-      </p>
+      <p>Manual entry, <em>Mark all present</em> and <em>Mark absent…</em> work with no hardware at all. The reader only makes a large class faster; nothing is hidden without it.</p>
     </article>
+    <article class="card feature">
+      <span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-folder-open"/></svg></span>
+      <h3>Your files, not our database</h3>
+      <p>Each class is a <span class="mono">.json</span> file for its settings and an <span class="mono">.xlsx</span> file for its roster and attendance. Back up by copying the folder; open the spreadsheets in Excel whenever you like.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile tone-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-triangle-alert"/></svg></span>
+      <h3>See who needs attention</h3>
+      <p>The dashboard counts students at risk, and each class names them: those who have missed enough sessions that they are close to failing your attendance policy.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-chart-column"/></svg></span>
+      <h3>Statistics that answer questions</h3>
+      <p>The Present / Late / Absent split, the trend against your policy, a weekday-and-time heatmap, a comparison of every class, and a printable report.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-calendar-days"/></svg></span>
+      <h3>Session history</h3>
+      <p>A calendar of every day you recorded a session across your active classes. Pick a day to see which classes met and open them.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-upload"/></svg></span>
+      <h3>Bring your lists in</h3>
+      <p>Upload your university's student list report, a TapIn roster export, or a plain number + name + surname list (<span class="mono">.xlsx</span>, <span class="mono">.xls</span>, <span class="mono">.ods</span>, <span class="mono">.csv</span>). Import whole classes from a spreadsheet too.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-file-down"/></svg></span>
+      <h3>Export anything</h3>
+      <p>The roster and the attendance grid as Excel, a student's history and your class list as CSV, a certificate of attendance and the statistics report as PDF, and any chart as an image.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile tone-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-shield-check"/></svg></span>
+      <h3>Hard to lose a record</h3>
+      <p>If TapIn closes before you submit, your scans are saved as a draft and offered back. If a workbook is open in Excel, records queue and retry. A zip backup is made when a changed folder opens; the newest five are kept.</p>
+    </article>
+  </div>
 
-    <article class="card">
-      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.9 2.6 15.1 0 18M12 3c-2.6 2.9-2.6 15.1 0 18"/></svg></div>
-      <h3>English and Turkish</h3>
-      <p>
-        The whole interface, including dates and weekday names, switches between
-        English and Turkish from Settings.
-      </p>
+  <div class="grid grid-3" style="margin-top: var(--space-5)">
+    <article class="card feature">
+      <span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-command"/></svg></span>
+      <h3>Quick to move around</h3>
+      <p>Search classes and students from the top bar (<span class="kbd">Ctrl</span> <span class="kbd">F</span>), open the command palette with <span class="kbd">Ctrl</span> <span class="kbd">K</span>, jump between pages with <span class="kbd">Ctrl</span> <span class="kbd">1</span>–<span class="kbd">4</span>, start a class with <span class="kbd">Ctrl</span> <span class="kbd">N</span>. On a Mac, use <span class="kbd">⌘</span>.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-languages"/></svg></span>
+      <h3>English and Türkçe</h3>
+      <p>The whole interface switches between English and Turkish at once, dates and weekday names included.</p>
+    </article>
+    <article class="card feature">
+      <span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-contrast"/></svg></span>
+      <h3>Light, dark, or your system's</h3>
+      <p>Pick a theme, make everything 90 % to 130 % bigger or smaller, switch glass to solid panels, or show classes on one line each. This page has the same theme switch, top right.</p>
     </article>
   </div>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
-<section class="shell" id="tour">
+<section class="block shell" id="screens">
   <div class="section-head">
-    <p class="eyebrow">Tour</p>
+    <span class="kicker">Screens</span>
     <h2>Every screen, as it really looks</h2>
-    <p>These are captures of the running app, not mockups.</p>
+    <p>These are captures of the running app on made-up demo classes and students. Switch the theme at the top to see them in light.</p>
   </div>
-
-  <div class="tour-tabs" role="tablist" aria-label="Screenshot tour"></div>
-  <div class="tour-panel" id="tour-panel"></div>
+  <div class="tabs" hidden><div class="segmented" role="tablist" aria-label="Screens of the app"><button type="button" class="segment" role="tab" id="tab-dashboard" aria-controls="panel-dashboard" aria-selected="true" tabindex="0">Dashboard</button><button type="button" class="segment" role="tab" id="tab-classes" aria-controls="panel-classes" aria-selected="false" tabindex="-1">Classes</button><button type="button" class="segment" role="tab" id="tab-class-detail" aria-controls="panel-class-detail" aria-selected="false" tabindex="-1">Class &amp; roster</button><button type="button" class="segment" role="tab" id="tab-take-attendance" aria-controls="panel-take-attendance" aria-selected="false" tabindex="-1">Take attendance</button><button type="button" class="segment" role="tab" id="tab-statistics" aria-controls="panel-statistics" aria-selected="false" tabindex="-1">Statistics</button><button type="button" class="segment" role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" tabindex="-1">Compare classes</button><button type="button" class="segment" role="tab" id="tab-heatmap" aria-controls="panel-heatmap" aria-selected="false" tabindex="-1">Heatmap</button><button type="button" class="segment" role="tab" id="tab-history" aria-controls="panel-history" aria-selected="false" tabindex="-1">History</button><button type="button" class="segment" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1">Settings</button><button type="button" class="segment" role="tab" id="tab-turkish" aria-controls="panel-turkish" aria-selected="false" tabindex="-1">Türkçe</button></div></div>
+  <div class="panel" role="tabpanel" id="panel-dashboard" aria-labelledby="tab-dashboard"><div class="window"><img class="shot-dark" src="images/dashboard-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The TapIn dashboard: counts of active classes, the attendance rate, records attended and students at risk; today's classes with a Take attendance button; recently viewed classes; and a card per class."><img class="shot-light" src="images/dashboard-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The TapIn dashboard: counts of active classes, the attendance rate, records attended and students at risk; today's classes with a Take attendance button; recently viewed classes; and a card per class."></div><p class="caption"><strong>Opens on what needs attention.</strong> Today's classes, how each class is doing, the classes you looked at last, and your notifications. The tiles count active classes, the attendance rate, records attended and students at risk.</p></div>
+  <div class="panel" role="tabpanel" id="panel-classes" aria-labelledby="tab-classes"><div class="window"><img class="shot-dark only" src="images/classes-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The Classes page: eleven classes in a list with their code, term, attendance rate, a pin and a menu, with sorting, an Active and Archived switch, Import classes, New class and Export list."></div><p class="caption"><strong>All your classes in one list.</strong> Sort by class code, name, day or your own order, pin the ones you use most, archive old ones, or switch to one line per class. Import classes from a spreadsheet and export the list.</p></div>
+  <div class="panel" role="tabpanel" id="panel-class-detail" aria-labelledby="tab-class-detail"><div class="window"><img class="shot-dark" src="images/class-detail-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="A class page: the class settings, a banner naming three students at risk, and the roster with a column per session, each cell marked Present, Late or Absent."><img class="shot-light" src="images/class-detail-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="A class page: the class settings, a banner naming three students at risk, and the roster with a column per session, each cell marked Present, Late or Absent."></div><p class="caption"><strong>One row per student, one column per session.</strong> Double-click a cell, or press Enter, to correct a record. A banner names the students who are at risk under your attendance policy.</p></div>
+  <div class="panel" role="tabpanel" id="panel-take-attendance" aria-labelledby="tab-take-attendance"><div class="window"><img class="shot-dark" src="images/take-attendance-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Take attendance during a session: the reader card shows the last student marked, the roster fills in on the right, tallies of Present, Late, Absent and Total sit below, and a Submit button waits at the bottom."><img class="shot-light" src="images/take-attendance-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Take attendance during a session: the reader card shows the last student marked, the roster fills in on the right, tallies of Present, Late, Absent and Total sit below, and a Submit button waits at the bottom."></div><p class="caption"><strong>The live session.</strong> Start scanning and the roster fills as students tap. Choose the date and time slot, set how late is late, mark by hand when you need to, and nothing is saved until you submit.</p></div>
+  <div class="panel" role="tabpanel" id="panel-statistics" aria-labelledby="tab-statistics"><div class="window"><img class="shot-dark" src="images/statistics-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Statistics for one class: Present, Late, Absent and attendance-rate tiles, a breakdown ring, and an attendance trend line with the policy line drawn across it."><img class="shot-light" src="images/statistics-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Statistics for one class: Present, Late, Absent and attendance-rate tiles, a breakdown ring, and an attendance trend line with the policy line drawn across it."></div><p class="caption"><strong>Where a class stands.</strong> Present, Late and Absent, the attendance rate against your policy, and a trend line session by session. Export a chart as a picture, or download a printable report.</p></div>
+  <div class="panel" role="tabpanel" id="panel-compare" aria-labelledby="tab-compare"><div class="window"><img class="shot-dark only" src="images/compare-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="A bar chart comparing the attendance rate of eight classes, each bar in its class colour."></div><p class="caption"><strong>Every class side by side.</strong> The attendance rate of each class that has data, in the colour you gave the class.</p></div>
+  <div class="panel" role="tabpanel" id="panel-heatmap" aria-labelledby="tab-heatmap"><div class="window"><img class="shot-dark" src="images/heatmap-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="A heatmap of average attendance by weekday and time slot, with the highest and the lowest slot named above it."><img class="shot-light" src="images/heatmap-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="A heatmap of average attendance by weekday and time slot, with the highest and the lowest slot named above it."></div><p class="caption"><strong>When attendance is strongest.</strong> The average attendance for each weekday and time slot a class meets, with the best and the worst slot named.</p></div>
+  <div class="panel" role="tabpanel" id="panel-history" aria-labelledby="tab-history"><div class="window"><img class="shot-dark" src="images/history-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Session history: a month calendar with a dot on each day that had a recorded session, and a panel listing the sessions of the selected day."><img class="shot-light" src="images/history-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Session history: a month calendar with a dot on each day that had a recorded session, and a panel listing the sessions of the selected day."></div><p class="caption"><strong>A month at a glance.</strong> Days with a recorded session carry a dot. Pick a day to see which classes met, and open one.</p></div>
+  <div class="panel" role="tabpanel" id="panel-settings" aria-labelledby="tab-settings"><div class="window"><img class="shot-dark" src="images/settings-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The Settings page with its sections listed on the left and the General and Data settings on the right."><img class="shot-light" src="images/settings-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The Settings page with its sections listed on the left and the General and Data settings on the right."></div><p class="caption"><strong>Everything in one place.</strong> Language, theme, interface size, the data folder and its backups, the card reader and updates.</p></div>
+  <div class="panel" role="tabpanel" id="panel-turkish" aria-labelledby="tab-turkish"><div class="window"><img class="shot-dark only" src="images/tr-take-attendance-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="The Take attendance page in Turkish: Yoklama al, with the roster, the reader card and the tallies all in Turkish."></div><p class="caption"><strong>The whole interface in Turkish.</strong> Switch the language in Settings and every screen, date and weekday follows at once.</p></div>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
-<section class="shell" id="hardware">
+<section class="block shell" id="how">
   <div class="section-head">
-    <p class="eyebrow">Hardware</p>
-    <h2>How the reader fits in</h2>
-    <p>
-      TapIn works with an ESP32-based RFID reader over USB, or over the reader's
-      own WiFi hotspot. It is optional — manual entry and bulk marking work with
-      no hardware at all.
-    </p>
+    <span class="kicker">How it works</span>
+    <h2>From a folder to a finished class in five steps</h2>
+    <p>The same path the in-app tour walks you through.</p>
   </div>
 
-  <div class="wire-flow">
-    <div class="wire-node"><b>ESP32 + RC522</b><span>Reads the card, sends the serial number</span></div>
-    <div class="wire-node"><b>USB cable or WiFi</b><span>Cable by default; the board can host its own hotspot</span></div>
-    <div class="wire-node"><b>TapIn</b><span>Resolves the card to a student, records the session</span></div>
-    <div class="wire-node"><b>Your vault folder</b><span>Plain files on your own disk</span></div>
+  <ol class="flow">
+    <li class="flow-step">
+      <div class="flow-text">
+        <div class="step-num" aria-hidden="true">1</div>
+        <h3>Choose where your data lives</h3>
+        <p>The first time TapIn opens it asks where to keep your classes, rosters and attendance. Pick any folder, or use <span class="mono">~/TapIn</span>. From then on TapIn opens that folder by itself and does not ask again.</p>
+        <ul>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-folder-open"/></svg><span>You only see this screen again if the saved folder can't be opened, and it says why: for example that it is open on another computer.</span></li>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-refresh-cw"/></svg><span>Switch to another folder at any time in <strong>Settings → Data</strong>. Nothing in the folder you leave is moved or deleted.</span></li>
+        </ul>
+      </div>
+      <div class="flow-media">
+        <div class="window narrow">
+          <img class="shot-dark only" src="images/launch-dark.webp" width="568" height="284" loading="lazy" decoding="async" alt="The first-run screen: &quot;Where should TapIn keep your data?&quot; with two buttons, Use ~/TapIn and Choose a folder.">
+        </div>
+      </div>
+    </li>
+
+    <li class="flow-step">
+      <div class="flow-text">
+        <div class="step-num" aria-hidden="true">2</div>
+        <h3>Add a class</h3>
+        <p>A four-step editor: <strong>Details</strong> (code, name, term, attendance policy, late limit, weeks and hours), <strong>Schedule</strong> (the days it meets and the times), <strong>Students</strong>, and <strong>Colour &amp; review</strong>.</p>
+        <ul>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-upload"/></svg><span>Add students by hand, upload your university's student list report, or copy them from another class.</span></li>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg><span>Duplicate a class for next term, pin the ones you use most, archive the ones you don't.</span></li>
+        </ul>
+      </div>
+      <div class="flow-media">
+        <div class="window narrow">
+          <img class="shot-dark only" src="images/editor-details-dark.webp" width="760" height="680" loading="lazy" decoding="async" alt="The New class editor on step 1, Details, filled in: class code COMP101, name Introduction to Programming, section 1, term Fall 2026, policy 70 per cent, late after 15 minutes, 14 weeks, 42 total hours, 3 weekly hours.">
+        </div>
+        <div class="window narrow">
+          <img class="shot-dark only" src="images/editor-schedule-dark.webp" width="760" height="680" loading="lazy" decoding="async" alt="The New class editor on step 2, Schedule: Monday and Wednesday switched on with a start and end time, the other days off.">
+        </div>
+      </div>
+    </li>
+
+    <li class="flow-step">
+      <div class="flow-text">
+        <div class="step-num" aria-hidden="true">3</div>
+        <h3>Take attendance</h3>
+        <p>Open the class and press <strong>Take attendance</strong>. With a reader, students tap their card and are marked as they go. Without one, mark them by hand on the same screen. <strong>Nothing is saved until you press Submit.</strong></p>
+        <div class="status-row" aria-label="How a record is marked">
+          <span class="pill pill-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg> Present</span>
+          <span class="pill pill-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg> Late</span>
+          <span class="pill pill-absent"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-x"/></svg> Absent</span>
+        </div>
+        <ul>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-id-card"/></svg><span>An unknown card? Register it to a student on the spot, and they are recorded straight away. A card belongs to one student, across every class.</span></li>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-undo-2"/></svg><span>Undo the last record, mark everyone present, or mark absentees in bulk.</span></li>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-shield-check"/></svg><span>Close TapIn by accident and your unsubmitted scans are saved as a draft, offered back the next time.</span></li>
+        </ul>
+      </div>
+      <div class="flow-media">
+        <div class="window">
+          <img class="shot-dark" src="images/take-attendance-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Take attendance during a session: the reader card shows the last student, Elif Güneş, marked Late at 14:25; four students are Present, one Late; the roster fills in on the right and a Submit 5 records button waits at the bottom."><img class="shot-light" src="images/take-attendance-light.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Take attendance during a session: the reader card shows the last student, Elif Güneş, marked Late at 14:25; four students are Present, one Late; the roster fills in on the right and a Submit 5 records button waits at the bottom.">
+        </div>
+        <div class="window narrow">
+          <img class="shot-dark only" src="images/register-card-dark.webp" width="560" height="334" loading="lazy" decoding="async" alt="The Register this card prompt: an unregistered card number, a list to choose the student it belongs to, and the buttons Not now and Register and record.">
+        </div>
+      </div>
+    </li>
+
+    <li class="flow-step">
+      <div class="flow-text">
+        <div class="step-num" aria-hidden="true">4</div>
+        <h3>See where you stand</h3>
+        <p>Each class names its students at risk under your attendance policy. <strong>Statistics</strong> shows the split, the trend with your policy line, a weekday-and-time heatmap and a comparison of all your classes. <strong>History</strong> shows every session, a month at a time.</p>
+        <ul>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-users"/></svg><span>Open a student to see every session and their card, or double-click a cell in the grid to correct a record.</span></li>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-file-down"/></svg><span>Download a printable PDF report for any class.</span></li>
+        </ul>
+      </div>
+      <div class="flow-media">
+        <div class="window">
+          <img class="shot-dark only" src="images/student-sheet-dark.webp" width="1440" height="900" loading="lazy" decoding="async" alt="A class page with a student's sheet open on the right: attended 4, missed 8, a 33 per cent rate, the student's card number with a Remove card button, and every session with its status.">
+        </div>
+      </div>
+    </li>
+
+    <li class="flow-step">
+      <div class="flow-text">
+        <div class="step-num" aria-hidden="true">5</div>
+        <h3>Take it with you</h3>
+        <p>Export the roster or the attendance grid as Excel, a student's history or your class list as CSV, a <strong>certificate of attendance</strong> or the statistics report as PDF, and any chart as a PNG or SVG picture.</p>
+        <ul>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-hard-drive"/></svg><span>Because every class is already an ordinary file, there is nothing to export in order to leave: copy the folder.</span></li>
+        </ul>
+      </div>
+      <div class="flow-media">
+        <div class="paper">
+          <img src="images/certificate.webp" width="684" height="1013" loading="lazy" decoding="async" alt="A certificate of attendance: Ayşe Çelik, student number 20260001, enrolled in Introduction to Programming (COMP101), 11 of 12 sessions attended, 91.7 per cent, meets the attendance policy of 70 per cent.">
+        </div>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="reader">
+  <div class="section-head">
+    <span class="kicker">The reader</span>
+    <h2>An optional card reader</h2>
+    <p>TapIn works with an ESP32-based RFID reader over a USB cable, over the reader's own Wi-Fi hotspot, or over Bluetooth. It is a convenience, not a requirement: every feature works by hand.</p>
   </div>
 
-  <article class="card split">
-    <div>
+  <div class="wire" role="list" aria-label="How the reader fits in">
+    <div class="wire-node" role="listitem"><b>ESP32 + RC522</b><span>Reads the card and sends its serial number</span></div>
+    <span class="wire-arrow" aria-hidden="true"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-right"/></svg></span>
+    <div class="wire-node" role="listitem"><b>USB, Wi-Fi or Bluetooth</b><span>Cable by default; the board can host its own hotspot, or pair over Bluetooth</span></div>
+    <span class="wire-arrow" aria-hidden="true"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-right"/></svg></span>
+    <div class="wire-node" role="listitem"><b>TapIn</b><span>Looks up the student and records the session</span></div>
+    <span class="wire-arrow" aria-hidden="true"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-right"/></svg></span>
+    <div class="wire-node" role="listitem"><b>Your data folder</b><span>Plain files on your own disk</span></div>
+  </div>
+
+  <div class="reader-grid">
+    <article class="card">
       <h3>The board only ever sends a number</h3>
-      <p>
-        The reader has no roster and no idea who anyone is. It sends a card's
-        serial number; the app looks up who that is and sends the name back for
-        the reader's screen. Names never live on the device, so a reader that is
-        lost or taken apart gives up nothing about your students.
-      </p>
-    </div>
-    <pre><code>board &#8594; app   04A3B2C1
-app &#8594; board   OK:20210042|Nisa Aktas
-app &#8594; board   INVALID</code></pre>
-  </article>
+      <p>The reader has no roster and no idea who anyone is. It sends a card's serial number; TapIn looks up who that is and sends the name back for the reader's screen. Names never live on the device, so a reader that is lost or taken apart gives up nothing about your students.</p>
+      <pre class="code" tabindex="0"><code><span class="dim">board → app</span>  04A3B2C1
+<span class="dim">app → board</span>  OK:20260001|Ayşe Çelik
+<span class="dim">app → board</span>  INVALID</code></pre>
+      <p>On the reader, a green light means the card was recorded; a red light and a beep mean it was refused.</p>
+      <ul class="options">
+        <li><span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-usb"/></svg></span><div><b>USB cable</b><span>Nothing to set up. Plug the reader in and TapIn finds the port when you open Take attendance.</span></div></li>
+        <li><span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-wifi"/></svg></span><div><b>Its own Wi-Fi</b><span>The reader hosts a small network your computer joins. It does not touch your institution's network, which also means no internet on this computer while scanning.</span></div></li>
+        <li><span class="icon-tile tone-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-bluetooth"/></svg></span><div><b>Bluetooth <span class="tag tag-warn">New</span></b><span>Pair the reader with your computer, then pick its serial port in Settings. It needs the Bluetooth version of the reader's firmware. Tried with a real reader on Linux; Windows and macOS have not been tried yet.</span></div></li>
+      </ul>
+    </article>
+    <article class="card reader-shot">
+      <h3>Wi-Fi mode, in five steps</h3>
+      <p>Settings → Card reader walks you through it, and has a <strong>Test connection</strong> button that tells you whether this computer is on the reader's network, whether the reader answers, or that it was found.</p>
+      <div class="window">
+        <img class="shot-dark" src="images/settings-reader-wifi-dark.webp" width="834" height="525" loading="lazy" decoding="async" alt="Settings, Card reader, Wi-Fi: five numbered steps (power the reader, join its Wi-Fi network, expect no internet, test the connection, take attendance) and the reader address 192.168.4.1, port 8888, with a Test connection button."><img class="shot-light" src="images/settings-reader-wifi-light.webp" width="834" height="525" loading="lazy" decoding="async" alt="Settings, Card reader, Wi-Fi: five numbered steps (power the reader, join its Wi-Fi network, expect no internet, test the connection, take attendance) and the reader address 192.168.4.1, port 8888, with a Test connection button.">
+      </div>
+    </article>
+  </div>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
-<section class="shell" id="download">
+<section class="block shell" id="settings">
   <div class="section-head">
-    <p class="eyebrow">Download</p>
+    <span class="kicker">Settings</span>
+    <h2>Make it yours</h2>
+    <p>One page, five sections: General, Data, Card reader, Updates, and Help &amp; about.</p>
+  </div>
+
+  <div class="settings-grid">
+    <ul class="setting-list">
+      <li><span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-languages"/></svg></span><div><h3>Language</h3><p>English or Türkçe. Changes every screen at once.</p></div></li>
+      <li><span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-contrast"/></svg></span><div><h3>Theme</h3><p>Dark, Light, or System, which follows your computer's own setting and switches while TapIn is open.</p></div></li>
+      <li><span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-type"/></svg></span><div><h3>Interface size</h3><p>90 %, 100 %, 115 % or 130 %: text, buttons and lists grow or shrink together.</p></div></li>
+      <li><span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-layers"/></svg></span><div><h3>Reduce transparency &amp; compact lists</h3><p>Solid panels instead of glass, if that reads better, and one line per class in Classes.</p></div></li>
+      <li><span class="icon-tile tone-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg></span><div><h3>Close after inactivity</h3><p>Closes TapIn when nobody has used it for a while, so a shared computer isn't left open. It never closes while you have unsubmitted scans.</p></div></li>
+      <li><span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-hard-drive"/></svg></span><div><h3>Data folder &amp; backups</h3><p>Show the folder, copy its path, or switch to another one. When a changed folder opens, TapIn saves a zip backup in <span class="mono">.backups</span> and keeps the newest five.</p></div></li>
+      <li><span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-save"/></svg></span><div><h3>Settings file</h3><p>Export your language, interface size, class list and inactivity choices to a file, and import it on another computer.</p></div></li>
+      <li><span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-refresh-cw"/></svg></span><div><h3>Updates, off by default</h3><p>Turn it on and TapIn asks GitHub at startup whether a newer version exists. Nothing is downloaded or installed.</p></div></li>
+      <li><span class="icon-tile tone-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-life-buoy"/></svg></span><div><h3>Help &amp; about</h3><p>The tour, the FAQ and the privacy notes are one click away, any time.</p></div></li>
+    </ul>
+    <div class="setting-shots">
+      <div class="window">
+        <img class="shot-dark" src="images/settings-general-dark.webp" width="884" height="537" loading="lazy" decoding="async" alt="Settings, General: language, interface size, theme (Dark, Light, System), reduce transparency, compact class list, and close after inactivity."><img class="shot-light" src="images/settings-general-light.webp" width="884" height="537" loading="lazy" decoding="async" alt="Settings, General: language, interface size, theme (Dark, Light, System), reduce transparency, compact class list, and close after inactivity.">
+      </div>
+      <div class="window">
+        <img class="shot-dark" src="images/settings-data-dark.webp" width="884" height="591" loading="lazy" decoding="async" alt="Settings, Data: the data folder with Show in folder and Copy path, switch data folder, backups with the last backup and the five kept, and export and import of a settings file."><img class="shot-light" src="images/settings-data-light.webp" width="884" height="591" loading="lazy" decoding="async" alt="Settings, Data: the data folder with Show in folder and Copy path, switch data folder, backups with the last backup and the five kept, and export and import of a settings file.">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="privacy">
+  <div class="section-head">
+    <span class="kicker">Privacy</span>
+    <h2>Where the data goes</h2>
+    <p>The same notes the app shows under Settings → Help &amp; about → Privacy.</p>
+  </div>
+  <div class="grid grid-2">
+    <article class="card privacy-card">
+      <span class="pill pill-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-eye-off"/></svg> By design</span>
+      <h3>Nothing leaves your computer</h3>
+      <p>TapIn has no accounts, no cloud service and no analytics. It sends no usage data and no crash reports. Out of the box the only network connection it makes is to your own card reader, on the reader's own local network.</p>
+    </article>
+    <article class="card privacy-card">
+      <span class="pill pill-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-refresh-cw"/></svg> One exception, and it is off</span>
+      <h3>The update check</h3>
+      <p>Settings has a switch called <strong>Check for new versions</strong>. It is off. If you turn it on, TapIn asks github.com once at startup for the version number of the newest release, and tells you in Notifications if yours is older. The request carries no student data, no data folder path and no identifier. Nothing is downloaded or installed. Leave the switch off and TapIn never contacts github.com.</p>
+    </article>
+    <article class="card privacy-card">
+      <span class="pill pill-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-file-text"/></svg> What is stored</span>
+      <h3>Numbers, names, attendance, card IDs</h3>
+      <p>Each student's number and name, their attendance records and, if you use the reader, the ID of the card they registered. TapIn asks for nothing else: no email addresses, no photographs, no grades. It all lives in the data folder you chose, as ordinary <span class="mono">.json</span> and <span class="mono">.xlsx</span> files.</p>
+    </article>
+    <article class="card privacy-card">
+      <span class="pill pill-absent"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg> Worth being plain about</span>
+      <h3>The files are not encrypted</h3>
+      <p>Anyone who can open the data folder can read every student's name, number and attendance, because the spreadsheets open directly in Excel by design. The data is private because the folder is. Keep it somewhere only you can reach, treat a backup zip the same way, and remember that your institution's rules (GDPR included) apply to how you keep it.</p>
+    </article>
+  </div>
+  <p class="note" style="text-align:center">Removing TapIn never deletes your records: your data folder stays exactly where you put it.</p>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="download">
+  <div class="section-head">
+    <span class="kicker">Download</span>
     <h2>Get TapIn</h2>
-    <p>
-      Pick your system below. The Windows build is a real installer — it puts TapIn in
-      your Start menu and adds an uninstall entry, rather than dropping a loose
-      executable in your Downloads folder.
-    </p>
+    <p>Free, with no account and no licence key. Pick your system below: the downloads come straight from the project's releases page, so the newest version is always the one shown.</p>
   </div>
 
   <div class="dl-bar">
@@ -200,8 +430,9 @@ app &#8594; board   INVALID</code></pre>
     <span id="release-date" class="dl-meta"></span>
   </div>
 
-  <div class="grid grid-4" id="download-cards"></div>
+  <div class="grid grid-3" id="download-cards"></div>
   <div class="dl-status" id="download-status" hidden></div>
+  <noscript><div class="dl-status"><p><strong>The list of downloads needs JavaScript.</strong></p><p style="margin-top:8px">Get them from the <a href="https://github.com/imndllnuri/students-attendance-app/releases">releases page</a> instead.</p></div></noscript>
 
   <details class="dl-older" id="older-releases" hidden>
     <summary>All released versions</summary>
@@ -215,184 +446,98 @@ app &#8594; board   INVALID</code></pre>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
-<section class="shell" id="install">
+<section class="block tight shell" id="install">
   <div class="section-head">
-    <p class="eyebrow">Installing</p>
+    <span class="kicker">Installing</span>
     <h2>First run, step by step</h2>
+    <p>TapIn 3 opens data folders made by TapIn 2, so an upgrade keeps your classes. After that, the <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">user guide</a> covers every screen.</p>
   </div>
 
   <div class="grid grid-3">
-    <article class="card">
-      <div class="dl-os" style="margin-bottom:16px">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.2 4.5v6.9H3zM11.4 4.3 21 3v8.4h-9.6zM3 12.6h7.2v6.9L3 18.5zM11.4 12.6H21V21l-9.6-1.3z"/></svg>
-        <h3>Windows 10/11</h3>
-      </div>
+    <article class="card os-card">
+      <h3>Windows 10 / 11</h3>
       <ol class="steps">
-        <li><strong>Run the setup file</strong><span>TapIn-x.y.z-setup.exe</span></li>
-        <li><strong>Click through the wizard</strong><span>Installs for your user only — no administrator password needed</span></li>
-        <li><strong>Launch from the Start menu</strong><span>Uninstall from Settings → Apps like any other program</span></li>
+        <li><strong>Run the setup file</strong><span>TapIn-x.y.z-setup.exe, 64-bit</span></li>
+        <li><strong>Click through the wizard</strong><span>It installs for your user: no administrator password needed unless you choose to install for everyone</span></li>
+        <li><strong>Start it from the Start menu</strong><span>Remove it from Settings → Apps like any other program</span></li>
       </ol>
-      <p class="dl-note" style="margin-top:16px">
-        Windows SmartScreen may warn on first run because the installer is not
-        code-signed. Choose <em>More info → Run anyway</em>.
-      </p>
+      <p class="note">Windows SmartScreen may warn on first run because the installer is not code-signed. Choose <em>More info → Run anyway</em>.</p>
     </article>
 
-    <article class="card">
-      <div class="dl-os" style="margin-bottom:16px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3.5c0 2.5-2 3.6-2 6.5 0 2.4-2.5 5-2.5 7.5C4.5 20 7.5 21 12 21s7.5-1 7.5-3.5c0-2.5-2.5-5.1-2.5-7.5 0-2.9-2-4-2-6.5C15 2.1 13.7 1.5 12 1.5S9 2.1 9 3.5Z"/><circle cx="10.2" cy="7.4" r=".9" fill="currentColor"/><circle cx="13.8" cy="7.4" r=".9" fill="currentColor"/></svg>
-        <h3>Debian / Ubuntu</h3>
-      </div>
+    <article class="card os-card">
+      <h3>macOS (Apple Silicon)</h3>
+      <ol class="steps">
+        <li><strong>Unzip the download</strong><span>It contains TapIn.app</span></li>
+        <li><strong>Move it to Applications</strong><span>Then open it</span></li>
+        <li><strong>Allow it once</strong><span>The app is not signed by Apple, so macOS blocks the first launch: open System Settings → Privacy &amp; Security and choose <em>Open Anyway</em></span></li>
+      </ol>
+      <p class="note">This build is for Macs with an Apple chip (M1 or newer). There is no Intel build yet.</p>
+    </article>
+
+    <article class="card os-card">
+      <h3>Debian / Ubuntu</h3>
       <ol class="steps">
         <li><strong>Install the package</strong><span>Double-click it, or use the command below</span></li>
-        <li><strong>Find TapIn in your applications menu</strong><span>Or run <code>tapin</code> in a terminal</span></li>
-        <li><strong>Remove it any time</strong><span><code>sudo apt remove tapin</code></span></li>
+        <li><strong>Find TapIn in your applications menu</strong><span>Or run <span class="mono">tapin</span> in a terminal</span></li>
+        <li><strong>Remove it any time</strong><span><span class="mono">sudo apt remove tapin</span></span></li>
       </ol>
-      <pre style="margin-top:16px"><code>sudo apt install ./tapin_*_amd64.deb</code></pre>
-    </article>
-
-    <article class="card">
-      <div class="dl-os" style="margin-bottom:16px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        <h3>Other Linux &amp; macOS</h3>
-      </div>
-      <ol class="steps">
-        <li><strong>Unzip the archive</strong><span>It carries its own Python and Qt</span></li>
-        <li><strong>Run the launcher</strong><span><code>./TapIn/TapIn</code>, or open TapIn.app on macOS</span></li>
-        <li><strong>Keep the folder together</strong><span>The app reads files next to it, so move the whole folder, not just the binary</span></li>
-      </ol>
-      <p class="dl-note" style="margin-top:16px">
-        These are archives, not installers — there is no Start-menu entry or uninstaller.
-        macOS is unsigned, so allow it under System Settings → Privacy &amp; Security.
-      </p>
-    </article>
-  </div>
-
-  <div class="card" style="margin-top:18px">
-    <h3>Then, on first launch</h3>
-    <ol class="steps" style="margin-top:14px">
-      <li><strong>Choose a vault folder</strong><span>An empty folder anywhere you like. Everything TapIn stores goes here — put it in your usual backed-up location.</span></li>
-      <li><strong>Add a class</strong><span>Code, name, weekly schedule and attendance policy. Import the roster from CSV or Excel, or type it in.</span></li>
-      <li><strong>Bind cards</strong><span>Add a student and scan their card in one step, or bind cards to an existing roster from the class screen.</span></li>
-      <li><strong>Take attendance</strong><span>Press Start Attendance and let students tap. Submit when the session ends.</span></li>
-    </ol>
-  </div>
-</section>
-
-<!-- ------------------------------------------------------------------ -->
-<section class="shell" id="privacy">
-  <div class="section-head">
-    <p class="eyebrow">Privacy</p>
-    <h2>Where the data goes</h2>
-  </div>
-  <div class="grid grid-3">
-    <article class="card">
-      <span class="tag tag-ok">By design</span>
-      <h3 style="margin-top:12px">Nothing leaves your machine</h3>
-      <p>
-        TapIn has no telemetry, no analytics and no accounts. Out of the box the only
-        network connection it opens is to your own card reader, on your own local
-        network, and only if you have configured the WiFi reader. Physical access to
-        the vault folder is the entire access model — protect it the way you would
-        protect a paper gradebook.
-      </p>
-    </article>
-    <article class="card">
-      <span class="tag tag-warn">One exception</span>
-      <h3 style="margin-top:12px">The update check is off until you switch it on</h3>
-      <p>
-        Settings has a switch called <strong>Check for New Versions</strong>, and it
-        ships off. Turn it on and TapIn asks github.com once at startup for the version
-        number of the newest release, then tells you in Notifications if yours is older.
-        The request carries no student data, no vault path and no identifier — it reads
-        the same public page anyone can open in a browser. Nothing is downloaded or
-        installed. Leave the switch off and TapIn never contacts github.com at all.
-      </p>
-    </article>
-    <article class="card">
-      <span class="tag tag-warn">Worth knowing</span>
-      <h3 style="margin-top:12px">Uninstalling never deletes your records</h3>
-      <p>
-        Your vault is a folder you chose, so removing TapIn leaves it exactly where it
-        is. That is deliberate: quietly deleting a term of attendance records because
-        someone uninstalled an app would be indefensible. Delete the folder yourself
-        when you actually want it gone.
-      </p>
+      <pre class="code" tabindex="0"><code>sudo apt install ./tapin_*_amd64.deb</code></pre>
+      <p class="note">64-bit only. On Ubuntu 24.04 and later the package also installs a small security profile, so TapIn's sandbox can start.</p>
     </article>
   </div>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
-<section class="shell" id="faq">
+<section class="block shell" id="faq">
   <div class="section-head">
-    <p class="eyebrow">FAQ</p>
+    <span class="kicker">FAQ</span>
     <h2>Common questions</h2>
   </div>
 
   <div class="faq">
-    <details class="qa">
-      <summary>Do I need the RFID reader to use TapIn?</summary>
-      <p>No. Manual Attendance Entry, "Mark All Present" and bulk absence marking all work with no hardware. The reader makes a large class faster; it is not required for any feature.</p>
-    </details>
-    <details class="qa">
-      <summary>Can two people use the same vault?</summary>
-      <p>Not at the same time. A vault is locked while TapIn has it open, so a second instance is refused rather than allowed to corrupt it. Sharing a vault on a network drive between two people at once is not supported.</p>
-    </details>
-    <details class="qa">
-      <summary>What happens if a student loses their card?</summary>
-      <p>Open the class, double-click the student, and choose Remove Card. The card stops being recognised in every class that student is enrolled in — not just the one you are looking at — and can then be issued to someone else.</p>
-    </details>
-    <details class="qa">
-      <summary>One student is in three of my classes. Do I register their card three times?</summary>
-      <p>No. A card belongs to a person, so registering it once writes it to every roster row that shares that student number. The reverse is enforced too: a card already held by a different student is refused rather than silently reassigned.</p>
-    </details>
-    <details class="qa">
-      <summary>Can I move my vault to another computer?</summary>
-      <p>Yes — copy the folder. There is no license key, no activation and no machine binding. Point TapIn at the copied folder on the new machine and everything is there.</p>
-    </details>
-    <details class="qa">
-      <summary>Will TapIn tell me when a new version is out?</summary>
-      <p>Only if you ask it to. Settings → Updates has a <strong>Check for New Versions</strong> switch that is off by default. With it on, TapIn checks this project's public releases page once at startup and puts a line in Notifications when a newer version exists. It never downloads or installs anything by itself — you come back here and run the installer when you want to. With it off, no check is made.</p>
-    </details>
-
-    <details class="qa">
-      <summary>Does the WiFi reader need internet?</summary>
-      <p>No, and it does not connect to your institution's network either. The board hosts its own small hotspot that your laptop joins directly. That does mean the laptop has no internet while scanning.</p>
-    </details>
-    <details class="qa">
-      <summary>Is my Excel file safe to open while TapIn is running?</summary>
-      <p>Opening it is fine. Keeping it open while TapIn tries to save is not — on Windows, Excel locks the file. TapIn queues the submission and retries rather than losing it, but closing the spreadsheet first avoids the round trip.</p>
-    </details>
-    <details class="qa">
-      <summary>What does it cost?</summary>
-      <p>Nothing. TapIn is free to download and use — no subscription, no account and no licence key.</p>
-    </details>
+    <details class="qa"><summary>Do I need the RFID reader to use TapIn?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No. Every class can be taken with manual entry, which is a fully supported way to work. The reader only makes a large class faster; nothing is hidden or disabled without hardware.</p></details>
+    <details class="qa"><summary>Where is my data kept?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>In the data folder you chose when TapIn first started, and nowhere else. Each class is one <span class="mono">.json</span> file for its settings and one <span class="mono">.xlsx</span> file for its roster and attendance. You can open those <span class="mono">.xlsx</span> files in Excel whenever you like.</p></details>
+    <details class="qa"><summary>How do I back up my data?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Copy the data folder. That is the whole backup: there is no database or hidden state anywhere else. TapIn also takes its own zip snapshot into the folder's <span class="mono">.backups</span> folder each time it opens and something has changed, keeping the five most recent.</p></details>
+    <details class="qa"><summary>Can I move my data folder to another computer?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Yes. Copy the folder across and point TapIn at it from Settings → Data. There is no licence key, no activation and no machine binding. Do not, however, keep one data folder in a synced cloud folder and open it on two computers at once.</p></details>
+    <details class="qa"><summary>Why does TapIn say my data folder is open on another computer?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>The data folder is in a synced folder (OneDrive, Dropbox, iCloud) and another computer still has it open. Two computers saving to one folder would overwrite each other's attendance with no warning, so TapIn refuses. Close TapIn on the other computer first. If that computer is off or crashed, delete the <span class="mono">.lock</span> file in the data folder.</p></details>
+    <details class="qa"><summary>A student's card was refused. Why?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Usually the card belongs to someone else. TapIn names the real holder when it refuses, which normally turns out to be a student handing over a friend's card. A card can only ever belong to one student, across every class.</p></details>
+    <details class="qa"><summary>A student is in two of my classes. Do they register their card twice?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No. Registering a card once binds it to that student everywhere they appear, so it works in every class they are enrolled in. If they join a new class later, their existing card is recognised the first time they tap it.</p></details>
+    <details class="qa"><summary>What happens if a student loses their card?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Open the class, open the student, and choose <em>Remove card</em>. The card stops being recognised, and a new one can be registered the next time the student taps.</p></details>
+    <details class="qa"><summary>What happens if TapIn cannot save attendance?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>It queues the records inside the data folder and retries automatically the next time it opens, so nothing is lost if the workbook was open in Excel or the disk was briefly unavailable. The Dashboard tells you when a queued batch has gone through.</p></details>
+    <details class="qa"><summary>Can I edit the Excel files directly?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>You can open and read them any time. Avoid editing them while TapIn is running, because your changes could be overwritten the next time it saves, and a file left open in Excel will block TapIn from saving, which it will tell you about.</p></details>
+    <details class="qa"><summary>Does the Bluetooth reader work on my computer?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Bluetooth is new in TapIn 3. It has been tried with a real reader on Linux, where it paired, reconnected every time and recorded real card taps. It has not been tried yet on Windows or macOS, so use the USB cable or the reader's own Wi-Fi if you need to be sure. The steps for your system are in Settings → Card reader → Bluetooth.</p></details>
+    <details class="qa"><summary>Does the Wi-Fi reader need internet?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No, and it does not connect to your institution's network either. The reader hosts its own small network that your computer joins directly. That does mean the computer has no internet while scanning.</p></details>
+    <details class="qa"><summary>Is there a password or login?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No. TapIn has no accounts and trusts whoever is using the computer, because your operating system already decided that. If the machine is shared, protect the data folder the way you would protect any other folder of student records, and consider the <em>Close after inactivity</em> setting.</p></details>
+    <details class="qa"><summary>What does it cost?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Nothing. TapIn is free to download and use: no subscription, no account and no licence key.</p></details>
   </div>
 </section>
 
 </main>
 
-<footer>
-  <div class="shell foot-grid">
-    <div>
-      <a class="brand" href="#top" style="margin-bottom:8px">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round">
-            <path d="M5 12.5a9.5 9.5 0 0 1 14 0"/><path d="M8 16a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19.2" r="1.1" fill="#fff" stroke="none"/>
-          </svg>
-        </span>
-        <span class="brand-word">Tap<em>In</em></span>
-      </a>
-      <div>Built for the COMP413 Internet of Things course at Abdullah Gül University.</div>
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#top"><img src="images/app-icon-96.png" width="34" height="34" alt="">TapIn</a>
+        <div>Made for Abdullah Gül University classes.</div>
+      </div>
+      <nav class="foot-links" aria-label="Links">
+        <a href="#download">Download</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">User guide</a>
+        <a href="https://github.com/imndllnuri/students-attendance-app/releases">Releases</a>
+        <a href="https://github.com/imndllnuri/students-attendance-app/issues">Report a problem</a>
+      </nav>
     </div>
-    <div class="foot-right">
-      <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">User guide</a>
-      <a href="https://github.com/imndllnuri/students-attendance-app/issues">Report a problem</a>
-    </div>
+    <p class="legal">
+      The pictures show demo data: every class, student and number is made up. Set in DM Sans and DM Mono
+      (SIL Open Font Licence); icons from Lucide (ISC licence). This page loads nothing from other sites,
+      except the list of downloads, which it asks GitHub for. See <a href="THIRD-PARTY.txt">THIRD-PARTY.txt</a>.
+    </p>
   </div>
 </footer>
 
-<script src="tour.js"></script>
+<script src="site.js"></script>
 <script src="downloads.js"></script>
 </body>
 </html>
