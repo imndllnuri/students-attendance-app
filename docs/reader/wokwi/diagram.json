@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "author": "student-attendance-app",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "board-mfrc522", "id": "rfid1", "top": -80, "left": 180, "attrs": { "uid": "8A:9B:D1:06" } },
+    { "type": "wokwi-led", "id": "led_green", "top": 140, "left": 260, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "led_yellow", "top": 140, "left": 300, "attrs": { "color": "yellow" } },
+    { "type": "wokwi-led", "id": "led_red", "top": 140, "left": 340, "attrs": { "color": "red" } },
+    { "type": "wokwi-resistor", "id": "r_green", "top": 170, "left": 260, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r_yellow", "top": 170, "left": 300, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r_red", "top": 170, "left": 340, "attrs": { "value": "220" } },
+    { "type": "wokwi-lcd1602", "id": "lcd1", "top": 280, "left": 20, "attrs": { "pins": "i2c" } },
+    { "type": "wokwi-led", "id": "led_white", "top": 140, "left": 380, "attrs": { "color": "white" } },
+    { "type": "wokwi-resistor", "id": "r_white", "top": 170, "left": 380, "attrs": { "value": "220" } },
+    { "type": "wokwi-pushbutton-6mm", "id": "btn_open", "top": 60, "left": 380, "attrs": { "color": "blue" } }
+  ],
+  "connections": [
+    ["esp:D5", "rfid1:SDA", "green", []],
+    ["esp:D18", "rfid1:SCK", "green", []],
+    ["esp:D23", "rfid1:MOSI", "green", []],
+    ["esp:D19", "rfid1:MISO", "green", []],
+    ["esp:D21", "rfid1:RST", "green", []],
+    ["esp:3V3", "rfid1:3.3V", "red", []],
+    ["esp:GND.1", "rfid1:GND", "black", []],
+
+    ["esp:D4", "r_green:1", "green", []],
+    ["r_green:2", "led_green:A", "green", []],
+    ["led_green:C", "esp:GND.2", "black", []],
+
+    ["esp:RX2", "r_yellow:1", "yellow", []],
+    ["r_yellow:2", "led_yellow:A", "yellow", []],
+    ["led_yellow:C", "esp:GND.2", "black", []],
+
+    ["esp:TX2", "r_red:1", "red", []],
+    ["r_red:2", "led_red:A", "red", []],
+    ["led_red:C", "esp:GND.2", "black", []],
+
+    ["esp:VIN", "lcd1:VCC", "red", []],
+    ["esp:GND.2", "lcd1:GND", "black", []],
+    ["esp:D32", "lcd1:SDA", "green", []],
+    ["esp:D22", "lcd1:SCL", "green", []],
+
+    ["esp:D26", "r_white:1", "white", []],
+    ["r_white:2", "led_white:A", "white", []],
+    ["led_white:C", "esp:GND.2", "black", []],
+
+    ["esp:D27", "btn_open:1.l", "blue", []],
+    ["btn_open:2.r", "esp:GND.1", "black", []]
+  ]
+}

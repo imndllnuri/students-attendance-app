@@ -73,6 +73,27 @@
     select(0, false);
   }
 
+  /* ── The demo video: starts by itself when it first scrolls into view, and stops when it leaves ──
+   * Not at all for anyone who asked their system for less motion; they press play. Without this file the
+   * video simply waits behind its poster picture, with its own controls. */
+  var video = document.querySelector(".demo-video");
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (video && "IntersectionObserver" in window && !reduced) {
+    video.preload = "metadata";
+    var started = false;
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !started) {
+          started = true;
+          var played = video.play();
+          if (played && played.catch) played.catch(function () { /* blocked: the poster and the controls remain */ });
+        } else if (!entry.isIntersecting && !video.paused) {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.6 }).observe(video);
+  }
+
   /* ── Menu on small screens ─────────────────────────────────────── */
   var toggle = document.getElementById("nav-toggle");
   var links = document.getElementById("nav-links");

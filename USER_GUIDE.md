@@ -21,10 +21,22 @@ The card reader is optional. Every screen works without it.
 | System | File | Notes |
 |---|---|---|
 | Windows 10 or 11, 64-bit | `TapIn-x.y.z-setup.exe` | Installs for your user. No administrator password is needed. Windows SmartScreen may warn on the first run because the installer is not code-signed: choose More info, then Run anyway. |
-| macOS, Apple Silicon (M1 or newer) | `TapIn-x.y.z-macos.zip` | Unzip it, move TapIn to Applications, open it. macOS blocks the first launch because the app is not signed by Apple: open System Settings → Privacy & Security and choose Open Anyway. There is no Intel build yet. |
-| Debian or Ubuntu, 64-bit | `tapin_x.y.z_amd64.deb` | Run `sudo apt install ./tapin_*_amd64.deb`. This adds a menu entry and a `tapin` command. |
+| macOS 13 or newer, Apple Silicon (M1 or newer) | `TapIn-vx.y.z-macos.zip` | Unzip it, move TapIn to Applications, open it. macOS blocks the first launch because the app is not signed by Apple: open System Settings → Privacy & Security and choose Open Anyway. There is no Intel build yet. |
+| Ubuntu 24.04 or newer, 64-bit | `tapin_x.y.z_amd64.deb` | Run `sudo apt install ./tapin_*_amd64.deb`. This adds a menu entry and a `tapin` command. |
 
 TapIn 3 opens data folders made by TapIn 2, so an upgrade keeps your classes.
+
+### Check your download
+
+Every release has a file called `SHA256SUMS.txt`: a checksum (a fingerprint) for each installer. To be sure your download is the real, complete file, work out its checksum and compare it with the one in that file. The two must be identical.
+
+```
+Windows (PowerShell)   Get-FileHash .\TapIn-3.0.0-setup.exe -Algorithm SHA256
+macOS                  shasum -a 256 TapIn-v3.0.0-macos.zip
+Linux                  sha256sum tapin_3.0.0_amd64.deb
+```
+
+The website shows the same checksum under each download.
 
 ### Your first five minutes
 
@@ -183,6 +195,8 @@ A `term` column is optional. Other columns are ignored. The file made by Export 
 
 TapIn first shows a preview. Every row says Ready or "Can't be imported" and gives the reason. Rows with problems are skipped, and the rest are created. Fix the file and import it again to add the skipped ones.
 
+If a column is missing, TapIn says which one and offers **Save a sample file…**: an Excel or CSV file with every column and two example classes. The same samples are on the website.
+
 Only the classes are imported. Schedules and students are not, so set each class's days and times in its editor, then add its students.
 
 ### Export list
@@ -215,11 +229,13 @@ Switch on each day the class meets, from Monday to Sunday, then set the times. P
 
 **Students**
 
-Add students one at a time with their student number and their name and surname, or press Upload student list…. TapIn reads three kinds of file:
+Add students one at a time with their student number and their name and surname, or press Upload student list…. The file can be `.xlsx`, `.xls`, `.ods` or `.csv`. TapIn finds the headings by their labels, not by counting rows, and understands three kinds of sheet:
 
-- Your university's student list report, exactly as the university gives it.
-- A roster exported from TapIn.
-- Any sheet whose first two columns are headed "Student Number" and "Name Surname".
+- **Your university's student list report**, exactly as the university gives it. TapIn finds the "Adı Soyadı" heading and the student numbers beside it, even though the report repeats its header on every page.
+- **A simple sheet with two headings**, `Student Number` and `Name Surname`, in the first two columns. This is also what Export roster makes. A title may sit above the headings, as long as they are within the first five rows.
+- **A simple sheet with three headings**, `Student Number`, `Name` and `Surname`, in the first three columns. The name and surname are joined.
+
+Write the headings exactly as shown, with the same capital letters. Press **Save a sample file…** to get a ready-made Excel or CSV file with three example students, and replace them with your own. The same samples can be downloaded from the website, in the samples folder.
 
 Before anything is added, TapIn shows a preview: who will be added, who is already on the roster and is skipped, and any student number that appears more than once (only the first row of each is used).
 
@@ -296,7 +312,7 @@ Notes is a free text box for the class: room changes, exam dates, anything to re
 | Copy roster from another class… | Brings the students of another class into this one. |
 | Export roster… | Saves the student numbers and names as an Excel file. |
 | Export attendance grid… | Saves the whole table, every student and every session, as an Excel file. |
-| Export certificate… | Makes a one-page PDF for one student. |
+| Export certificate… | Makes a printable certificate of attendance: a one-page PDF for one student. |
 | Refresh | Reads the class files again. |
 
 **Add student.** Type the number and name. Leave "Scan their card now" ticked and press Add student; TapIn then asks you to tap the card on the reader. The student is added first, so if the scan fails they stay on the roster without a card. You can add the card later with Edit card. A student number that is already on the roster is refused. If the card belongs to someone else, TapIn tells you who.
@@ -307,7 +323,7 @@ Notes is a free text box for the class: room changes, exam dates, anything to re
 
 **Copy roster.** Choose another class, including an archived one. TapIn shows how many students will be copied and skips anyone already on this roster.
 
-**Export certificate.** Choose a student and see a preview. The certificate says the student was enrolled in the class, how many sessions they attended out of the total with their rate, and whether they meet the attendance policy. Press Save PDF… to keep it.
+**Export certificate.** A printable certificate of attendance for one student, for proof-of-attendance requests. Choose a student and see a preview. The certificate says the student was enrolled in the class, how many sessions they attended out of the total with their rate, and whether they meet the attendance policy. Press Save PDF… to keep it.
 
 # Take attendance
 
@@ -414,6 +430,8 @@ The reader makes its own Wi-Fi network. It does not join yours.
 
 The address and the port are already filled in. Change them only if you changed them in the reader's firmware.
 
+**Is the Wi-Fi reader an ESP8266?** No. It is the same ESP32 board as the other two, running the Wi-Fi sketch. You choose Wi-Fi in Settings → Card reader, and you never have to edit a file. TapIn does keep the choice in a small file called `.hardware_config.json` in its settings folder (see Your files and backups). It says `serial` for USB, `bluetooth` (with the port) for Bluetooth, and `esp8266` for Wi-Fi. That last name comes from the first Wi-Fi reader idea, which used an ESP8266 board; the ESP32 reader speaks the same language, so the name stayed.
+
 ### Bluetooth
 
 1. **Pair the reader.** Switch it on. Its screen says "Waiting for app". Open your computer's Bluetooth settings and pair with `TapIn-Reader`. There is no code to type. If your computer asks you to confirm a number, confirm it: the reader has no screen to compare it with.
@@ -488,7 +506,7 @@ Settings has five sections.
 
 | Setting | What it does |
 |---|---|
-| Language | English or Turkish. Changes every screen at once. |
+| Language | English or Turkish. Changes every screen at once, with no restart. |
 | Interface size | Small (90%), Normal (100%), Large (115%) or Extra large (130%). Makes text, buttons and lists larger or smaller together. |
 | Theme | Dark, Light or System. System follows your computer and changes while TapIn is open. |
 | Reduce transparency | Solid panels instead of glass, which can make text easier to read. |
@@ -561,7 +579,7 @@ Small settings files hold your language, your chosen data folder, your reader se
 - Out of the box, the only network connection it makes is to your own card reader, on the reader's own network.
 - The one exception is the Check for new versions switch, and it is off. If you turn it on, TapIn asks github.com once at startup for the newest version number. The request carries no student data, no folder path and no identifier.
 - TapIn stores each student's number and name, their attendance, and the ID of their card. It asks for nothing else: no email addresses, no photographs, no grades.
-- Attendance records are personal data about identifiable students. Your university probably has rules for handling them. TapIn keeps the data on your computer, and keeping it lawfully is up to you.
+- Attendance records are personal data about identifiable students. Your university probably has rules for handling them, and so may the law: KVKK in Turkey, GDPR in the European Union. TapIn keeps the data on your computer, and keeping it lawfully is up to you. This is not legal advice: if you are unsure, ask your university's data protection office.
 - To delete data, delete a class, or delete the data folder. There is no other copy.
 
 # Fixing problems
@@ -636,7 +654,7 @@ The buzzer is an active-low, passive module. The sketches already drive it corre
 
 ### The three sketches
 
-Each connection has its own Arduino sketch. The wiring is the same for all three, so one board can run any of them.
+The sketches, the wiring and a circuit for the Wokwi simulator can be downloaded from the TapIn website (the "Build the reader" section). Each connection has its own Arduino sketch. The wiring is the same for all three, so one board can run any of them.
 
 | Sketch | Connection |
 |---|---|
@@ -655,6 +673,10 @@ The Bluetooth sketch is large. If the upload says "Sketch too big", choose Tools
 
 When the board starts, it prints a self-test line over USB: `RC522 version register: 0x91` or `0x92` means the RC522 is wired correctly. `0x00` or `0xFF` means the data wires are wrong or loose, even when the power lights are on. Check MOSI, MISO, SCK, SDA and RST.
 
+### Try it without a board
+
+Wokwi is a free simulator that runs in your browser. It can run the USB sketch against a pretend ESP32, RC522 reader, screen and lights, and lets you pretend a card was tapped. Open wokwi.com, start a new ESP32 project, replace its files with the `diagram.json`, `sketch.ino` and `libraries.txt` from the website, and press Play. It is a good way to see how the reader behaves before you buy parts. The Wi-Fi and Bluetooth sketches are not meant for the simulator.
+
 ### How the reader and TapIn talk
 
 It is a simple text line in each direction, 9600 baud over USB. The Wi-Fi sketch sends the same lines over TCP, and the Bluetooth sketch sends them over the Bluetooth serial port.
@@ -672,3 +694,13 @@ TapIn to reader   MSG:No session|today
 - `MSG:` shows two lines of text and lights yellow.
 - The reader sends card IDs only. Anything else on that line would be taken for a card.
 - The reader never waits for an answer. It keeps scanning and queues the answers, so students who tap one after another are all read.
+
+# About and support
+
+TapIn is free to use, under the MIT licence. It is made by Nuri İmrendi for Abdullah Gül University classes.
+
+- Website and downloads: https://imndllnuri.github.io/students-attendance-app/
+- Report a problem or ask a question: https://github.com/imndllnuri/students-attendance-app/issues
+- Contact: ni.imrendi@gmail.com
+- What changed in each version: the release notes at https://github.com/imndllnuri/students-attendance-app/releases
+- The application's source code is kept in a private repository.

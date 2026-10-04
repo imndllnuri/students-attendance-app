@@ -2,7 +2,11 @@
  *
  * Hand-written links would name one version and rot at the next tag. This reads the real releases, so a new
  * tag publishes itself here: the newest becomes the default, every older one stays reachable from the picker,
- * and the file sizes shown are the actual asset sizes.
+ * and the file sizes and checksums shown are the real ones.
+ *
+ * The page works without this script, and when the API cannot be reached: the HTML already holds one card
+ * per system that opens the newest release on GitHub. This script replaces those cards with the real files,
+ * and only then shows the version picker, so a version number is never shown that was not just fetched.
  *
  * The page is built from text nodes, never from markup in the API's answer.
  */
@@ -11,6 +15,32 @@
 
   var REPO = "imndllnuri/students-attendance-app";
 
+  /* Every sentence this script shows, in one table. A page in another language sets window.TAPIN_I18N before
+   * loading this file, with any of these keys; what it leaves out stays English. {name}, {tag} and {error}
+   * are filled in. */
+  var STR = {
+    locale: document.documentElement.lang || undefined,
+    download: "Download ", released: "Released ", latest: " — latest", prerelease: "pre-release", preTag: "Pre-release",
+    installer: "Installer", archive: "Archive",
+    windowsSub: "Windows 10 or 11, 64-bit", windowsKind: "Installer (.exe)", windowsNote: "Installs for your user, with no administrator password needed.",
+    macosSub: "macOS 13 or newer · Apple Silicon (arm64)", macosKind: "Archive (.zip)", macosNote: "Unzip, move it to Applications and open it. It is not signed by Apple, so allow it once under Privacy & Security.",
+    debianName: "Debian / Ubuntu", debianSub: "Ubuntu 24.04 or newer · 64-bit", debianKind: "Package (.deb)", debianNote: "Adds a menu entry, an icon and a tapin command.",
+    linuxName: "Other Linux", linuxSub: "Any 64-bit distribution", linuxKind: "Archive (.zip)", linuxNote: "Unpack and run. No installer and no menu entry.",
+    copy: "Copy", copied: "Copied", copyLabel: "Copy the SHA-256 checksum of the {name} download",
+    sumsBefore: "All checksums for {tag} in one file: ", howToCheck: "How to check a download",
+    noFiles: "{tag} has no downloadable files attached.", seeOn: "See it on ", noRelease: "No release has been published yet.",
+    noReleaseBody: "Builds appear here automatically once the first version is published.",
+    testChannel: "Test channel", testChannelNote: " Pre-release builds are listed here. They are not announced to anyone, and TapIn never offers them as an update.",
+    errorTitle: "Could not reach GitHub to list the files.", errorBefore: "The buttons above open the newest release, where every file is listed. You can also use the ", releasesPage: "releases page"
+  };
+  var USER = window.TAPIN_I18N || {};
+  for (var key in USER) { if (Object.prototype.hasOwnProperty.call(USER, key)) { STR[key] = USER[key]; } }
+  function say(key, vars) {
+    var text = STR[key];
+    if (vars) { for (var v in vars) { text = text.split("{" + v + "}").join(vars[v]); } }
+    return text;
+  }
+
   /* Pre-releases (tags like v3.0.0-beta.1) exist to be installed on a test machine before a version goes
    * public, so this page leaves them out for everyone - unless it is opened as .../?channel=beta, which lists
    * them too and says so. Nothing secret: the same builds are on GitHub's releases page, marked Pre-release.
@@ -18,6 +48,7 @@
   var SHOW_PRERELEASES = /(?:^|&)channel=beta(?:&|$)/.test(window.location.search.slice(1));
   var API = "https://api.github.com/repos/" + REPO + "/releases";
   var RELEASES_PAGE = "https://github.com/" + REPO + "/releases";
+  var LATEST_PAGE = RELEASES_PAGE + "/latest";
 
   /* Assets are matched by how the release workflow names them (.github/workflows/package-electron.yml for
    * TapIn 3: a *-setup.exe, a tapin_*_amd64.deb and a *-macos.zip). The *-linux.zip is what TapIn 2 shipped; a
@@ -40,28 +71,28 @@
 
   var TARGETS = [
     {
-      id: "windows", os: "windows", name: "Windows", sub: "Windows 10 or 11, 64-bit", icon: ICONS.windows,
+      id: "windows", os: "windows", name: "Windows", sub: STR.windowsSub, icon: ICONS.windows,
       match: function (n) { return /-setup\.exe$/i.test(n); },
-      kind: "Installer (.exe)", installer: true,
-      note: "Installs for your user, with no administrator password needed."
+      kind: STR.windowsKind, installer: true,
+      note: STR.windowsNote
     },
     {
-      id: "macos", os: "macos", name: "macOS", sub: "Apple Silicon (M1 or newer)", icon: ICONS.macos,
+      id: "macos", os: "macos", name: "macOS", sub: STR.macosSub, icon: ICONS.macos,
       match: function (n) { return /-macos\.zip$/i.test(n); },
-      kind: "Archive (.zip)", installer: false,
-      note: "Unzip, move it to Applications and open it. It is not signed by Apple, so allow it once under Privacy & Security."
+      kind: STR.macosKind, installer: false,
+      note: STR.macosNote
     },
     {
-      id: "debian", os: "linux", name: "Debian / Ubuntu", sub: "64-bit", icon: ICONS.debian,
+      id: "debian", os: "linux", name: STR.debianName, sub: STR.debianSub, icon: ICONS.debian,
       match: function (n) { return /\.deb$/i.test(n); },
-      kind: "Package (.deb)", installer: true,
-      note: "Adds a menu entry, an icon and a tapin command."
+      kind: STR.debianKind, installer: true,
+      note: STR.debianNote
     },
     {
-      id: "linux", os: "linux", name: "Other Linux", sub: "Any 64-bit distribution", icon: ICONS.linux,
+      id: "linux", os: "linux", name: STR.linuxName, sub: STR.linuxSub, icon: ICONS.linux,
       match: function (n) { return /-linux\.zip$/i.test(n); },
-      kind: "Archive (.zip)", installer: false,
-      note: "Unpack and run. No installer and no menu entry."
+      kind: STR.linuxKind, installer: false,
+      note: STR.linuxNote
     }
   ];
 
@@ -71,6 +102,8 @@
   var dateEl = document.getElementById("release-date");
   var older = document.getElementById("older-releases");
   var bar = document.querySelector(".dl-bar");
+  var fallbackNote = document.getElementById("download-fallback-note");
+  var sums = document.getElementById("download-sums");
   if (!select || !cards || !status) { return; }
 
   function el(tag, className, text) {
@@ -96,12 +129,45 @@
     if (!iso) { return ""; }
     var d = new Date(iso);
     if (isNaN(d)) { return ""; }
-    return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    return d.toLocaleDateString(STR.locale, { year: "numeric", month: "long", day: "numeric" });
   }
 
-  function showMessage(lines) {
+  /* The SHA-256 GitHub computed for an asset, as plain hex, or "" when the API did not give one. */
+  function sha256Of(asset) {
+    var d = asset && typeof asset.digest === "string" ? asset.digest : "";
+    var m = /^sha256:([0-9a-f]{64})$/i.exec(d);
+    return m ? m[1].toLowerCase() : "";
+  }
+
+  function checksumRow(target, hash) {
+    var row = el("div", "dl-hash");
+    row.appendChild(el("span", "dl-hash-label", "SHA-256"));
+    var code = el("code", "mono", hash.slice(0, 12) + "…" + hash.slice(-8));
+    code.title = hash;
+    row.appendChild(code);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      var copy = el("button", "dl-copy", say("copy"));
+      copy.type = "button";
+      copy.setAttribute("aria-label", say("copyLabel", { name: target.name }));
+      copy.addEventListener("click", function () {
+        navigator.clipboard.writeText(hash).then(function () {
+          copy.textContent = say("copied");
+          window.setTimeout(function () { copy.textContent = say("copy"); }, 1600);
+        }, function () { /* the full value is in the tooltip and in SHA256SUMS.txt */ });
+      });
+      row.appendChild(copy);
+    }
+    return row;
+  }
+
+  /* A message under the cards. `keepCards` leaves the static fallback cards in place (the API failed: the
+   * buttons still work); without it the cards go too (there is nothing to download yet). */
+  function showMessage(lines, keepCards) {
     bar.hidden = true;
-    cards.textContent = "";
+    if (!keepCards) {
+      cards.textContent = "";
+      if (fallbackNote) { fallbackNote.hidden = true; }
+    }
     status.hidden = false;
     status.textContent = "";
     lines.forEach(function (line, i) {
@@ -127,7 +193,8 @@
 
   function renderRelease(release) {
     status.hidden = true;
-    dateEl.textContent = release.published_at ? "Released " + humanDate(release.published_at) : "";
+    if (fallbackNote) { fallbackNote.hidden = true; }
+    dateEl.textContent = release.published_at ? say("released") + humanDate(release.published_at) : "";
     cards.textContent = "";
 
     /* The highlighted card is the visitor's own system when this release has a file for it, else the first one. */
@@ -148,22 +215,38 @@
       os.appendChild(icon);
       os.appendChild(el("h3", "", target.name));
       card.appendChild(os);
-      card.appendChild(el("span", "tag " + (target.installer ? "tag-accent" : "tag-ok"), target.installer ? "Installer" : "Archive"));
+      card.appendChild(el("span", "tag " + (target.installer ? "tag-accent" : "tag-ok"), target.installer ? say("installer") : say("archive")));
 
       var meta = el("div");
       meta.appendChild(el("div", "dl-kind", target.kind));
       meta.appendChild(el("div", "dl-meta", target.sub + " · " + humanSize(asset.size)));
+      var hash = sha256Of(asset);
+      if (hash) { meta.appendChild(checksumRow(target, hash)); }
       card.appendChild(meta);
       card.appendChild(el("p", "dl-note", target.note));
-      card.appendChild(link(asset.browser_download_url, "Download " + release.tag_name,
+      card.appendChild(link(asset.browser_download_url, say("download") + release.tag_name,
         "btn " + (chosen ? "btn-primary" : "btn-secondary")));
       cards.appendChild(card);
     });
 
+    /* One file with every checksum, if the release has it. */
+    if (sums) {
+      sums.textContent = "";
+      var sumsAsset = (release.assets || []).filter(function (a) { return /^SHA256SUMS\.txt$/i.test(a.name); })[0];
+      if (sumsAsset) {
+        sums.appendChild(document.createTextNode(say("sumsBefore", { tag: release.tag_name })));
+        sums.appendChild(link(sumsAsset.browser_download_url, "SHA256SUMS.txt"));
+        sums.appendChild(document.createTextNode(". "));
+        sums.appendChild(link("#verify", say("howToCheck")));
+        sums.appendChild(document.createTextNode("."));
+      }
+      sums.hidden = !sums.firstChild;
+    }
+
     if (!found) {
       showMessage([
-        { text: release.tag_name + " has no downloadable files attached." },
-        { text: "See it on ", href: release.html_url, linkText: "GitHub", after: "." }
+        { text: say("noFiles", { tag: release.tag_name }) },
+        { text: say("seeOn"), href: release.html_url, linkText: "GitHub", after: "." }
       ]);
     }
   }
@@ -180,7 +263,7 @@
       row.appendChild(el("td", "num", humanDate(release.published_at)));
       row.appendChild(el("td", "num", names ? String(names) : "—"));
       var notes = el("td");
-      if (release.prerelease) { notes.appendChild(el("span", "tag tag-warn", "Pre-release")); }
+      if (release.prerelease) { notes.appendChild(el("span", "tag tag-warn", say("preTag"))); }
       row.appendChild(notes);
       body.appendChild(row);
     });
@@ -200,16 +283,15 @@
         var note = el("p");
         note.style.textAlign = "center";
         note.style.margin = "0 0 14px";
-        note.appendChild(el("span", "tag tag-warn", "Test channel"));
-        note.appendChild(document.createTextNode(
-          " Pre-release builds are listed here. They are not announced to anyone, and TapIn never offers them as an update."));
+        note.appendChild(el("span", "tag tag-warn", say("testChannel")));
+        note.appendChild(document.createTextNode(say("testChannelNote")));
         bar.parentNode.insertBefore(note, bar);
       }
       if (!releases.length) {
         /* The state before the first tag is published. Saying so plainly beats a row of dead buttons. */
         showMessage([
-          { text: "No release has been published yet." },
-          { text: "Builds appear here automatically once the first version is published." }
+          { text: say("noRelease") },
+          { text: say("noReleaseBody") }
         ]);
         return;
       }
@@ -221,7 +303,7 @@
         if (!releases[k].prerelease) { latest = k; break; }
       }
       releases.forEach(function (release, i) {
-        var option = el("option", "", release.tag_name + (release.prerelease ? " (pre-release)" : "") + (i === latest ? " — latest" : ""));
+        var option = el("option", "", release.tag_name + (release.prerelease ? " (" + say("prerelease") + ")" : "") + (i === latest ? say("latest") : ""));
         option.value = String(i);
         select.appendChild(option);
       });
@@ -230,15 +312,17 @@
         renderRelease(releases[Number(select.value)]);
       });
 
+      /* Only now, with real data in hand, is a version shown. */
+      bar.hidden = false;
       renderRelease(releases[0]);
       renderOlder(releases);
     })
     .catch(function (error) {
       /* Rate limiting is the likely cause (the API allows 60 unauthenticated requests an hour per IP), and it
-       * is temporary - so this points at the releases page rather than pretending there is nothing to download. */
+       * is temporary. The static cards stay, and every one of them opens the newest release. */
       showMessage([
-        { text: "Could not reach GitHub to list the downloads." },
-        { text: "Get them directly from the ", href: RELEASES_PAGE, linkText: "releases page", after: ". (" + error.message + ")" }
-      ]);
+        { text: say("errorTitle") },
+        { text: say("errorBefore"), href: RELEASES_PAGE, linkText: say("releasesPage"), after: ". (" + error.message + ")" }
+      ], true);
     });
 })();

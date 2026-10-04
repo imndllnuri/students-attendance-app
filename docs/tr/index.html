@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TapIn — Offline RFID attendance for classrooms</title>
+<meta content="TapIn takes class attendance from RFID cards or by hand, and keeps every class as ordinary Excel and JSON files in a folder you choose. No server, no account, no internet needed. Free for Windows, macOS and Debian/Ubuntu." name="description"/>
+<meta content="dark light" name="color-scheme"/>
+<meta content="#070b18" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="#f3f5fb" media="(prefers-color-scheme: light)" name="theme-color"/>
+<link href="../images/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="../images/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="https://imndllnuri.github.io/students-attendance-app/" hreflang="en" rel="alternate"/>
+<link href="https://imndllnuri.github.io/students-attendance-app/tr/" hreflang="tr" rel="alternate"/>
+<link href="https://imndllnuri.github.io/students-attendance-app/" hreflang="x-default" rel="alternate"/>
+<link href="https://imndllnuri.github.io/students-attendance-app/tr/" rel="canonical"/>
+<meta content="TapIn — Offline RFID attendance for classrooms" property="og:title"/>
+<meta content="Take attendance from RFID cards in seconds. Everything stays in a folder on your own computer." property="og:description"/>
+<meta content="website" property="og:type"/>
+<!-- Absolute, and a PNG: a relative path gives link scrapers nothing to fetch, and some do not show WebP. -->
+<meta content="https://imndllnuri.github.io/students-attendance-app/tr/" property="og:url"/>
+<meta content="https://imndllnuri.github.io/students-attendance-app/images/og.png" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<!-- Before first paint: the visitor's saved theme choice, so a light page never flashes dark. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("tapin-site-theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+  document.documentElement.classList.add("js");
+})();
+</script>
+<link as="font" crossorigin="" href="../fonts/dm-sans-latin-opsz-normal.woff2" rel="preload" type="font/woff2"/>
+<link href="../styles.css" rel="stylesheet"/>
+<meta content="tr_TR" property="og:locale"/></head>
+<body>
+<svg aria-hidden="true" focusable="false" height="0" style="position:absolute" width="0"><defs><symbol id="i-bluetooth" viewbox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"></path></symbol><symbol id="i-calendar-days" viewbox="0 0 24 24"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect height="18" rx="2" width="18" x="3" y="3"></rect><path d="M3 9h18"></path><path d="M8 13h.01"></path><path d="M12 13h.01"></path><path d="M16 13h.01"></path><path d="M8 17h.01"></path><path d="M12 17h.01"></path><path d="M16 17h.01"></path></symbol><symbol id="i-chart-column" viewbox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></symbol><symbol id="i-chevron-down" viewbox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></symbol><symbol id="i-chevron-right" viewbox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></symbol><symbol id="i-circle-check" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m16 9-5.5 5.5L8 12"></path></symbol><symbol id="i-circle-x" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></symbol><symbol id="i-clock" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></symbol><symbol id="i-command" viewbox="0 0 24 24"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></symbol><symbol id="i-contrast" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 18a6 6 0 0 0 0-12v12z"></path></symbol><symbol id="i-copy" viewbox="0 0 24 24"><rect height="14" rx="2" ry="2" width="14" x="8" y="8"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></symbol><symbol id="i-download" viewbox="0 0 24 24"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></symbol><symbol id="i-eye-off" viewbox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"></path><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"></path><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"></path><path d="m2 2 20 20"></path></symbol><symbol id="i-file-down" viewbox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M12 18v-6"></path><path d="m9 15 3 3 3-3"></path></symbol><symbol id="i-file-text" viewbox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></symbol><symbol id="i-folder-open" viewbox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></symbol><symbol id="i-hard-drive" viewbox="0 0 24 24"><path d="M10 16h.01"></path><path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path><path d="M21.946 12.013H2.054"></path><path d="M6 16h.01"></path></symbol><symbol id="i-id-card" viewbox="0 0 24 24"><path d="M13 19a4 4 0 00-8 0"></path><path d="M16 10h2"></path><path d="M16 14h2"></path><circle cx="9" cy="12" r="3"></circle><rect height="14" rx="2" width="20" x="2" y="5"></rect></symbol><symbol id="i-languages" viewbox="0 0 24 24"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></symbol><symbol id="i-layers" viewbox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></symbol><symbol id="i-life-buoy" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></symbol><symbol id="i-lock" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></symbol><symbol id="i-menu" viewbox="0 0 24 24"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></symbol><symbol id="i-monitor" viewbox="0 0 24 24"><rect height="14" rx="2" width="20" x="2" y="3"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></symbol><symbol id="i-moon" viewbox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></symbol><symbol id="i-nfc" viewbox="0 0 24 24"><path d="M6 8.32a7.43 7.43 0 0 1 0 7.36"></path><path d="M9.46 6.21a11.76 11.76 0 0 1 0 11.58"></path><path d="M12.91 4.1a15.91 15.91 0 0 1 .01 15.8"></path><path d="M16.37 2a20.16 20.16 0 0 1 0 20"></path></symbol><symbol id="i-pencil-line" viewbox="0 0 24 24"><path d="M13 21h8"></path><path d="m15 5 4 4"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></symbol><symbol id="i-refresh-cw" viewbox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></symbol><symbol id="i-save" viewbox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path><path d="M7 3v4a1 1 0 0 0 1 1h7"></path></symbol><symbol id="i-shield-check" viewbox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></symbol><symbol id="i-sun" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></symbol><symbol id="i-triangle-alert" viewbox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></symbol><symbol id="i-type" viewbox="0 0 24 24"><path d="M12 4v16"></path><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"></path><path d="M9 20h6"></path></symbol><symbol id="i-undo-2" viewbox="0 0 24 24"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"></path></symbol><symbol id="i-upload" viewbox="0 0 24 24"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></symbol><symbol id="i-usb" viewbox="0 0 24 24"><circle cx="10" cy="7" r="1"></circle><circle cx="4" cy="20" r="1"></circle><path d="M4.7 19.3 19 5"></path><path d="m21 3-3 1 2 2Z"></path><path d="M9.26 7.68 5 12l2 5"></path><path d="m10 14 5 2 3.5-3.5"></path><path d="m18 12 1-1 1 1-1 1Z"></path></symbol><symbol id="i-users" viewbox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></symbol><symbol id="i-wifi" viewbox="0 0 24 24"><path d="M12 20h.01"></path><path d="M2 8.82a15 15 0 0 1 20 0"></path><path d="M5 12.859a10 10 0 0 1 14 0"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path></symbol><symbol id="i-zap" viewbox="0 0 24 24"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"></path></symbol></defs></svg>
+<a class="skip-link" href="#main">İçeriğe geç</a>
+<header class="site-header">
+<div class="shell header-inner">
+<a class="brand" href="#top"><img alt="" height="34" src="../images/app-icon-96.png" width="34"/>TapIn</a>
+<nav aria-label="Bölümler" class="nav-links" id="nav-links"><a href="#features">Özellikler</a> <a href="#screens">Ekranlar</a> <a href="#how">Nasıl çalışır</a> <a href="#reader">Okuyucu</a> <a href="#settings">Ayarlar</a> <a href="#download">İndir</a> <a href="#faq">SSS</a></nav>
+<div class="header-tools">
+<a class="lang-link" href="../" hreflang="en" lang="en" title="English">English</a>
+<div aria-label="Tema" class="segmented theme-switch" hidden="" id="theme-switch" role="radiogroup">
+<button aria-checked="false" aria-label="Koyu" class="segment" data-theme-choice="dark" role="radio" title="Koyu" type="button"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-moon"></use></svg></button>
+<button aria-checked="false" aria-label="Açık" class="segment" data-theme-choice="light" role="radio" title="Açık" type="button"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-sun"></use></svg></button>
+<button aria-checked="true" aria-label="Sistem" class="segment" data-theme-choice="system" role="radio" title="Sistem" type="button"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-monitor"></use></svg></button>
+</div>
+<a class="btn btn-secondary gh-link" href="https://github.com/imndllnuri/students-attendance-app/releases">Sürümler</a>
+<button aria-controls="nav-links" aria-expanded="false" aria-label="Menü" class="nav-toggle" id="nav-toggle" type="button"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-menu"></use></svg></button>
+</div>
+</div>
+</header>
+<main id="main">
+<!-- ------------------------------------------------------------------ -->
+<header class="hero shell" id="top">
+<p class="eyebrow"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-nfc"></use></svg> Sınıflar için çevrimdışı RFID yoklaması</p>
+<h1>Dokunuşla yoklama. <span class="grad">Kayıtlar kendi klasörünüzde.</span></h1>
+<p class="lede">TapIn, sınıf yoklamasını RFID kartlarından ya da elle alır ve her sınıfı, seçtiğiniz bir klasörde sıradan Excel ve JSON dosyaları olarak saklar. Sunucu yok. Hesap yok. İnternet gerekmez.</p>
+<div class="cta-row"><a class="btn btn-primary btn-lg" href="#download"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-download"></use></svg> TapIn'i indir</a> <a class="btn btn-secondary btn-lg" href="#screens">Tüm ekranları gör</a></div>
+<div aria-label="Nerede çalışır" class="chip-row"><span class="pill">Windows 10/11</span> <span class="pill">macOS 13+ (Apple Silicon)</span> <span class="pill">Ubuntu 24.04+</span> <span class="pill pill-accent">İngilizce &amp; Türkçe</span> <span class="pill pill-accent">Açık &amp; koyu</span></div>
+<div class="hero-shot">
+<div class="window">
+<img alt="TapIn paneli: aktif sınıf sayıları, devam oranı, katılım kayıtları ve risk altındaki öğrenciler; Yoklama al düğmeli bugünkü sınıflar ve son görüntülenen sınıflar." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/dashboard-dark.webp" width="1440"/><img alt="TapIn paneli: aktif sınıf sayıları, devam oranı, katılım kayıtları ve risk altındaki öğrenciler; Yoklama al düğmeli bugünkü sınıflar ve son görüntülenen sınıflar." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/dashboard-light.webp" width="1440"/>
+</div>
+</div>
+</header>
+<!-- ------------------------------------------------------------------ -->
+<section aria-labelledby="new-title" class="block tight shell">
+<div class="card whatsnew">
+<div class="whatsnew-head">
+<span class="pill pill-accent"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-zap"></use></svg> Yeni</span>
+<h2 id="new-title">TapIn 3'te yenilikler</h2>
+<p>Uygulama baştan yazıldı. İşte en çok değişenler.</p>
+</div>
+<ul class="whatsnew-list">
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg><span><strong>Yeni bir görünüm:</strong> tek pencere, her şey için bir kenar çubuğu ve dizüstü bilgisayar ekranına sığan sayfalar.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg><span><strong>Oturum geçmişi:</strong> bir ayı tek bakışta görün; kaydettiğiniz her oturum içinde.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg><span><strong>İstatistikler:</strong> zaman içinde devam, hafta günü ısı haritası, sınıf karşılaştırması ve yazdırılabilir bir rapor.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg><span><strong>Sınıfları içe ve dışa aktarma:</strong> sınıfları bir tablodan getirin, sınıf listenizi dışa aktarın.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg><span><strong>Yoklama alma:</strong> okutmalar siz ilerledikçe düşer; geri al ve tek bir net gönder düğmesiyle.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg><span><strong>Ayarlar tek yerde:</strong> dil, tema, arayüz boyutu, kart okuyucu, yedekler ve güncellemeler.</span></li>
+</ul>
+</div>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section aria-labelledby="demo-title" class="block shell" id="demo">
+<div class="section-head">
+<span class="kicker">Çalışırken görün</span>
+<h2 id="demo-title">Bir sınıf, canlı bir oturum ve istatistikler, 40 saniyede</h2>
+<p>Çalışan uygulamanın, uydurma demo sınıflar ve öğrencilerle kaydedilmiş sessiz bir ekran kaydı. Daire, her tıklamanın nereye düştüğünü gösterir.</p>
+</div>
+<div class="window">
+<video aria-describedby="demo-notes" class="demo-video" controls="" height="800" loop="" muted="" playsinline="" poster="../media/demo-tr-poster.webp" preload="none" width="1280">
+<source src="../media/demo-tr.webm" type="video/webm"/>
+<source src="../media/demo-tr.mp4" type="video/mp4"/>
+<p>Tarayıcınız bu videoyu oynatamıyor. <a href="../media/demo-tr.mp4">İndirin (MP4, 1 MB'ın altında)</a>.</p>
+</video>
+</div>
+<details class="dl-older" id="demo-notes">
+<summary>Videoda neler oluyor</summary>
+<ol>
+<li>Panel, dikkat isteyenle açılır: bugünkü sınıflar ve risk altındaki öğrenciler.</li>
+<li>Sınıflar her sınıfı listeler. Tek tıkla Introduction to Programming açılır; her öğrenci için bir satır, her oturum için bir sütun vardır.</li>
+<li>Yoklama al: geç kalma sınırını ayarlayın, Taramayı başlat'a basın; beş öğrenci kartını okutur. Okuyucunun ekranı her birinin adını söylerdi; burada liste onlar geldikçe dolar. Sonuncusu Geç kaldı olarak işaretlenir. Gönder, beş kaydın hepsini kaydeder.</li>
+<li>İstatistikler: bir sınıfın gün ve saate göre ısı haritası, ardından tüm sınıflar yan yana.</li>
+<li>Ayarlar: tema koyudan açığa döner ve tüm arayüz onu izler.</li>
+</ol>
+</details>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="features">
+<div class="section-head">
+<span class="kicker">Neler yapar</span>
+<h2>Gerçek bir sınıfı yöneten tek bir kişi için</h2>
+<p>Üye olunacak bir platform değil. Kurduğunuz, bir klasörü gösterdiğiniz ve dönem boyunca kullandığınız bir masaüstü uygulaması.</p>
+</div>
+<div class="grid grid-3">
+<article class="card feature">
+<span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-nfc"></use></svg></span>
+<h3>Dokun, kaydedilsin</h3>
+<p>Öğrenciler kartını okutur, okuyucunun ekranı adlarını geri gösterir. TapIn her birini Katıldı olarak işaretler; oturum <em>Geç kalma sınırı</em> ayarınızı aşınca Geç kaldı olarak.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-pencil-line"></use></svg></span>
+<h3>Okuyucu yok mu? Yine çalışır</h3>
+<p>Manuel giriş, <em>Tümünü Katıldı işaretle</em> ve <em>Katılmadı işaretle…</em> hiçbir donanım olmadan da çalışır. Okuyucu yalnızca kalabalık bir sınıfı hızlandırır; onsuz hiçbir şey gizlenmez.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-folder-open"></use></svg></span>
+<h3>Dosyalarınız, bizim veri tabanımız değil</h3>
+<p>Her sınıf, ayarları için bir <span class="mono">.json</span> dosyası ve öğrenci listesi ile yoklaması için bir <span class="mono">.xlsx</span> dosyasıdır. Klasörü kopyalayarak yedekleyin; tabloları istediğiniz zaman Excel'de açın.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-triangle-alert"></use></svg></span>
+<h3>Kime dikkat etmek gerektiğini görün</h3>
+<p>Panel risk altındaki öğrencileri sayar ve her sınıf onları adıyla gösterir: devam zorunluluğunu karşılayamamaya yaklaşacak kadar oturum kaçıranlar.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-chart-column"></use></svg></span>
+<h3>Soruları yanıtlayan istatistikler</h3>
+<p>Katıldı / Geç kaldı / Katılmadı dağılımı, zorunluluğunuza göre eğilim, gün ve saate göre ısı haritası, tüm sınıfların karşılaştırması ve yazdırılabilir bir rapor.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-calendar-days"></use></svg></span>
+<h3>Oturum geçmişi</h3>
+<p>Aktif sınıflarınızda oturum kaydettiğiniz her günün takvimi. Bir gün seçin; hangi sınıfların toplandığını görün ve açın.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-upload"></use></svg></span>
+<h3>Listelerinizi getirin</h3>
+<p>Üniversitenizin öğrenci listesi raporunu ya da <em>Student Number</em> ve <em>Name Surname</em> başlıklı basit bir sayfayı yükleyin (<span class="mono">.xlsx</span>, <span class="mono">.xls</span>, <span class="mono">.ods</span>, <span class="mono">.csv</span>). Nasıl görünmesi gerektiğinden emin değil misiniz? <a download="" href="../samples/student-list-sample.xlsx">Bir örnek indirin</a>. Sınıfların tamamını da bir tablodan içe aktarabilirsiniz.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-file-down"></use></svg></span>
+<h3>Her şeyi dışa aktarın</h3>
+<p>Öğrenci listesi ve yoklama tablosu Excel olarak, bir öğrencinin geçmişi ve sınıf listeniz CSV olarak, devam belgesi ve istatistik raporu PDF olarak, her grafik de resim olarak.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-shield-check"></use></svg></span>
+<h3>Bir kaydı kaybetmek zor</h3>
+<p>TapIn siz göndermeden kapanırsa okutmalarınız taslak olarak saklanır ve size geri sunulur. Bir çalışma kitabı Excel'de açıksa kayıtlar sıraya girer ve yeniden denenir. Değişmiş bir klasör açıldığında zip yedeği alınır; en yeni beşi saklanır.</p>
+</article>
+</div>
+<div class="grid grid-3" style="margin-top: var(--space-5)">
+<article class="card feature">
+<span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-command"></use></svg></span>
+<h3>Gezinmesi hızlı</h3>
+<p>Üst çubuktan sınıfları ve öğrencileri arayın (<span class="kbd">Ctrl</span> <span class="kbd">F</span>), komut paletini <span class="kbd">Ctrl</span> <span class="kbd">K</span> ile açın, sayfalar arasında <span class="kbd">Ctrl</span> <span class="kbd">1</span>–<span class="kbd">4</span> ile geçin, yeni sınıfı <span class="kbd">Ctrl</span> <span class="kbd">N</span> ile başlatın. Mac'te <span class="kbd">⌘</span> kullanın.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-languages"></use></svg></span>
+<h3>İngilizce ve Türkçe</h3>
+<p>Arayüzün tamamı İngilizce ile Türkçe arasında bir anda değişir; tarihler ve gün adları dâhil.</p>
+</article>
+<article class="card feature">
+<span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-contrast"></use></svg></span>
+<h3>Açık, koyu ya da sisteminizin teması</h3>
+<p>Bir tema seçin, her şeyi %90 ile %130 arasında büyütün ya da küçültün, camı düz panellere çevirin ya da sınıfları satır başına birer satır gösterin. Bu sayfada da aynı tema anahtarı var, sağ üstte.</p>
+</article>
+</div>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="screens">
+<div class="section-head">
+<span class="kicker">Ekranlar</span>
+<h2>Her ekran, gerçekte göründüğü gibi</h2>
+<p>Bunlar, çalışan uygulamanın uydurma demo sınıflar ve öğrencilerle alınmış görüntüleridir. Açık halini görmek için üstteki temayı değiştirin. Resimlerde uygulamanın İngilizce arayüzü görünür; son sekme Türkçe arayüzü gösterir.</p>
+</div>
+<div class="tabs" hidden=""><div aria-label="Uygulamanın ekranları" class="segmented" role="tablist"><button aria-controls="panel-dashboard" aria-selected="true" class="segment" id="tab-dashboard" role="tab" tabindex="0" type="button">Panel</button><button aria-controls="panel-classes" aria-selected="false" class="segment" id="tab-classes" role="tab" tabindex="-1" type="button">Sınıflar</button><button aria-controls="panel-class-detail" aria-selected="false" class="segment" id="tab-class-detail" role="tab" tabindex="-1" type="button">Sınıf ve liste</button><button aria-controls="panel-take-attendance" aria-selected="false" class="segment" id="tab-take-attendance" role="tab" tabindex="-1" type="button">Yoklama al</button><button aria-controls="panel-statistics" aria-selected="false" class="segment" id="tab-statistics" role="tab" tabindex="-1" type="button">İstatistikler</button><button aria-controls="panel-compare" aria-selected="false" class="segment" id="tab-compare" role="tab" tabindex="-1" type="button">Sınıfları karşılaştır</button><button aria-controls="panel-heatmap" aria-selected="false" class="segment" id="tab-heatmap" role="tab" tabindex="-1" type="button">Isı haritası</button><button aria-controls="panel-history" aria-selected="false" class="segment" id="tab-history" role="tab" tabindex="-1" type="button">Geçmiş</button><button aria-controls="panel-settings" aria-selected="false" class="segment" id="tab-settings" role="tab" tabindex="-1" type="button">Ayarlar</button><button aria-controls="panel-turkish" aria-selected="false" class="segment" id="tab-turkish" role="tab" tabindex="-1" type="button">Türkçe</button></div></div>
+<div aria-labelledby="tab-dashboard" class="panel" id="panel-dashboard" role="tabpanel"><div class="window"><img alt="TapIn paneli: aktif sınıf sayıları, devam oranı, katılım kayıtları ve risk altındaki öğrenciler; Yoklama al düğmeli bugünkü sınıflar, son görüntülenen sınıflar ve her sınıf için bir kart." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/dashboard-dark.webp" width="1440"/><img alt="TapIn paneli: aktif sınıf sayıları, devam oranı, katılım kayıtları ve risk altındaki öğrenciler; Yoklama al düğmeli bugünkü sınıflar, son görüntülenen sınıflar ve her sınıf için bir kart." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/dashboard-light.webp" width="1440"/></div><p class="caption"><strong>Dikkat isteyenle açılır.</strong> Bugünkü sınıflar, her sınıfın durumu, en son baktığınız sınıflar ve bildirimleriniz. Kutucuklar aktif sınıfları, devam oranını, katılım kayıtlarını ve risk altındaki öğrencileri sayar.</p></div>
+<div aria-labelledby="tab-classes" class="panel" id="panel-classes" role="tabpanel"><div class="window"><img alt="Sınıflar sayfası: sınıf kodu, dönem, devam oranı, bir iğne ve bir menüyle listelenmiş on bir sınıf; sıralama, Aktif ve Arşivlenmiş anahtarı, Sınıfları içe aktar, Yeni sınıf ve Listeyi dışa aktar düğmeleri." class="shot-dark only" decoding="async" height="900" loading="lazy" src="../images/classes-dark.webp" width="1440"/></div><p class="caption"><strong>Tüm sınıflarınız tek listede.</strong> Sınıf koduna, adına, güne ya da kendi sıranıza göre sıralayın, en çok kullandıklarınızı sabitleyin, eskileri arşivleyin ya da sınıf başına tek satıra geçin. Sınıfları bir tablodan içe aktarın, listeyi dışa aktarın.</p></div>
+<div aria-labelledby="tab-class-detail" class="panel" id="panel-class-detail" role="tabpanel"><div class="window"><img alt="Bir sınıf sayfası: sınıf ayarları, risk altındaki üç öğrenciyi adıyla söyleyen bir uyarı ve her oturum için bir sütun içeren öğrenci listesi; her hücre Katıldı, Geç kaldı ya da Katılmadı olarak işaretli." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/class-detail-dark.webp" width="1440"/><img alt="Bir sınıf sayfası: sınıf ayarları, risk altındaki üç öğrenciyi adıyla söyleyen bir uyarı ve her oturum için bir sütun içeren öğrenci listesi; her hücre Katıldı, Geç kaldı ya da Katılmadı olarak işaretli." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/class-detail-light.webp" width="1440"/></div><p class="caption"><strong>Her öğrenci için bir satır, her oturum için bir sütun.</strong> Bir kaydı düzeltmek için bir hücreye çift tıklayın ya da Enter'a basın. Bir uyarı, devam zorunluluğunuz altında risk taşıyan öğrencileri adıyla söyler.</p></div>
+<div aria-labelledby="tab-take-attendance" class="panel" id="panel-take-attendance" role="tabpanel"><div class="window"><img alt="Bir oturum sırasında Yoklama al: okuyucu kartı en son işaretlenen öğrenciyi gösterir, öğrenci listesi sağda dolar, altında Katıldı, Geç kaldı, Katılmadı ve Toplam sayaçları durur ve altta bir Gönder düğmesi bekler." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/take-attendance-dark.webp" width="1440"/><img alt="Bir oturum sırasında Yoklama al: okuyucu kartı en son işaretlenen öğrenciyi gösterir, öğrenci listesi sağda dolar, altında Katıldı, Geç kaldı, Katılmadı ve Toplam sayaçları durur ve altta bir Gönder düğmesi bekler." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/take-attendance-light.webp" width="1440"/></div><p class="caption"><strong>Canlı oturum.</strong> Taramayı başlatın; öğrenciler okuttukça liste dolar. Tarihi ve ders saatini seçin, geç kalma sınırını ayarlayın, gerektiğinde elle işaretleyin; siz göndermeden hiçbir şey kaydedilmez.</p></div>
+<div aria-labelledby="tab-statistics" class="panel" id="panel-statistics" role="tabpanel"><div class="window"><img alt="Bir sınıfın istatistikleri: Katıldı, Geç kaldı, Katılmadı ve devam oranı kutucukları, bir dağılım halkası ve üzerinden zorunluluk çizgisinin geçtiği bir devam eğilimi çizgisi." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/statistics-dark.webp" width="1440"/><img alt="Bir sınıfın istatistikleri: Katıldı, Geç kaldı, Katılmadı ve devam oranı kutucukları, bir dağılım halkası ve üzerinden zorunluluk çizgisinin geçtiği bir devam eğilimi çizgisi." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/statistics-light.webp" width="1440"/></div><p class="caption"><strong>Bir sınıfın durumu.</strong> Katıldı, Geç kaldı ve Katılmadı; devam oranı zorunluluğunuza karşı ve oturum oturum bir eğilim çizgisi. Bir grafiği resim olarak dışa aktarın ya da yazdırılabilir bir rapor indirin.</p></div>
+<div aria-labelledby="tab-compare" class="panel" id="panel-compare" role="tabpanel"><div class="window"><img alt="Sekiz sınıfın devam oranını karşılaştıran çubuk grafik; her çubuk sınıfının renginde." class="shot-dark only" decoding="async" height="900" loading="lazy" src="../images/compare-dark.webp" width="1440"/></div><p class="caption"><strong>Tüm sınıflar yan yana.</strong> Verisi olan her sınıfın devam oranı, sınıfa verdiğiniz renkte.</p></div>
+<div aria-labelledby="tab-heatmap" class="panel" id="panel-heatmap" role="tabpanel"><div class="window"><img alt="Gün ve saat dilimine göre ortalama devamın ısı haritası; en yüksek ve en düşük dilim üstünde adıyla yazılı." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/heatmap-dark.webp" width="1440"/><img alt="Gün ve saat dilimine göre ortalama devamın ısı haritası; en yüksek ve en düşük dilim üstünde adıyla yazılı." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/heatmap-light.webp" width="1440"/></div><p class="caption"><strong>Devamın en güçlü olduğu zaman.</strong> Bir sınıfın toplandığı her gün ve saat dilimi için ortalama devam; en iyi ve en kötü dilim adıyla söylenir.</p></div>
+<div aria-labelledby="tab-history" class="panel" id="panel-history" role="tabpanel"><div class="window"><img alt="Oturum geçmişi: oturum kaydedilen her günde bir nokta olan ay takvimi ve seçili günün oturumlarını listeleyen bir panel." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/history-dark.webp" width="1440"/><img alt="Oturum geçmişi: oturum kaydedilen her günde bir nokta olan ay takvimi ve seçili günün oturumlarını listeleyen bir panel." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/history-light.webp" width="1440"/></div><p class="caption"><strong>Bir ay tek bakışta.</strong> Oturum kaydedilen günlerde bir nokta vardır. Bir gün seçin, hangi sınıfların toplandığını görün ve birini açın.</p></div>
+<div aria-labelledby="tab-settings" class="panel" id="panel-settings" role="tabpanel"><div class="window"><img alt="Soldaki bölüm listesiyle ve sağdaki Genel ve Veriler ayarlarıyla Ayarlar sayfası." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/settings-dark.webp" width="1440"/><img alt="Soldaki bölüm listesiyle ve sağdaki Genel ve Veriler ayarlarıyla Ayarlar sayfası." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/settings-light.webp" width="1440"/></div><p class="caption"><strong>Her şey tek yerde.</strong> Dil, tema, arayüz boyutu, veri klasörü ve yedekleri, kart okuyucu ve güncellemeler.</p></div>
+<div aria-labelledby="tab-turkish" class="panel" id="panel-turkish" role="tabpanel"><div class="window"><img alt="Türkçe Yoklama al sayfası: öğrenci listesi, okuyucu kartı ve sayaçların hepsi Türkçe." class="shot-dark only" decoding="async" height="900" loading="lazy" src="../images/tr-take-attendance-dark.webp" width="1440"/></div><p class="caption"><strong>Arayüzün tamamı Türkçe.</strong> Ayarlar'dan dili değiştirin; her ekran, tarih ve gün adı hemen onu izler.</p></div>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="how">
+<div class="section-head">
+<span class="kicker">Nasıl çalışır</span>
+<h2>Bir klasörden bitmiş bir sınıfa, beş adımda</h2>
+<p>Uygulamanın içindeki tanıtımın sizi yürüttüğü yolun aynısı.</p>
+</div>
+<ol class="flow">
+<li class="flow-step">
+<div class="flow-text">
+<div aria-hidden="true" class="step-num">1</div>
+<h3>Verinizin nerede duracağını seçin</h3>
+<p>TapIn ilk açıldığında sınıflarınızı, öğrenci listelerinizi ve yoklamanızı nerede saklayacağını sorar. Herhangi bir klasör seçin ya da <span class="mono">~/TapIn</span> kullanın. Bundan sonra TapIn o klasörü kendi açar, bir daha sormaz.</p>
+<ul>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-folder-open"></use></svg><span>Bu ekranı yalnızca kayıtlı klasör açılamazsa yeniden görürsünüz ve nedenini söyler: örneğin başka bir bilgisayarda açık olduğunu.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-refresh-cw"></use></svg><span>İstediğiniz zaman <strong>Ayarlar → Veriler</strong>'den başka bir klasöre geçin. Bıraktığınız klasördeki hiçbir şey taşınmaz ya da silinmez.</span></li>
+</ul>
+</div>
+<div class="flow-media">
+<div class="window narrow">
+<img alt="İlk çalıştırma ekranı (İngilizce arayüz): “Where should TapIn keep your data?” sorusu ve iki düğme, “Use ~/TapIn” ve “Choose a folder”." class="shot-dark only" decoding="async" height="284" loading="lazy" src="../images/launch-dark.webp" width="568"/>
+</div>
+</div>
+</li>
+<li class="flow-step">
+<div class="flow-text">
+<div aria-hidden="true" class="step-num">2</div>
+<h3>Bir sınıf ekleyin</h3>
+<p>Dört adımlı bir düzenleyici: <strong>Sınıf bilgisi</strong> (kod, ad, dönem, devam zorunluluğu, geç kalma sınırı, hafta ve saatler), <strong>Ders programı</strong> (toplandığı günler ve saatler), <strong>Öğrenci listesi</strong> ve <strong>Renk ve onay</strong>.</p>
+<ul>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-upload"></use></svg><span>Öğrencileri elle ekleyin, üniversitenizin öğrenci listesi raporunu yükleyin ya da başka bir sınıftan kopyalayın. Yükleme ekranı, basit bir listenin ihtiyaç duyduğu başlıkları içeren bir örnek dosya kaydedebilir.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-copy"></use></svg><span>Gelecek dönem için bir sınıfı çoğaltın, en çok kullandıklarınızı sabitleyin, kullanmadıklarınızı arşivleyin.</span></li>
+</ul>
+</div>
+<div class="flow-media">
+<div class="window narrow">
+<img alt="Yeni sınıf düzenleyicisi, 1. adım Sınıf bilgisi, doldurulmuş: sınıf kodu COMP101, ad Introduction to Programming, şube 1, dönem Fall 2026, zorunluluk yüzde 70, geç kalma sınırı 15 dakika, 14 hafta, toplam 42 saat, haftalık 3 saat." class="shot-dark only" decoding="async" height="680" loading="lazy" src="../images/editor-details-dark.webp" width="760"/>
+</div>
+<div class="window narrow">
+<img alt="Yeni sınıf düzenleyicisi, 2. adım Ders programı: Pazartesi ve Çarşamba açık, başlangıç ve bitiş saatleriyle; diğer günler kapalı." class="shot-dark only" decoding="async" height="680" loading="lazy" src="../images/editor-schedule-dark.webp" width="760"/>
+</div>
+</div>
+</li>
+<li class="flow-step">
+<div class="flow-text">
+<div aria-hidden="true" class="step-num">3</div>
+<h3>Yoklama alın</h3>
+<p>Sınıfı açın ve <strong>Yoklama al</strong>'a basın. Okuyucuyla öğrenciler kartını okutur ve geldikçe işaretlenir. Okuyucu yoksa aynı ekranda elle işaretleyin. <strong>Siz Gönder'e basmadan hiçbir şey kaydedilmez.</strong></p>
+<div aria-label="Bir kayıt nasıl işaretlenir" class="status-row"><span class="pill pill-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-check"></use></svg> Katıldı</span> <span class="pill pill-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-clock"></use></svg> Geç kaldı</span> <span class="pill pill-absent"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-circle-x"></use></svg> Katılmadı</span></div>
+<ul>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-id-card"></use></svg><span>Bilinmeyen bir kart mı? Hemen bir öğrenciye kaydedin; öğrenci de anında kaydedilir. Bir kart, tüm sınıflarda tek bir öğrenciye aittir.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-undo-2"></use></svg><span>Son kaydı geri alın, herkesi Katıldı işaretleyin ya da devamsızları toplu işaretleyin.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-shield-check"></use></svg><span>TapIn'i yanlışlıkla kapatırsanız gönderilmemiş okutmalarınız taslak olarak saklanır ve bir sonraki sefer size geri sunulur.</span></li>
+</ul>
+</div>
+<div class="flow-media">
+<div class="window">
+<img alt="Bir oturum sırasında Yoklama al: okuyucu kartı son öğrenciyi, Elif Güneş'i, saat 14:25'te Geç kaldı olarak gösterir; dört öğrenci Katıldı, biri Geç kaldı; öğrenci listesi sağda dolar ve altta “Submit 5 records” düğmesi bekler." class="shot-dark" decoding="async" height="900" loading="lazy" src="../images/take-attendance-dark.webp" width="1440"/><img alt="Bir oturum sırasında Yoklama al: okuyucu kartı son öğrenciyi, Elif Güneş'i, saat 14:25'te Geç kaldı olarak gösterir; dört öğrenci Katıldı, biri Geç kaldı; öğrenci listesi sağda dolar ve altta “Submit 5 records” düğmesi bekler." class="shot-light" decoding="async" height="900" loading="lazy" src="../images/take-attendance-light.webp" width="1440"/>
+</div>
+<div class="window narrow">
+<img alt="Bu kartı kaydet penceresi: kayıtsız bir kart numarası, ait olduğu öğrenciyi seçmek için bir liste ve “Not now” ile “Register and record” düğmeleri." class="shot-dark only" decoding="async" height="334" loading="lazy" src="../images/register-card-dark.webp" width="560"/>
+</div>
+</div>
+</li>
+<li class="flow-step">
+<div class="flow-text">
+<div aria-hidden="true" class="step-num">4</div>
+<h3>Nerede durduğunuzu görün</h3>
+<p>Her sınıf, devam zorunluluğunuz altında risk taşıyan öğrencilerini adıyla söyler. <strong>İstatistikler</strong> dağılımı, zorunluluk çizginizle eğilimi, gün ve saate göre ısı haritasını ve tüm sınıflarınızın karşılaştırmasını gösterir. <strong>Geçmiş</strong> her oturumu, her seferinde bir ay olarak gösterir.</p>
+<ul>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-users"></use></svg><span>Her oturumu ve kartını görmek için bir öğrenciyi açın ya da bir kaydı düzeltmek için tablodaki bir hücreye çift tıklayın.</span></li>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-file-down"></use></svg><span>Herhangi bir sınıf için yazdırılabilir bir PDF rapor indirin.</span></li>
+</ul>
+</div>
+<div class="flow-media">
+<div class="window">
+<img alt="Sağda bir öğrencinin sayfasının açık olduğu sınıf sayfası: katıldığı 4, kaçırdığı 8, yüzde 33 oran, öğrencinin kart numarası ve bir kartı kaldırma düğmesi ve her oturum durumuyla." class="shot-dark only" decoding="async" height="900" loading="lazy" src="../images/student-sheet-dark.webp" width="1440"/>
+</div>
+</div>
+</li>
+<li class="flow-step">
+<div class="flow-text">
+<div aria-hidden="true" class="step-num">5</div>
+<h3>Yanınıza alın</h3>
+<p>Öğrenci listesini ya da yoklama tablosunu Excel olarak, bir öğrencinin geçmişini ya da sınıf listenizi CSV olarak, bir <strong>devam belgesini</strong> ya da istatistik raporunu PDF olarak, her grafiği de PNG ya da SVG resmi olarak dışa aktarın.</p>
+<ul>
+<li><svg aria-hidden="true" class="i" focusable="false"><use href="#i-hard-drive"></use></svg><span>Her sınıf zaten sıradan bir dosya olduğu için ayrılmak adına dışa aktarılacak bir şey yoktur: klasörü kopyalayın.</span></li>
+</ul>
+</div>
+<div class="flow-media">
+<div class="paper">
+<img alt="Bir devam belgesi: Ayşe Çelik, öğrenci numarası 20260001, Introduction to Programming (COMP101) sınıfına kayıtlı, 12 oturumun 11'ine katılmış, yüzde 91,7; yüzde 70'lik devam zorunluluğunu karşılıyor." decoding="async" height="1013" loading="lazy" src="../images/certificate.webp" width="684"/>
+</div>
+</div>
+</li>
+</ol>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="reader">
+<div class="section-head">
+<span class="kicker">Okuyucu</span>
+<h2>İsteğe bağlı bir kart okuyucu</h2>
+<p>TapIn, ESP32 tabanlı bir RFID okuyucuyla USB kablosu üzerinden, okuyucunun kendi Wi-Fi erişim noktası üzerinden ya da Bluetooth üzerinden çalışır. Bu bir kolaylıktır, zorunluluk değil: her özellik elle de çalışır.</p>
+</div>
+<div aria-label="Okuyucunun yerleşimi" class="wire" role="list">
+<div class="wire-node" role="listitem"><b>ESP32 + RC522</b><span>Kartı okur ve seri numarasını gönderir</span></div>
+<span aria-hidden="true" class="wire-arrow"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-right"></use></svg></span>
+<div class="wire-node" role="listitem"><b>USB, Wi-Fi ya da Bluetooth</b><span>Varsayılan kablodur; kart kendi erişim noktasını kurabilir ya da Bluetooth ile eşleşebilir</span></div>
+<span aria-hidden="true" class="wire-arrow"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-right"></use></svg></span>
+<div class="wire-node" role="listitem"><b>TapIn</b><span>Öğrenciyi bulur ve oturumu kaydeder</span></div>
+<span aria-hidden="true" class="wire-arrow"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-right"></use></svg></span>
+<div class="wire-node" role="listitem"><b>Veri klasörünüz</b><span>Kendi diskinizdeki sıradan dosyalar</span></div>
+</div>
+<div class="reader-grid">
+<article class="card">
+<h3>Kart yalnızca bir numara gönderir</h3>
+<p>Okuyucuda öğrenci listesi yoktur ve kimin kim olduğunu bilmez. Bir kartın seri numarasını gönderir; TapIn bunun kime ait olduğunu bulur ve okuyucunun ekranı için adı geri yollar. İsimler hiçbir zaman cihazda durmaz; bu yüzden kaybolan ya da sökülen bir okuyucu öğrencileriniz hakkında hiçbir şey ele vermez.</p>
+<pre class="code" tabindex="0"><code><span class="dim">board → app</span>  04A3B2C1
+<span class="dim">app → board</span>  OK:20260001|Ayşe Çelik
+<span class="dim">app → board</span>  INVALID</code></pre>
+<p>Okuyucuda yeşil ışık kartın kaydedildiği, kırmızı ışık ve bip sesi ise reddedildiği anlamına gelir. 16×2 ekranı öğrencinin numarasını ve adını (aksansız: ekranda Türkçe harfler yoktur) ya da <em>Invalid card</em> gibi kısa bir mesajı gösterir.</p>
+<ul class="options">
+<li><span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-usb"></use></svg></span><div><b>USB kablosu</b><span>Kurulacak bir şey yok. Okuyucuyu takın; Yoklama al'ı açtığınızda TapIn portu bulur.</span></div></li>
+<li><span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-wifi"></use></svg></span><div><b>Kendi Wi-Fi'ı</b><span>Okuyucu, bilgisayarınızın katıldığı küçük bir ağ kurar. Kurumunuzun ağına dokunmaz; bu da tarama sırasında bu bilgisayarda internet olmaması demektir.</span></div></li>
+<li><span class="icon-tile tone-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-bluetooth"></use></svg></span><div><b>Bluetooth <span class="tag tag-warn">Yeni</span></b><span>Okuyucuyu bilgisayarınızla eşleştirin, sonra Ayarlar'da seri portunu seçin. Okuyucunun Bluetooth sürümü yazılımına ihtiyaç duyar. Gerçek bir okuyucuyla Linux'ta denendi; Windows ve macOS henüz denenmedi.</span></div></li>
+</ul>
+</article>
+<article class="card reader-shot">
+<h3>Wi-Fi kipi, beş adımda</h3>
+<p>Ayarlar → Kart okuyucu sizi adım adım yönlendirir ve <strong>Bağlantıyı test et</strong> düğmesiyle bu bilgisayarın okuyucunun ağında olup olmadığını, okuyucunun yanıt verip vermediğini ya da bulunduğunu söyler.</p>
+<div class="window">
+<img alt="Ayarlar, Kart okuyucu, Wi-Fi: beş numaralı adım (okuyucuyu çalıştırın, Wi-Fi ağına katılın, internet olmamasını bekleyin, bağlantıyı test edin, yoklama alın) ve 192.168.4.1 okuyucu adresi, 8888 portu ve bir bağlantıyı test etme düğmesi." class="shot-dark" decoding="async" height="525" loading="lazy" src="../images/settings-reader-wifi-dark.webp" width="834"/><img alt="Ayarlar, Kart okuyucu, Wi-Fi: beş numaralı adım (okuyucuyu çalıştırın, Wi-Fi ağına katılın, internet olmamasını bekleyin, bağlantıyı test edin, yoklama alın) ve 192.168.4.1 okuyucu adresi, 8888 portu ve bir bağlantıyı test etme düğmesi." class="shot-light" decoding="async" height="525" loading="lazy" src="../images/settings-reader-wifi-light.webp" width="834"/>
+</div>
+</article>
+</div>
+<p class="note" style="text-align:center">Kendi okuyucunuzu yapmak mı istiyorsunuz? <a href="#build">Okuyucuyu yapın</a> bölümüne bakın.</p>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="build">
+<div class="section-head">
+<span class="kicker">Okuyucuyu yapın</span>
+<h2>Parçalar, bağlantılar ve yazılım</h2>
+<p>Okuyucu; bir ESP32 kartı, bir RC522 kart modülü, 16×2 bir ekran, dört ışık ve bir buzzer'dan oluşur. İşte üç sketch (her bağlanma yolu için bir tane) ve bir şey satın almadan önce tarayıcınızda çalıştırabileceğiniz bir devre.</p>
+</div>
+<div class="grid grid-2">
+<article class="card">
+<h3>Üç sketch</h3>
+<p>Bağlantılar üçünde de aynıdır; bu yüzden tek bir kart hangisini isterseniz onu çalıştırabilir. Arduino-ESP32 3.3.12 çekirdeği ile <span class="mono">MFRC522</span> ve <span class="mono">LiquidCrystal_I2C</span> kütüphaneleriyle derlenmişlerdir ve MIT lisansıyla yayımlanmıştır.</p>
+<ul class="options">
+<li><span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-usb"></use></svg></span><div><b><a download="" href="../reader/rc522_serial_reader.ino">rc522_serial_reader.ino</a></b><span>USB kablosu</span></div></li>
+<li><span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-wifi"></use></svg></span><div><b><a download="" href="../reader/rc522_wifi_reader.ino">rc522_wifi_reader.ino</a></b><span>Kendi Wi-Fi ağı, <span class="mono">TapIn-Reader</span></span></div></li>
+<li><span class="icon-tile tone-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-bluetooth"></use></svg></span><div><b><a download="" href="../reader/rc522_bluetooth_reader.ino">rc522_bluetooth_reader.ino</a></b><span>Bluetooth Classic. Yeni ve yalnızca Linux'ta denendi</span></div></li>
+</ul>
+<p class="note">Parça listesi, pin pin bağlantı tabloları, ışıkların ne anlama geldiği, yazılımı yükleme adımları ve bir sorun giderme tablosu <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md#building-the-reader">kullanım kılavuzunda</a> (İngilizce).</p>
+</article>
+<article class="card">
+<h3>Kart olmadan deneyin</h3>
+<p><a href="https://wokwi.com/">Wokwi</a>, tarayıcınızda çalışan ücretsiz bir simülatördür. USB sketch'ini sahte bir ESP32, RC522 okuyucu, ekran ve ışıklara karşı çalıştırabilir ve bir kartın okutulduğunu taklit etmenizi sağlar.</p>
+<ol class="steps">
+<li><strong>Bir proje başlatın</strong><span>wokwi.com'da <a href="https://wokwi.com/projects/new/esp32">yeni bir ESP32 projesi</a> açın</span></li>
+<li><strong>Üç dosyasını değiştirin</strong><span><a download="" href="../reader/wokwi/diagram.json">diagram.json</a>, <a download="" href="../reader/wokwi/sketch.ino">sketch.ino</a> ve <a download="" href="../reader/wokwi/libraries.txt">libraries.txt</a></span></li>
+<li><strong>Play'e basın</strong><span>Ekranda “Ready to scan” yazar. Wi-Fi ve Bluetooth sketch'leri simülatör için düşünülmemiştir</span></li>
+</ol>
+</article>
+</div>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="settings">
+<div class="section-head">
+<span class="kicker">Ayarlar</span>
+<h2>Kendinize göre yapın</h2>
+<p>Tek sayfa, beş bölüm: Genel, Veriler, Kart okuyucu, Güncellemeler ve Yardım ve hakkında.</p>
+</div>
+<div class="settings-grid">
+<ul class="setting-list">
+<li><span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-languages"></use></svg></span><div><h3>Dil</h3><p>İngilizce ya da Türkçe. Her ekranı bir anda değiştirir, yeniden başlatma gerekmez.</p></div></li>
+<li><span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-contrast"></use></svg></span><div><h3>Tema</h3><p>Koyu, Açık ya da Sistem; Sistem bilgisayarınızın kendi ayarını izler ve TapIn açıkken değişir.</p></div></li>
+<li><span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-type"></use></svg></span><div><h3>Arayüz boyutu</h3><p>%90, %100, %115 ya da %130: metin, düğmeler ve listeler birlikte büyür veya küçülür.</p></div></li>
+<li><span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-layers"></use></svg></span><div><h3>Şeffaflığı azalt &amp; kompakt listeler</h3><p>Daha iyi okunuyorsa cam yerine düz paneller ve Sınıflar'da sınıf başına tek satır.</p></div></li>
+<li><span class="icon-tile tone-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-lock"></use></svg></span><div><h3>Hareketsizlikte kapat</h3><p>Bir süre kimse kullanmazsa TapIn'i kapatır; böylece ortak bir bilgisayar açık kalmaz. Gönderilmemiş okutmalarınız varken asla kapanmaz.</p></div></li>
+<li><span class="icon-tile tone-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-hard-drive"></use></svg></span><div><h3>Veri klasörü &amp; yedekler</h3><p>Klasörü gösterin, yolunu kopyalayın ya da başkasına geçin. Değişmiş bir klasör açıldığında TapIn <span class="mono">.backups</span> içine bir zip yedeği alır ve en yeni beşini saklar.</p></div></li>
+<li><span class="icon-tile tone-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-save"></use></svg></span><div><h3>Ayar dosyası</h3><p>Dilinizi, arayüz boyutunuzu, sınıf listesi ve hareketsizlik tercihlerinizi bir dosyaya aktarın ve başka bir bilgisayarda içe aktarın.</p></div></li>
+<li><span class="icon-tile"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-refresh-cw"></use></svg></span><div><h3>Güncellemeler, varsayılan olarak kapalı</h3><p>Açarsanız TapIn başlangıçta GitHub'a daha yeni bir sürüm olup olmadığını sorar. Hiçbir şey indirilmez ya da kurulmaz.</p></div></li>
+<li><span class="icon-tile tone-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-life-buoy"></use></svg></span><div><h3>Yardım ve hakkında</h3><p>Tanıtım, SSS ve gizlilik notları her an bir tık uzakta.</p></div></li>
+</ul>
+<div class="setting-shots">
+<div class="window">
+<img alt="Ayarlar, Genel: dil, arayüz boyutu, tema (Koyu, Açık, Sistem), şeffaflığı azalt, kompakt sınıf listesi ve hareketsizlikte kapat." class="shot-dark" decoding="async" height="537" loading="lazy" src="../images/settings-general-dark.webp" width="884"/><img alt="Ayarlar, Genel: dil, arayüz boyutu, tema (Koyu, Açık, Sistem), şeffaflığı azalt, kompakt sınıf listesi ve hareketsizlikte kapat." class="shot-light" decoding="async" height="537" loading="lazy" src="../images/settings-general-light.webp" width="884"/>
+</div>
+<div class="window">
+<img alt="Ayarlar, Veriler: klasörde göster ve yolu kopyala düğmeleriyle veri klasörü, veri klasörünü değiştir, son yedek ve saklanan beş yedekle yedekler, bir ayar dosyasının dışa ve içe aktarımı." class="shot-dark" decoding="async" height="591" loading="lazy" src="../images/settings-data-dark.webp" width="884"/><img alt="Ayarlar, Veriler: klasörde göster ve yolu kopyala düğmeleriyle veri klasörü, veri klasörünü değiştir, son yedek ve saklanan beş yedekle yedekler, bir ayar dosyasının dışa ve içe aktarımı." class="shot-light" decoding="async" height="591" loading="lazy" src="../images/settings-data-light.webp" width="884"/>
+</div>
+</div>
+</div>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="privacy">
+<div class="section-head">
+<span class="kicker">Gizlilik</span>
+<h2>Veri nereye gider</h2>
+<p>Uygulamanın Ayarlar → Yardım ve hakkında → Gizlilik altında gösterdiği notların aynısı.</p>
+</div>
+<div class="grid grid-2">
+<article class="card privacy-card">
+<span class="pill pill-ok"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-eye-off"></use></svg> Tasarım gereği</span>
+<h3>Hiçbir şey bilgisayarınızdan çıkmaz</h3>
+<p>TapIn'in hesabı, bulut hizmeti ve analitiği yoktur. Hiçbir kullanım verisi ve çökme raporu göndermez. Kutudan çıktığı haliyle yaptığı tek ağ bağlantısı, okuyucunun kendi yerel ağı üzerinden kendi kart okuyucunuzadır.</p>
+</article>
+<article class="card privacy-card">
+<span class="pill pill-late"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-refresh-cw"></use></svg> Bir istisna, o da kapalı</span>
+<h3>Güncelleme denetimi</h3>
+<p>Ayarlar'da <strong>Yeni sürümleri denetle</strong> adında bir anahtar vardır. Kapalıdır. Açarsanız TapIn başlangıçta github.com'a en yeni sürümün sürüm numarasını sorar ve sizinki eskiyse Bildirimler'de söyler. İstek hiçbir öğrenci verisi, veri klasörü yolu ya da tanımlayıcı taşımaz. Hiçbir şey indirilmez ya da kurulmaz. Anahtarı kapalı bırakırsanız TapIn github.com ile hiç iletişim kurmaz.</p>
+</article>
+<article class="card privacy-card">
+<span class="pill pill-info"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-file-text"></use></svg> Neler saklanır</span>
+<h3>Numaralar, adlar, devam, kart kimlikleri</h3>
+<p>Her öğrencinin numarası ve adı, devam kayıtları ve okuyucuyu kullanıyorsanız kaydettirdikleri kartın kimliği. TapIn başka bir şey istemez: e-posta adresi yok, fotoğraf yok, not yok. Hepsi seçtiğiniz veri klasöründe, sıradan <span class="mono">.json</span> ve <span class="mono">.xlsx</span> dosyaları olarak durur.</p>
+</article>
+<article class="card privacy-card">
+<span class="pill pill-absent"><svg aria-hidden="true" class="i" focusable="false"><use href="#i-lock"></use></svg> Açık konuşmaya değer</span>
+<h3>Dosyalar şifrelenmemiştir</h3>
+<p>Veri klasörünü açabilen herkes her öğrencinin adını, numarasını ve devamını okuyabilir; çünkü tablolar tasarım gereği doğrudan Excel'de açılır. Veri, klasör gizli olduğu için gizlidir. Onu yalnızca sizin erişebileceğiniz bir yerde tutun, bir yedek zip'ine de aynı özeni gösterin ve unutmayın ki yasa ile kurumunuzun kuralları (Türkiye'de KVKK, Avrupa Birliği'nde GDPR) onu nasıl sakladığınız için de geçerlidir. Bu hukuki tavsiye değildir: emin değilseniz üniversitenizin kişisel veri koruma birimine sorun.</p>
+</article>
+</div>
+<p class="note" style="text-align:center">TapIn'i kaldırmak kayıtlarınızı asla silmez: veri klasörünüz koyduğunuz yerde aynen durur.</p>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="download">
+<div class="section-head">
+<span class="kicker">İndir</span>
+<h2>TapIn'i edinin</h2>
+<p>Ücretsiz; hesap ve lisans anahtarı yok. Aşağıdan sisteminizi seçin: indirmeler doğrudan projenin sürümler sayfasından gelir; bu yüzden gösterilen her zaman en yeni sürümdür.</p>
+</div>
+<div class="dl-bar" hidden=""><label for="version-select">Sürüm</label> <select aria-label="Bir sürüm seçin" id="version-select"></select> <span class="dl-meta" id="release-date"></span></div>
+<div class="grid grid-3" id="download-cards">
+<article class="card dl-card dl-fallback">
+<div class="dl-os"><span><svg aria-hidden="true" fill="currentColor" viewbox="0 0 24 24"><path d="M3 5.5 10.2 4.5v6.9H3zM11.4 4.3 21 3v8.4h-9.6zM3 12.6h7.2v6.9L3 18.5zM11.4 12.6H21V21l-9.6-1.3z"></path></svg></span><h3>Windows</h3></div>
+<span class="tag tag-accent">Yükleyici</span>
+<div><div class="dl-kind">Yükleyici (.exe)</div><div class="dl-meta">Windows 10 veya 11, 64 bit</div></div>
+<p class="dl-note">Kullanıcınız için kurulur; yönetici parolası gerekmez.</p>
+<a class="btn btn-secondary" href="https://github.com/imndllnuri/students-attendance-app/releases/latest">En son sürümü aç</a>
+</article>
+<article class="card dl-card dl-fallback">
+<div class="dl-os"><span><svg aria-hidden="true" fill="currentColor" viewbox="0 0 24 24"><path d="M16.4 12.7c0-2.3 1.9-3.4 2-3.4-1.1-1.6-2.8-1.8-3.4-1.9-1.4-.1-2.8.9-3.5.9-.7 0-1.9-.8-3.1-.8-1.6 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.4-1-2.4-3.8zM14.2 5.4c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"></path></svg></span><h3>macOS</h3></div>
+<span class="tag tag-ok">Arşiv</span>
+<div><div class="dl-kind">Arşiv (.zip)</div><div class="dl-meta">macOS 13 veya daha yeni · Apple Silicon (arm64)</div></div>
+<p class="dl-note">Zip'i açın, Uygulamalar'a taşıyın ve çalıştırın. Apple tarafından imzalanmamıştır; bu yüzden Gizlilik ve Güvenlik altında bir kez izin verin.</p>
+<a class="btn btn-secondary" href="https://github.com/imndllnuri/students-attendance-app/releases/latest">En son sürümü aç</a>
+</article>
+<article class="card dl-card dl-fallback">
+<div class="dl-os"><span><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewbox="0 0 24 24"><path d="M9 3.5c0 2.5-2 3.6-2 6.5 0 2.4-2.5 5-2.5 7.5C4.5 20 7.5 21 12 21s7.5-1 7.5-3.5c0-2.5-2.5-5.1-2.5-7.5 0-2.9-2-4-2-6.5C15 2.1 13.7 1.5 12 1.5S9 2.1 9 3.5Z"></path><circle cx="10.2" cy="7.4" fill="currentColor" r=".9"></circle><circle cx="13.8" cy="7.4" fill="currentColor" r=".9"></circle></svg></span><h3>Debian / Ubuntu</h3></div>
+<span class="tag tag-accent">Yükleyici</span>
+<div><div class="dl-kind">Paket (.deb)</div><div class="dl-meta">Ubuntu 24.04 veya daha yeni · 64 bit</div></div>
+<p class="dl-note">Bir menü girişi, bir simge ve bir tapin komutu ekler.</p>
+<a class="btn btn-secondary" href="https://github.com/imndllnuri/students-attendance-app/releases/latest">En son sürümü aç</a>
+</article>
+</div>
+<p class="note dl-fallback-note" id="download-fallback-note" style="text-align:center">Bu düğmeler GitHub'daki en yeni sürümü açar; sisteminiz için dosyayı orada seçersiniz. JavaScript açıkken bu bölüm her dosyayı boyutu ve sağlama toplamıyla birlikte listeler.</p>
+<p class="note" hidden="" id="download-sums" style="text-align:center"></p>
+<div class="dl-status" hidden="" id="download-status"></div>
+<details class="dl-older" hidden="" id="older-releases">
+<summary>Yayımlanmış tüm sürümler</summary>
+<div class="table-wrap">
+<table id="older-table">
+<thead><tr><th>Sürüm</th><th>Yayın tarihi</th><th>Dosyalar</th><th>Notlar</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</details>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block tight shell" id="install">
+<div class="section-head">
+<span class="kicker">Kurulum</span>
+<h2>İlk çalıştırma, adım adım</h2>
+<p>TapIn 3, TapIn 2'nin oluşturduğu veri klasörlerini açar; bu yüzden bir yükseltme sınıflarınızı korur. Sonrasında <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">kullanım kılavuzu</a> (İngilizce) her ekranı anlatır.</p>
+</div>
+<div class="grid grid-3">
+<article class="card os-card">
+<h3>Windows 10 / 11</h3>
+<ol class="steps">
+<li><strong>Kurulum dosyasını çalıştırın</strong><span>TapIn-x.y.z-setup.exe, 64 bit</span></li>
+<li><strong>Sihirbazda ilerleyin</strong><span>Kullanıcınız için kurulur: herkes için kurmayı seçmediğiniz sürece yönetici parolası gerekmez</span></li>
+<li><strong>Başlat menüsünden açın</strong><span>Diğer programlar gibi Ayarlar → Uygulamalar'dan kaldırın</span></li>
+</ol>
+<p class="note">Kurulum dosyası kod imzalı olmadığı için Windows SmartScreen ilk çalıştırmada uyarabilir. <em>Daha fazla bilgi → Yine de çalıştır</em>'ı seçin.</p>
+</article>
+<article class="card os-card">
+<h3>macOS 13+ (Apple Silicon)</h3>
+<ol class="steps">
+<li><strong>İndirdiğinizi açın</strong><span>İçinde TapIn.app vardır</span></li>
+<li><strong>Uygulamalar'a taşıyın</strong><span>Sonra açın</span></li>
+<li><strong>Bir kez izin verin</strong><span>Uygulama Apple tarafından imzalanmamıştır; bu yüzden macOS ilk açılışı engeller: Sistem Ayarları → Gizlilik ve Güvenlik'i açın ve <em>Yine de Aç</em>'ı seçin</span></li>
+</ol>
+<p class="note">Bu sürüm, macOS 13 veya daha yenisini çalıştıran, Apple çipli (M1 veya daha yeni, arm64) Mac'ler içindir. Henüz Intel sürümü yok.</p>
+</article>
+<article class="card os-card">
+<h3>Ubuntu 24.04+</h3>
+<ol class="steps">
+<li><strong>Paketi kurun</strong><span>Çift tıklayın ya da aşağıdaki komutu kullanın</span></li>
+<li><strong>TapIn'i uygulamalar menünüzde bulun</strong><span>Ya da bir terminalde <span class="mono">tapin</span> çalıştırın</span></li>
+<li><strong>İstediğiniz zaman kaldırın</strong><span><span class="mono">sudo apt remove tapin</span></span></li>
+</ol>
+<pre class="code" tabindex="0"><code>sudo apt install ./tapin_*_amd64.deb</code></pre>
+<p class="note">Yalnızca 64 bit. Ubuntu 24.04 ve sonrasında derlenmiş ve denenmiştir; orada paket ayrıca küçük bir güvenlik profili kurar ve böylece TapIn'in korumalı alanı başlayabilir.</p>
+</article>
+</div>
+<details class="dl-older verify" id="verify">
+<summary>İndirdiğinizi doğrulayın (SHA-256)</summary>
+<p>Yukarıdaki her indirme bir sağlama toplamı gösterir: dosyanın bir parmak izi. İndirdikten sonra kendi kopyanızın sağlama toplamını hesaplayın ve karşılaştırın. İkisi aynı olmalıdır; değilse yeniden indirin.</p>
+<pre class="code" tabindex="0"><code><span class="dim">Windows (PowerShell)</span>  Get-FileHash .\TapIn-*-setup.exe -Algorithm SHA256
+<span class="dim">macOS</span>                 shasum -a 256 TapIn-*-macos.zip
+<span class="dim">Linux</span>                 sha256sum tapin_*_amd64.deb</code></pre>
+<p class="note">Her sürümün ayrıca hepsini içeren bir <span class="mono">SHA256SUMS.txt</span> dosyası vardır; <a href="https://github.com/imndllnuri/students-attendance-app/releases/latest">sürüm sayfasında</a>.</p>
+</details>
+</section>
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="faq">
+<div class="section-head">
+<span class="kicker">SSS</span>
+<h2>Sık sorulan sorular</h2>
+</div>
+<div class="faq">
+<details class="qa"><summary>TapIn'i kullanmak için RFID okuyucuya ihtiyacım var mı?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Hayır. Her sınıf manuel girişle alınabilir; bu, tam olarak desteklenen bir çalışma yoludur. Okuyucu yalnızca kalabalık bir sınıfı hızlandırır; donanım olmadan hiçbir şey gizlenmez ya da devre dışı kalmaz.</p></details>
+<details class="qa"><summary>Verilerim nerede tutuluyor?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>TapIn ilk başladığında seçtiğiniz veri klasöründe ve başka hiçbir yerde. Her sınıf, ayarları için bir <span class="mono">.json</span> dosyası ve öğrenci listesi ile yoklaması için bir <span class="mono">.xlsx</span> dosyasıdır. Bu <span class="mono">.xlsx</span> dosyalarını istediğiniz zaman Excel'de açabilirsiniz.</p></details>
+<details class="qa"><summary>Verilerimi nasıl yedeklerim?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Veri klasörünü kopyalayın. Yedeğin tamamı budur: başka hiçbir yerde veri tabanı ya da gizli durum yoktur. TapIn ayrıca her açıldığında ve bir şey değişmişse klasörün <span class="mono">.backups</span> klasörüne kendi zip anlık görüntüsünü alır ve en yeni beşini saklar.</p></details>
+<details class="qa"><summary>Veri klasörümü başka bir bilgisayara taşıyabilir miyim?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Evet. Klasörü karşıya kopyalayın ve Ayarlar → Veriler'den TapIn'e gösterin. Lisans anahtarı, etkinleştirme ve makineye bağlama yoktur. Ancak tek bir veri klasörünü eşitlenen bir bulut klasöründe tutup iki bilgisayarda aynı anda açmayın.</p></details>
+<details class="qa"><summary>TapIn neden veri klasörümün başka bir bilgisayarda açık olduğunu söylüyor?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Veri klasörü eşitlenen bir klasörde (OneDrive, Dropbox, iCloud) ve başka bir bilgisayar onu hâlâ açık tutuyor. İki bilgisayarın tek klasöre kaydetmesi, birbirlerinin yoklamasını uyarısız ezerdi; bu yüzden TapIn reddeder. Önce diğer bilgisayarda TapIn'i kapatın. O bilgisayar kapalıysa ya da çöktüyse veri klasöründeki <span class="mono">.lock</span> dosyasını silin.</p></details>
+<details class="qa"><summary>Bir öğrencinin kartı reddedildi. Neden?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Genellikle kart başkasına aittir. TapIn reddederken gerçek sahibin adını söyler; bu çoğunlukla bir arkadaşının kartını veren bir öğrenci çıkar. Bir kart, tüm sınıflarda yalnızca tek bir öğrenciye ait olabilir.</p></details>
+<details class="qa"><summary>Bir öğrenci iki sınıfımda da var. Kartını iki kez mi kaydettirir?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Hayır. Bir kartı bir kez kaydetmek onu öğrenciye göründüğü her yerde bağlar; bu yüzden kayıtlı olduğu her sınıfta çalışır. Daha sonra yeni bir sınıfa katılırsa mevcut kartı ilk okutuşunda tanınır.</p></details>
+<details class="qa"><summary>Bir öğrenci kartını kaybederse ne olur?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Sınıfı açın, öğrenciyi açın ve <em>Kartı kaldır</em>'ı seçin. Kart tanınmaz olur ve öğrenci bir sonraki okutuşunda yeni bir kart kaydedilebilir.</p></details>
+<details class="qa"><summary>TapIn yoklamayı kaydedemezse ne olur?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Kayıtları veri klasörünün içinde sıraya alır ve bir sonraki açılışta otomatik olarak yeniden dener; böylece çalışma kitabı Excel'de açıksa ya da disk kısa süre kullanılamıyorsa hiçbir şey kaybolmaz. Sıradaki bir grup geçtiğinde Panel size söyler.</p></details>
+<details class="qa"><summary>Excel dosyalarını doğrudan düzenleyebilir miyim?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Onları istediğiniz zaman açıp okuyabilirsiniz. TapIn çalışırken düzenlemekten kaçının; çünkü değişiklikleriniz bir sonraki kaydedişinde ezilebilir ve Excel'de açık kalan bir dosya TapIn'in kaydetmesini engeller; TapIn bunu size söyler.</p></details>
+<details class="qa"><summary>Bluetooth okuyucu benim bilgisayarımda çalışır mı?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Bluetooth, TapIn 3'te yenidir. Gerçek bir okuyucuyla Linux'ta denendi; orada eşleşti, her seferinde yeniden bağlandı ve gerçek kart okutmalarını kaydetti. Windows ya da macOS'ta henüz denenmedi; emin olmak istiyorsanız USB kablosunu ya da okuyucunun kendi Wi-Fi'ını kullanın. Sisteminiz için adımlar Ayarlar → Kart okuyucu → Bluetooth altındadır.</p></details>
+<details class="qa"><summary>Wi-Fi okuyucu internet ister mi?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Hayır, kurumunuzun ağına da bağlanmaz. Okuyucu, bilgisayarınızın doğrudan katıldığı kendi küçük ağını kurar. Bu da tarama sırasında bilgisayarın internetinin olmadığı anlamına gelir.</p></details>
+<details class="qa"><summary>Parola ya da giriş var mı?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Hayır. TapIn'in hesabı yoktur ve bilgisayarı kullanan kişiye güvenir; çünkü işletim sisteminiz buna zaten karar vermiştir. Makine ortaksa veri klasörünü, başka herhangi bir öğrenci kaydı klasörünü koruduğunuz gibi koruyun ve <em>Hareketsizlikte kapat</em> ayarını düşünün.</p></details>
+<details class="qa"><summary>Öğrenci listesi dosyam nasıl görünmeli?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>TapIn üç tür tablo okur (<span class="mono">.xlsx</span>, <span class="mono">.xls</span>, <span class="mono">.ods</span> ya da <span class="mono">.csv</span>) ve başlıkları satırları sayarak değil, adlarıyla bulur. Biri üniversitenizin öğrenci listesi raporudur, üniversitenin verdiği haliyle. Diğer ikisi basittir: ilk iki sütunda <em>Student Number</em> ve <em>Name Surname</em>, ya da ilk üç sütunda <em>Student Number</em>, <em>Name</em> ve <em>Surname</em>. Başlıkları tam olarak böyle yazın. Hazır bir dosya bir tık uzakta: <a download="" href="../samples/student-list-sample.xlsx">student-list-sample.xlsx</a> ya da <a download="" href="../samples/student-list-sample.csv">student-list-sample.csv</a>. TapIn aynı örneği yükleme ekranından da kaydedebilir. Sınıfların tamamını içe aktarmak için <a download="" href="../samples/class-list-sample.xlsx">class-list-sample.xlsx</a> ya da <a download="" href="../samples/class-list-sample.csv">class-list-sample.csv</a> dosyalarına bakın.</p></details>
+<details class="qa"><summary>Cumartesi ya da Pazar günü yoklama alabilir miyim?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Evet. Bir sınıfın ders programı Pazartesi'den Pazar'a kadar yedi günün herhangi birini içerebilir ve bir sınıf aynı gün birden fazla kez toplanabilir.</p></details>
+<details class="qa"><summary>Dili değiştirdikten sonra TapIn'i yeniden başlatmam gerekir mi?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Hayır. Ayarlar'da İngilizce ile Türkçe arasında geçin; her ekran, tarih ve gün adı bir anda değişir.</p></details>
+<details class="qa"><summary>Windows, macOS ve Ubuntu'nun hangi sürümlerine ihtiyacım var?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Windows 10 veya 11, 64 bit. Apple çipli (M1 veya daha yeni) bir Mac'te macOS 13 veya daha yenisi. Ubuntu 24.04 veya daha yenisi, 64 bit. Yukarıdaki indirmeler de aynısını söyler.</p></details>
+<details class="qa"><summary>TapIn KVKK ve GDPR'ye uyar mı?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>TapIn öğrenci verilerini kendi bilgisayarınızda tutar ve hiçbir yere göndermez; bu da onları korumayı kolaylaştırır. Ama yasa, kayıtları tutan kişiye uygulanır ve bu sizsiniz: Türkiye'de KVKK ve Avrupa Birliği'nde GDPR, yoklama kayıtlarını kişisel veri sayar. Veri klasörünü yalnızca sizin erişebileceğiniz bir yerde tutun, öğrencilerinize neyi kaydettiğinizi söyleyin ve üniversitenizin kurallarına uyun. Bu hukuki tavsiye değildir; neyin geçerli olduğunu üniversitenizin kişisel veri koruma birimi söyleyebilir.</p></details>
+<details class="qa"><summary>Ne kadar tutar?<svg aria-hidden="true" class="i" focusable="false"><use href="#i-chevron-down"></use></svg></summary><p>Hiçbir şey. TapIn'i indirmek ve kullanmak ücretsizdir: abonelik yok, hesap yok, lisans anahtarı yok.</p></details>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="shell">
+<div class="foot-grid">
+<div>
+<a class="brand" href="#top"><img alt="" height="34" src="../images/app-icon-96.png" width="34"/>TapIn</a>
+<div><strong>Nuri İmrendi</strong> tarafından Abdullah Gül Üniversitesi dersleri için yapıldı.<br/><a href="mailto:ni.imrendi@gmail.com">ni.imrendi@gmail.com</a></div>
+</div>
+<nav aria-label="Bağlantılar" class="foot-links"><a href="#download">İndir</a> <a href="#privacy">Gizlilik</a> <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">Kullanım kılavuzu</a> <a href="https://github.com/imndllnuri/students-attendance-app/releases">Değişiklikler ve sürümler</a> <a href="#build">Okuyucuyu yapın</a> <a href="../LICENSE.txt">Lisans (MIT)</a> <a href="https://github.com/imndllnuri/students-attendance-app/issues">Sorun bildirin</a></nav>
+</div>
+<p class="legal">TapIn, MIT lisansı altında özgür yazılımdır, © 2026 Nuri İmrendi. Resimler demo verilerini gösterir: her sınıf, öğrenci ve numara uydurmadır. DM Sans ve DM Mono ile dizilmiştir (SIL Open Font License); simgeler Lucide'dendir (ISC lisansı). Bu sayfa, GitHub'dan istediği indirme listesi dışında başka sitelerden hiçbir şey yüklemez. Bkz. <a href="../THIRD-PARTY.txt">THIRD-PARTY.txt</a>.</p>
+</div>
+</footer>
+<script src="../site.js"></script>
+<script>window.TAPIN_I18N = {"locale": "tr", "download": "İndir ", "released": "Yayın tarihi: ", "latest": " — en son", "prerelease": "ön sürüm", "preTag": "Ön sürüm", "installer": "Yükleyici", "archive": "Arşiv", "windowsSub": "Windows 10 veya 11, 64 bit", "windowsKind": "Yükleyici (.exe)", "windowsNote": "Kullanıcınız için kurulur; yönetici parolası gerekmez.", "macosSub": "macOS 13 veya daha yeni · Apple Silicon (arm64)", "macosKind": "Arşiv (.zip)", "macosNote": "Zip'i açın, Uygulamalar'a taşıyın ve çalıştırın. Apple tarafından imzalanmamıştır; bu yüzden Gizlilik ve Güvenlik altında bir kez izin verin.", "debianName": "Debian / Ubuntu", "debianSub": "Ubuntu 24.04 veya daha yeni · 64 bit", "debianKind": "Paket (.deb)", "debianNote": "Bir menü girişi, bir simge ve bir tapin komutu ekler.", "linuxName": "Diğer Linux", "linuxSub": "Herhangi bir 64 bit dağıtım", "linuxKind": "Arşiv (.zip)", "linuxNote": "Açın ve çalıştırın. Yükleyici ve menü girişi yok.", "copy": "Kopyala", "copied": "Kopyalandı", "copyLabel": "{name} indirmesinin SHA-256 sağlama toplamını kopyala", "sumsBefore": "{tag} için tüm sağlama toplamları tek dosyada: ", "howToCheck": "Bir indirme nasıl doğrulanır", "noFiles": "{tag} sürümüne eklenmiş indirilebilir dosya yok.", "seeOn": "Şurada görün: ", "noRelease": "Henüz bir sürüm yayımlanmadı.", "noReleaseBody": "İlk sürüm yayımlandığında yapılar buraya kendiliğinden gelir.", "testChannel": "Test kanalı", "testChannelNote": " Ön sürüm yapıları burada listelenir. Kimseye duyurulmazlar ve TapIn onları asla güncelleme olarak sunmaz.", "errorTitle": "Dosyaları listelemek için GitHub'a ulaşılamadı.", "errorBefore": "Yukarıdaki düğmeler, her dosyanın listelendiği en yeni sürümü açar. Ayrıca şunu da kullanabilirsiniz: ", "releasesPage": "sürümler sayfası"};</script><script src="../downloads.js"></script>
+</body>
+</html>

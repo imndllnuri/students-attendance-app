@@ -1502,3 +1502,73 @@ th {
     transform: none;
   }
 }
+
+/* ---- added with the Turkish page, the checksums and the fallback downloads ---- */
+
+/* The way to the other language: a small pill beside the theme switch. */
+.lang-link {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-full);
+  background: var(--surface-glass);
+  color: var(--text-1);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.lang-link:hover {
+  border-color: var(--accent);
+}
+
+/* The menu button does nothing without the script, so it is not shown. */
+html:not(.js) .nav-toggle {
+  display: none;
+}
+
+/* A download's checksum, and the button that copies it. */
+.dl-hash {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  color: var(--text-3);
+  font-size: 13px;
+}
+.dl-hash code {
+  color: var(--text-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.dl-copy {
+  padding: 2px 10px;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.dl-copy:hover {
+  border-color: var(--accent);
+  color: var(--text-1);
+}
+
+/* The demo video: a framed window, the same as the screenshots. */
+.demo-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--surface-sunken);
+}
+.demo-caption {
+  margin-top: var(--space-4);
+  text-align: center;
+  color: var(--text-3);
+  font-size: 14px;
+}

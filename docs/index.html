@@ -10,6 +10,10 @@
 <meta name="theme-color" content="#f3f5fb" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://imndllnuri.github.io/students-attendance-app/">
+<link rel="alternate" hreflang="tr" href="https://imndllnuri.github.io/students-attendance-app/tr/">
+<link rel="alternate" hreflang="x-default" href="https://imndllnuri.github.io/students-attendance-app/">
+<link rel="canonical" href="https://imndllnuri.github.io/students-attendance-app/">
 
 <meta property="og:title" content="TapIn — Offline RFID attendance for classrooms">
 <meta property="og:description" content="Take attendance from RFID cards in seconds. Everything stays in a folder on your own computer.">
@@ -51,6 +55,7 @@
       <a href="#faq">FAQ</a>
     </nav>
     <div class="header-tools">
+      <a class="lang-link" href="tr/" hreflang="tr" lang="tr" title="Türkçe">Türkçe</a>
       <div class="segmented theme-switch" role="radiogroup" aria-label="Theme" id="theme-switch" hidden>
         <button type="button" class="segment" role="radio" aria-checked="false" data-theme-choice="dark" aria-label="Dark" title="Dark"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg></button>
         <button type="button" class="segment" role="radio" aria-checked="false" data-theme-choice="light" aria-label="Light" title="Light"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg></button>
@@ -78,8 +83,8 @@
   </div>
   <div class="chip-row" aria-label="Where it runs">
     <span class="pill">Windows 10/11</span>
-    <span class="pill">macOS (Apple Silicon)</span>
-    <span class="pill">Debian / Ubuntu</span>
+    <span class="pill">macOS 13+ (Apple Silicon)</span>
+    <span class="pill">Ubuntu 24.04+</span>
     <span class="pill pill-accent">English &amp; Türkçe</span>
     <span class="pill pill-accent">Light &amp; dark</span>
   </div>
@@ -107,6 +112,32 @@
       <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-circle-check"/></svg><span><strong>Settings in one place:</strong> language, theme, interface size, the card reader, backups and updates.</span></li>
     </ul>
   </div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="demo" aria-labelledby="demo-title">
+  <div class="section-head">
+    <span class="kicker">See it work</span>
+    <h2 id="demo-title">A class, a live session and the statistics, in 40 seconds</h2>
+    <p>A silent screen recording of the running app on made-up demo classes and students. The circle shows where each click lands.</p>
+  </div>
+  <div class="window">
+    <video class="demo-video" controls muted loop playsinline preload="none" poster="media/demo-en-poster.webp" width="1280" height="800" aria-describedby="demo-notes">
+      <source src="media/demo-en.webm" type="video/webm">
+      <source src="media/demo-en.mp4" type="video/mp4">
+      <p>Your browser cannot play this video. <a href="media/demo-en.mp4">Download it (MP4, under 1 MB)</a>.</p>
+    </video>
+  </div>
+  <details class="dl-older" id="demo-notes">
+    <summary>What happens in the video</summary>
+    <ol>
+      <li>The dashboard opens on what needs attention: today's classes and the students at risk.</li>
+      <li>Classes lists every class. One click opens Introduction to Programming, with a row for each student and a column for each session.</li>
+      <li>Take attendance: set how late is late, press Start scanning, and five students tap their cards. The reader's screen would name each one; here the roster fills as they come. The last one is marked Late. Submit saves all five records.</li>
+      <li>Statistics: the heatmap of a class by weekday and time, then every class side by side.</li>
+      <li>Settings: the theme changes from dark to light, and the whole interface follows.</li>
+    </ol>
+  </details>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
@@ -151,7 +182,7 @@
     <article class="card feature">
       <span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-upload"/></svg></span>
       <h3>Bring your lists in</h3>
-      <p>Upload your university's student list report, a TapIn roster export, or a plain number + name + surname list (<span class="mono">.xlsx</span>, <span class="mono">.xls</span>, <span class="mono">.ods</span>, <span class="mono">.csv</span>). Import whole classes from a spreadsheet too.</p>
+      <p>Upload your university's student list report, or a simple sheet headed <em>Student Number</em> and <em>Name Surname</em> (<span class="mono">.xlsx</span>, <span class="mono">.xls</span>, <span class="mono">.ods</span>, <span class="mono">.csv</span>). Not sure how it should look? <a href="samples/student-list-sample.xlsx" download>Download a sample</a>. Import whole classes from a spreadsheet too.</p>
     </article>
     <article class="card feature">
       <span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-file-down"/></svg></span>
@@ -236,7 +267,7 @@
         <h3>Add a class</h3>
         <p>A four-step editor: <strong>Details</strong> (code, name, term, attendance policy, late limit, weeks and hours), <strong>Schedule</strong> (the days it meets and the times), <strong>Students</strong>, and <strong>Colour &amp; review</strong>.</p>
         <ul>
-          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-upload"/></svg><span>Add students by hand, upload your university's student list report, or copy them from another class.</span></li>
+          <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-upload"/></svg><span>Add students by hand, upload your university's student list report, or copy them from another class. The upload screen can save a sample file with the headings a simple list needs.</span></li>
           <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg><span>Duplicate a class for next term, pin the ones you use most, archive the ones you don't.</span></li>
         </ul>
       </div>
@@ -336,7 +367,7 @@
       <pre class="code" tabindex="0"><code><span class="dim">board → app</span>  04A3B2C1
 <span class="dim">app → board</span>  OK:20260001|Ayşe Çelik
 <span class="dim">app → board</span>  INVALID</code></pre>
-      <p>On the reader, a green light means the card was recorded; a red light and a beep mean it was refused.</p>
+      <p>On the reader, a green light means the card was recorded; a red light and a beep mean it was refused. Its 16×2 screen shows the student's number and name (without accents: the screen has no Turkish letters) or a short message such as <em>Invalid card</em>.</p>
       <ul class="options">
         <li><span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-usb"/></svg></span><div><b>USB cable</b><span>Nothing to set up. Plug the reader in and TapIn finds the port when you open Take attendance.</span></div></li>
         <li><span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-wifi"/></svg></span><div><b>Its own Wi-Fi</b><span>The reader hosts a small network your computer joins. It does not touch your institution's network, which also means no internet on this computer while scanning.</span></div></li>
@@ -351,6 +382,37 @@
       </div>
     </article>
   </div>
+  <p class="note" style="text-align:center">Want to build a reader of your own? See <a href="#build">Build the reader</a>.</p>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section class="block shell" id="build">
+  <div class="section-head">
+    <span class="kicker">Build the reader</span>
+    <h2>Parts, wiring and firmware</h2>
+    <p>The reader is an ESP32 board with an RC522 card module, a 16×2 screen, four lights and a buzzer. Here are the three sketches, one for each way of connecting, and a circuit you can run in your browser before you buy anything.</p>
+  </div>
+  <div class="grid grid-2">
+    <article class="card">
+      <h3>The three sketches</h3>
+      <p>The wiring is the same for all three, so one board can run any of them. They are built with the Arduino-ESP32 core 3.3.12 and the <span class="mono">MFRC522</span> and <span class="mono">LiquidCrystal_I2C</span> libraries, and released under the MIT licence.</p>
+      <ul class="options">
+        <li><span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-usb"/></svg></span><div><b><a href="reader/rc522_serial_reader.ino" download>rc522_serial_reader.ino</a></b><span>USB cable</span></div></li>
+        <li><span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-wifi"/></svg></span><div><b><a href="reader/rc522_wifi_reader.ino" download>rc522_wifi_reader.ino</a></b><span>Its own Wi-Fi network, <span class="mono">TapIn-Reader</span></span></div></li>
+        <li><span class="icon-tile tone-late"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-bluetooth"/></svg></span><div><b><a href="reader/rc522_bluetooth_reader.ino" download>rc522_bluetooth_reader.ino</a></b><span>Bluetooth Classic. New, and tried on Linux only</span></div></li>
+      </ul>
+      <p class="note">The parts list, the pin-by-pin wiring tables, the lights and what they mean, flashing steps and a troubleshooting table are in the <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md#building-the-reader">user guide</a>.</p>
+    </article>
+    <article class="card">
+      <h3>Try it without a board</h3>
+      <p><a href="https://wokwi.com/">Wokwi</a> is a free simulator that runs in your browser. It can run the USB sketch against a pretend ESP32, RC522 reader, screen and lights, and lets you pretend a card was tapped.</p>
+      <ol class="steps">
+        <li><strong>Start a project</strong><span>Open <a href="https://wokwi.com/projects/new/esp32">a new ESP32 project</a> on wokwi.com</span></li>
+        <li><strong>Replace its three files</strong><span><a href="reader/wokwi/diagram.json" download>diagram.json</a>, <a href="reader/wokwi/sketch.ino" download>sketch.ino</a> and <a href="reader/wokwi/libraries.txt" download>libraries.txt</a></span></li>
+        <li><strong>Press Play</strong><span>The screen says &ldquo;Ready to scan&rdquo;. The Wi-Fi and Bluetooth sketches are not meant for the simulator</span></li>
+      </ol>
+    </article>
+  </div>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
@@ -363,7 +425,7 @@
 
   <div class="settings-grid">
     <ul class="setting-list">
-      <li><span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-languages"/></svg></span><div><h3>Language</h3><p>English or Türkçe. Changes every screen at once.</p></div></li>
+      <li><span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-languages"/></svg></span><div><h3>Language</h3><p>English or Türkçe. Changes every screen at once, with no restart.</p></div></li>
       <li><span class="icon-tile tone-info"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-contrast"/></svg></span><div><h3>Theme</h3><p>Dark, Light, or System, which follows your computer's own setting and switches while TapIn is open.</p></div></li>
       <li><span class="icon-tile tone-ok"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-type"/></svg></span><div><h3>Interface size</h3><p>90 %, 100 %, 115 % or 130 %: text, buttons and lists grow or shrink together.</p></div></li>
       <li><span class="icon-tile"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-layers"/></svg></span><div><h3>Reduce transparency &amp; compact lists</h3><p>Solid panels instead of glass, if that reads better, and one line per class in Classes.</p></div></li>
@@ -410,7 +472,7 @@
     <article class="card privacy-card">
       <span class="pill pill-absent"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg> Worth being plain about</span>
       <h3>The files are not encrypted</h3>
-      <p>Anyone who can open the data folder can read every student's name, number and attendance, because the spreadsheets open directly in Excel by design. The data is private because the folder is. Keep it somewhere only you can reach, treat a backup zip the same way, and remember that your institution's rules (GDPR included) apply to how you keep it.</p>
+      <p>Anyone who can open the data folder can read every student's name, number and attendance, because the spreadsheets open directly in Excel by design. The data is private because the folder is. Keep it somewhere only you can reach, treat a backup zip the same way, and remember that the law and your institution's rules (KVKK in Turkey, GDPR in the European Union) apply to how you keep it. This is not legal advice: if you are unsure, ask your university's data protection office.</p>
     </article>
   </div>
   <p class="note" style="text-align:center">Removing TapIn never deletes your records: your data folder stays exactly where you put it.</p>
@@ -424,15 +486,38 @@
     <p>Free, with no account and no licence key. Pick your system below: the downloads come straight from the project's releases page, so the newest version is always the one shown.</p>
   </div>
 
-  <div class="dl-bar">
+  <div class="dl-bar" hidden>
     <label for="version-select">Version</label>
     <select id="version-select" aria-label="Choose a version"></select>
     <span id="release-date" class="dl-meta"></span>
   </div>
 
-  <div class="grid grid-3" id="download-cards"></div>
+  <div class="grid grid-3" id="download-cards">
+    <article class="card dl-card dl-fallback">
+      <div class="dl-os"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.2 4.5v6.9H3zM11.4 4.3 21 3v8.4h-9.6zM3 12.6h7.2v6.9L3 18.5zM11.4 12.6H21V21l-9.6-1.3z"/></svg></span><h3>Windows</h3></div>
+      <span class="tag tag-accent">Installer</span>
+      <div><div class="dl-kind">Installer (.exe)</div><div class="dl-meta">Windows 10 or 11, 64-bit</div></div>
+      <p class="dl-note">Installs for your user, with no administrator password needed.</p>
+      <a class="btn btn-secondary" href="https://github.com/imndllnuri/students-attendance-app/releases/latest">Open the latest release</a>
+    </article>
+    <article class="card dl-card dl-fallback">
+      <div class="dl-os"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.7c0-2.3 1.9-3.4 2-3.4-1.1-1.6-2.8-1.8-3.4-1.9-1.4-.1-2.8.9-3.5.9-.7 0-1.9-.8-3.1-.8-1.6 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.4-1-2.4-3.8zM14.2 5.4c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg></span><h3>macOS</h3></div>
+      <span class="tag tag-ok">Archive</span>
+      <div><div class="dl-kind">Archive (.zip)</div><div class="dl-meta">macOS 13 or newer · Apple Silicon (arm64)</div></div>
+      <p class="dl-note">Unzip, move it to Applications and open it. It is not signed by Apple, so allow it once under Privacy &amp; Security.</p>
+      <a class="btn btn-secondary" href="https://github.com/imndllnuri/students-attendance-app/releases/latest">Open the latest release</a>
+    </article>
+    <article class="card dl-card dl-fallback">
+      <div class="dl-os"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5c0 2.5-2 3.6-2 6.5 0 2.4-2.5 5-2.5 7.5C4.5 20 7.5 21 12 21s7.5-1 7.5-3.5c0-2.5-2.5-5.1-2.5-7.5 0-2.9-2-4-2-6.5C15 2.1 13.7 1.5 12 1.5S9 2.1 9 3.5Z"/><circle cx="10.2" cy="7.4" r=".9" fill="currentColor"/><circle cx="13.8" cy="7.4" r=".9" fill="currentColor"/></svg></span><h3>Debian / Ubuntu</h3></div>
+      <span class="tag tag-accent">Installer</span>
+      <div><div class="dl-kind">Package (.deb)</div><div class="dl-meta">Ubuntu 24.04 or newer · 64-bit</div></div>
+      <p class="dl-note">Adds a menu entry, an icon and a tapin command.</p>
+      <a class="btn btn-secondary" href="https://github.com/imndllnuri/students-attendance-app/releases/latest">Open the latest release</a>
+    </article>
+  </div>
+  <p class="note dl-fallback-note" id="download-fallback-note" style="text-align:center">These buttons open the newest release on GitHub, where you choose the file for your system. With JavaScript on, this section lists each file instead, with its size and checksum.</p>
+  <p class="note" id="download-sums" style="text-align:center" hidden></p>
   <div class="dl-status" id="download-status" hidden></div>
-  <noscript><div class="dl-status"><p><strong>The list of downloads needs JavaScript.</strong></p><p style="margin-top:8px">Get them from the <a href="https://github.com/imndllnuri/students-attendance-app/releases">releases page</a> instead.</p></div></noscript>
 
   <details class="dl-older" id="older-releases" hidden>
     <summary>All released versions</summary>
@@ -465,26 +550,35 @@
     </article>
 
     <article class="card os-card">
-      <h3>macOS (Apple Silicon)</h3>
+      <h3>macOS 13+ (Apple Silicon)</h3>
       <ol class="steps">
         <li><strong>Unzip the download</strong><span>It contains TapIn.app</span></li>
         <li><strong>Move it to Applications</strong><span>Then open it</span></li>
         <li><strong>Allow it once</strong><span>The app is not signed by Apple, so macOS blocks the first launch: open System Settings → Privacy &amp; Security and choose <em>Open Anyway</em></span></li>
       </ol>
-      <p class="note">This build is for Macs with an Apple chip (M1 or newer). There is no Intel build yet.</p>
+      <p class="note">This build is for Macs with an Apple chip (M1 or newer, arm64) running macOS 13 or newer. There is no Intel build yet.</p>
     </article>
 
     <article class="card os-card">
-      <h3>Debian / Ubuntu</h3>
+      <h3>Ubuntu 24.04+</h3>
       <ol class="steps">
         <li><strong>Install the package</strong><span>Double-click it, or use the command below</span></li>
         <li><strong>Find TapIn in your applications menu</strong><span>Or run <span class="mono">tapin</span> in a terminal</span></li>
         <li><strong>Remove it any time</strong><span><span class="mono">sudo apt remove tapin</span></span></li>
       </ol>
       <pre class="code" tabindex="0"><code>sudo apt install ./tapin_*_amd64.deb</code></pre>
-      <p class="note">64-bit only. On Ubuntu 24.04 and later the package also installs a small security profile, so TapIn's sandbox can start.</p>
+      <p class="note">64-bit only. Built and tried on Ubuntu 24.04 and later, where the package also installs a small security profile so TapIn's sandbox can start.</p>
     </article>
   </div>
+
+  <details class="dl-older verify" id="verify">
+    <summary>Check your download (SHA-256)</summary>
+    <p>Each download above shows a checksum: a fingerprint of the file. After you download, work out the checksum of your copy and compare. The two must be identical; if not, download again.</p>
+    <pre class="code" tabindex="0"><code><span class="dim">Windows (PowerShell)</span>  Get-FileHash .\TapIn-*-setup.exe -Algorithm SHA256
+<span class="dim">macOS</span>                 shasum -a 256 TapIn-*-macos.zip
+<span class="dim">Linux</span>                 sha256sum tapin_*_amd64.deb</code></pre>
+    <p class="note">Every release also has a <span class="mono">SHA256SUMS.txt</span> file with all of them, on its <a href="https://github.com/imndllnuri/students-attendance-app/releases/latest">release page</a>.</p>
+  </details>
 </section>
 
 <!-- ------------------------------------------------------------------ -->
@@ -508,6 +602,11 @@
     <details class="qa"><summary>Does the Bluetooth reader work on my computer?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Bluetooth is new in TapIn 3. It has been tried with a real reader on Linux, where it paired, reconnected every time and recorded real card taps. It has not been tried yet on Windows or macOS, so use the USB cable or the reader's own Wi-Fi if you need to be sure. The steps for your system are in Settings → Card reader → Bluetooth.</p></details>
     <details class="qa"><summary>Does the Wi-Fi reader need internet?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No, and it does not connect to your institution's network either. The reader hosts its own small network that your computer joins directly. That does mean the computer has no internet while scanning.</p></details>
     <details class="qa"><summary>Is there a password or login?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No. TapIn has no accounts and trusts whoever is using the computer, because your operating system already decided that. If the machine is shared, protect the data folder the way you would protect any other folder of student records, and consider the <em>Close after inactivity</em> setting.</p></details>
+    <details class="qa"><summary>What should my student list file look like?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>TapIn reads three kinds of sheet (<span class="mono">.xlsx</span>, <span class="mono">.xls</span>, <span class="mono">.ods</span> or <span class="mono">.csv</span>), and finds the headings by their labels, not by counting rows. One is your university's student list report, exactly as the university gives it. The other two are simple: <em>Student Number</em> and <em>Name Surname</em> in the first two columns, or <em>Student Number</em>, <em>Name</em> and <em>Surname</em> in the first three. Write the headings exactly like that. A ready-made file is one click away: <a href="samples/student-list-sample.xlsx" download>student-list-sample.xlsx</a> or <a href="samples/student-list-sample.csv" download>student-list-sample.csv</a>. TapIn can also save the same sample from the upload screen. For importing whole classes, see <a href="samples/class-list-sample.xlsx" download>class-list-sample.xlsx</a> or <a href="samples/class-list-sample.csv" download>class-list-sample.csv</a>.</p></details>
+    <details class="qa"><summary>Can I take attendance on a Saturday or Sunday?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Yes. A class's schedule can have any of the seven days, from Monday to Sunday, and a class can meet more than once on the same day.</p></details>
+    <details class="qa"><summary>Do I have to restart TapIn after changing the language?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>No. Switch between English and Türkçe in Settings and every screen, date and weekday changes at once.</p></details>
+    <details class="qa"><summary>Which versions of Windows, macOS and Ubuntu do I need?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Windows 10 or 11, 64-bit. macOS 13 or newer on a Mac with an Apple chip (M1 or newer). Ubuntu 24.04 or newer, 64-bit. The downloads above say the same.</p></details>
+    <details class="qa"><summary>Does TapIn follow KVKK and GDPR?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>TapIn keeps student data on your own computer and sends it nowhere, which makes it easy to keep. But the law applies to the person who keeps the records, and that is you: KVKK in Turkey and GDPR in the European Union both treat attendance records as personal data. Keep the data folder where only you can reach it, tell your students what you record, and follow your university's rules. This is not legal advice; your university's data protection office can tell you what applies.</p></details>
     <details class="qa"><summary>What does it cost?<svg class="i" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg></summary><p>Nothing. TapIn is free to download and use: no subscription, no account and no licence key.</p></details>
   </div>
 </section>
@@ -519,18 +618,20 @@
     <div class="foot-grid">
       <div>
         <a class="brand" href="#top"><img src="images/app-icon-96.png" width="34" height="34" alt="">TapIn</a>
-        <div>Made for Abdullah Gül University classes.</div>
+        <div>Made by <strong>Nuri İmrendi</strong> for Abdullah Gül University classes.<br><a href="mailto:ni.imrendi@gmail.com">ni.imrendi@gmail.com</a></div>
       </div>
       <nav class="foot-links" aria-label="Links">
         <a href="#download">Download</a>
         <a href="#privacy">Privacy</a>
         <a href="https://github.com/imndllnuri/students-attendance-app/blob/main/USER_GUIDE.md">User guide</a>
-        <a href="https://github.com/imndllnuri/students-attendance-app/releases">Releases</a>
+        <a href="https://github.com/imndllnuri/students-attendance-app/releases">Changelog &amp; releases</a>
+        <a href="#build">Build the reader</a>
+        <a href="LICENSE.txt">Licence (MIT)</a>
         <a href="https://github.com/imndllnuri/students-attendance-app/issues">Report a problem</a>
       </nav>
     </div>
     <p class="legal">
-      The pictures show demo data: every class, student and number is made up. Set in DM Sans and DM Mono
+      TapIn is free software under the MIT licence, &copy; 2026 Nuri İmrendi. The pictures show demo data: every class, student and number is made up. Set in DM Sans and DM Mono
       (SIL Open Font Licence); icons from Lucide (ISC licence). This page loads nothing from other sites,
       except the list of downloads, which it asks GitHub for. See <a href="THIRD-PARTY.txt">THIRD-PARTY.txt</a>.
     </p>
