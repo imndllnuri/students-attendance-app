@@ -73,25 +73,37 @@
     select(0, false);
   }
 
-  /* ── The demo video: starts by itself when it first scrolls into view, and stops when it leaves ──
-   * Not at all for anyone who asked their system for less motion; they press play. Without this file the
-   * video simply waits behind its poster picture, with its own controls. */
+  /* ── The demo video: plays by itself while it is on screen, and rests when it is not ──
+   * Not at all for anyone who asked their system for less motion; they press play. If a visitor pauses it
+   * themselves it stays paused. Without this file the video simply waits behind its poster picture, with
+   * its own controls. */
   var video = document.querySelector(".demo-video");
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (video && "IntersectionObserver" in window && !reduced) {
     video.preload = "metadata";
-    var started = false;
+    var mode = "idle";      /* idle (never started), playing, away (we paused it when it left), user (the visitor paused it) */
+    var ourPause = false;   /* the next "pause" event is ours, not the visitor's */
+    video.addEventListener("pause", function () {
+      if (ourPause) { ourPause = false; } else { mode = "user"; }
+    });
+    video.addEventListener("play", function () {
+      if (mode === "user") { mode = "playing"; } /* the visitor pressed play again */
+    });
     new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting && !started) {
-          started = true;
-          var played = video.play();
-          if (played && played.catch) played.catch(function () { /* blocked: the poster and the controls remain */ });
-        } else if (!entry.isIntersecting && !video.paused) {
+        if (entry.isIntersecting) {
+          if (mode === "idle" || mode === "away") {
+            mode = "playing";
+            var played = video.play();
+            if (played && played.catch) played.catch(function () { /* blocked: the poster and the controls remain */ });
+          }
+        } else if (!video.paused) {
+          ourPause = true;
+          mode = "away";
           video.pause();
         }
       });
-    }, { threshold: 0.6 }).observe(video);
+    }, { threshold: 0.5 }).observe(video);
   }
 
   /* ── Menu on small screens ─────────────────────────────────────── */
