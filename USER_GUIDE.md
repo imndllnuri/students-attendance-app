@@ -313,6 +313,7 @@ Notes is a free text box for the class: room changes, exam dates, anything to re
 | Export roster… | Saves the student numbers and names as an Excel file. |
 | Export attendance grid… | Saves the whole table, every student and every session, as an Excel file. |
 | Export certificate… | Makes a printable certificate of attendance: a one-page PDF for one student. |
+| Open web page | Opens the shared attendance page in your browser, at this class. See The shared attendance page. |
 | Refresh | Reads the class files again. |
 
 **Add student.** Type the number and name. Leave "Scan their card now" ticked and press Add student; TapIn then asks you to tap the card on the reader. The student is added first, so if the scan fails they stay on the roster without a card. You can add the card later with Edit card. A student number that is already on the roster is refused. If the card belongs to someone else, TapIn tells you who.
@@ -324,6 +325,17 @@ Notes is a free text box for the class: room changes, exam dates, anything to re
 **Copy roster.** Choose another class, including an archived one. TapIn shows how many students will be copied and skips anyone already on this roster.
 
 **Export certificate.** A printable certificate of attendance for one student, for proof-of-attendance requests. Choose a student and see a preview. The certificate says the student was enrolled in the class, how many sessions they attended out of the total with their rate, and whether they meet the attendance policy. Press Save PDF… to keep it.
+
+### The shared attendance page
+
+TapIn keeps one web page with the whole attendance record of every active class. You do not have to export anything: the page is made for you and kept up to date.
+
+- **Where it is.** `web/attendance.html` inside your data folder. Settings → Data → Web page shows the exact place, and Open page shows it in your browser. The class page's More menu has Open web page, which opens the page at that class.
+- **What it shows.** For each class: the attendance rate, the number of sessions, the policy, and a table with every student and every session (✓ present, L late, ✗ absent, – not recorded). The numbers are the same ones the class page shows. Students at risk are marked in words as well as colour. A box at the top finds a student by name or number.
+- **When it updates.** A moment after anything is saved: attendance submitted at the end of a session, a correction, a student added, removed or merged, a class edited, archived or deleted. Taps that are still waiting to be submitted are not in the page yet. Press Update now in Settings if you want to be sure. The page is in the language TapIn is set to.
+- **Archived classes** are left out.
+- **It is one file.** It has no links to anything outside itself, so you can open it by double-click, copy it, or send it by email. TapIn does not put it on the internet for you: it is a file on your computer. To give people a link, put the file on a web server you control.
+- **Be careful who gets it.** The page lists student names and numbers, and their absences. Share it only with people who may see them (see Privacy). It asks search engines not to list it, but that does not protect a page that is public.
 
 # Take attendance
 
@@ -520,6 +532,7 @@ Settings has five sections.
 | Data folder | Shows the open folder. Copy path copies it. Show in folder opens it. |
 | Switch data folder | Opens another folder of classes. Nothing is moved or deleted. |
 | Backups | When TapIn opens a folder whose files have changed, it saves a zip copy in the `.backups` folder inside it. The newest 5 are kept. Open backups folder shows them. |
+| Web page | Shows where the shared attendance page is and when it was last made. Open page shows it in your browser, Show in folder finds the file, and Update now makes it again. See The shared attendance page. |
 | Settings file | Export settings saves your language, interface size, class list and inactivity choices into a file, to load on another computer with Import settings. The file is called `app_settings.json`. |
 
 ### Card reader
@@ -549,6 +562,7 @@ your-data-folder/
 ├─ _class_order.json          your custom class order
 ├─ _session_templates.json    saved Take attendance defaults
 ├─ _offline_queue.json        attendance waiting to be saved
+├─ web/attendance.html        the shared attendance page, made from the data above
 ├─ .lock                      says the folder is open
 └─ .backups/                  zip copies, the newest 5
 ```
@@ -581,6 +595,7 @@ Small settings files hold your language, your chosen data folder, your reader se
 - TapIn stores each student's number and name, their attendance, and the ID of their card. It asks for nothing else: no email addresses, no photographs, no grades.
 - Attendance records are personal data about identifiable students. Your university probably has rules for handling them, and so may the law: KVKK in Turkey, GDPR in the European Union. TapIn keeps the data on your computer, and keeping it lawfully is up to you. This is not legal advice: if you are unsure, ask your university's data protection office.
 - To delete data, delete a class, or delete the data folder. There is no other copy.
+- The shared attendance page (`web/attendance.html`) is a copy of attendance and student names in a file you can send to anyone. It is rebuilt by TapIn after every change, but a copy you have sent or published stays as it was when you sent it.
 
 # Fixing problems
 
