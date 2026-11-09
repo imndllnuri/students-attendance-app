@@ -101,7 +101,7 @@ The top of the sidebar shows the name of the open folder. Click it for Show in f
 
 ### The sidebar and the top bar
 
-The sidebar has Dashboard, Classes, Statistics, History and Settings, and a Quit button. A button on it collapses it to icons.
+The sidebar has Dashboard, Classes, Statistics, History, Announcements and Settings, and a Quit button. A button on it collapses it to icons. A number beside Announcements says how many you have not read yet.
 
 The top bar has the search box and the bell for notifications.
 
@@ -132,9 +132,20 @@ The bell shows a number when there is news. It lists:
 - Students who have become at risk in a class.
 - Attendance that could not be saved at the time and has now been saved.
 - A student list file that TapIn could not read.
+- An announcement you have not read yet. Click it to open Announcements.
 - A new TapIn version, if you turned update checks on.
 
 The list lasts only while TapIn is open. Press Clear all to empty it.
+
+### Announcements
+
+Announcements are news from the developer: what is new in each version of TapIn, and how to use it. Open them with Announcements in the sidebar.
+
+- Each one shows the TapIn version that brought it, the date, a title and the details. The newest is at the top.
+- A number beside Announcements in the sidebar, and a note in the bell, tell you about the ones you have not read. Opening the page counts them all as read.
+- The cards you have not read are marked New while you are on the page.
+- At the bottom of every announcement is a box, **Need help or have feedback?** Its two buttons open a draft email to the developer. See Report a bug or send feedback.
+- Announcements come inside TapIn. TapIn does not go to the internet to fetch them, so you see a new one after you install the version that brings it.
 
 ### Leaving TapIn
 
@@ -541,11 +552,22 @@ Connection (USB cable, Wi-Fi or Bluetooth) and the set-up for each. See The card
 
 ### Updates
 
-**Check for new versions** is off. See Privacy. When it is on, press Check now at any time. If a newer TapIn exists, Open download page takes you to it. TapIn never downloads or installs anything by itself.
+**Check for new versions** is off. See Privacy. When it is on, TapIn asks once each time it starts, and a note appears in the bell if a newer version exists; click the note to open the download page. You can also press Check now at any time. If a newer TapIn exists, Open download page takes you to it. TapIn never downloads or installs anything by itself.
 
 ### Help & about
 
-Show the tour, User guide, FAQ, and Privacy & your data. It also shows your TapIn version.
+Show the tour, User guide, FAQ, and Privacy & your data. It also has Report a bug and Send feedback or ask for help (see the next part), and it shows your TapIn version.
+
+### Report a bug or send feedback
+
+Settings → Help & about has two rows: **Report a bug**, and **Send feedback or ask for help**. Every announcement has the same two buttons at its bottom.
+
+1. Press **Write in Gmail**. Your browser opens Gmail with a draft already addressed to the developer. If you do not use Gmail, press **Use my mail app** instead.
+2. Read the draft, write your message, and press Send in your mail.
+
+- TapIn only opens the draft. Nothing is sent until you press Send, and you can change or delete anything in it.
+- The draft has your TapIn version, your operating system and your language. It has no student data and no folder path. Please do not write student names or card numbers in it.
+- If nothing opens, for example because no mail program is set up, press **Copy address** and write to the developer from any mail program.
 
 # Your files and backups
 
@@ -595,6 +617,7 @@ Small settings files hold your language, your chosen data folder, your reader se
 - TapIn stores each student's number and name, their attendance, and the ID of their card. It asks for nothing else: no email addresses, no photographs, no grades.
 - Attendance records are personal data about identifiable students. Your university probably has rules for handling them, and so may the law: KVKK in Turkey, GDPR in the European Union. TapIn keeps the data on your computer, and keeping it lawfully is up to you. This is not legal advice: if you are unsure, ask your university's data protection office.
 - To delete data, delete a class, or delete the data folder. There is no other copy.
+- Report a bug and Send feedback only open a draft email, in Gmail in your browser or in your own mail program. Your mail sends it, and only when you press Send. The draft holds your TapIn version, your operating system and your language, and nothing else about your computer or your students.
 - The shared attendance page (`web/attendance.html`) is a copy of attendance and student names in a file you can send to anyone. It is rebuilt by TapIn after every change, but a copy you have sent or published stays as it was when you sent it.
 
 # Fixing problems
@@ -613,6 +636,7 @@ Small settings files hold your language, your chosen data folder, your reader se
 | "Couldn't load the roster" | Close any program that has the class's `.xlsx` file open, then try again. |
 | A class import skips rows | Each skipped row says why. Fix the file and import just those rows. |
 | Students marked Late when they were on time | Check the time slot and the "Late after" minutes on the Take attendance screen, and the clock on your computer. |
+| Something else is wrong, or something is missing | Settings → Help & about → Report a bug (or Send feedback). Say what you did, what happened and what you expected. |
 | TapIn closed by itself | The inactivity timer did it. Change it in Settings → General. |
 | Windows SmartScreen warns about the installer | The installer is not code-signed. Choose More info, then Run anyway. |
 | macOS will not open TapIn | Open System Settings → Privacy & Security and choose Open Anyway. |
