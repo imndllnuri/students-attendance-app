@@ -132,7 +132,7 @@ The bell shows a number when there is news. It lists:
 - Students who have become at risk in a class.
 - Attendance that could not be saved at the time and has now been saved.
 - A student list file that TapIn could not read.
-- An announcement you have not read yet. Click it to open Announcements.
+- An announcement or an item of news that you have not read yet. Click it to open Announcements.
 - A new TapIn version, if you turned update checks on.
 
 The list lasts only while TapIn is open. Press Clear all to empty it.
@@ -145,7 +145,8 @@ Announcements are news from the developer: what is new in each version of TapIn,
 - A number beside Announcements in the sidebar, and a note in the bell, tell you about the ones you have not read. Opening the page counts them all as read.
 - The cards you have not read are marked New while you are on the page.
 - At the bottom of every announcement is a box, **Need help or have feedback?** Its two buttons open a draft email to the developer. See Report a bug or send feedback.
-- Announcements come inside TapIn. TapIn does not go to the internet to fetch them, so you see a new one after you install the version that brings it.
+- Most announcements come inside TapIn, so you see them after you install the version that brings them. TapIn does not go to the internet to fetch them.
+- **News from the developer** is the exception, and it is off. If you turn on **Get news from the developer** (Settings → Updates), TapIn also reads one small file from the TapIn website when it starts, so a note can reach you without a new version: for example "known problem, a fix is coming". News looks like any other announcement and is marked in the same way. It is plain text. It cannot open a link or run anything. Turn the switch off and the news goes away.
 
 ### Leaving TapIn
 
@@ -324,7 +325,8 @@ Notes is a free text box for the class: room changes, exam dates, anything to re
 | Export roster… | Saves the student numbers and names as an Excel file. |
 | Export attendance grid… | Saves the whole table, every student and every session, as an Excel file. |
 | Export certificate… | Makes a printable certificate of attendance: a one-page PDF for one student. |
-| Open web page | Opens the shared attendance page in your browser, at this class. See The shared attendance page. |
+| Open web page | Opens this class's own attendance page in your browser. See The attendance page of each class. |
+| Show web page file | Shows this class's page file in your file manager, so you can attach it to an email. See The attendance page of each class. |
 | Refresh | Reads the class files again. |
 
 **Add student.** Type the number and name. Leave "Scan their card now" ticked and press Add student; TapIn then asks you to tap the card on the reader. The student is added first, so if the scan fails they stay on the roster without a card. You can add the card later with Edit card. A student number that is already on the roster is refused. If the card belongs to someone else, TapIn tells you who.
@@ -337,16 +339,18 @@ Notes is a free text box for the class: room changes, exam dates, anything to re
 
 **Export certificate.** A printable certificate of attendance for one student, for proof-of-attendance requests. Choose a student and see a preview. The certificate says the student was enrolled in the class, how many sessions they attended out of the total with their rate, and whether they meet the attendance policy. Press Save PDF… to keep it.
 
-### The shared attendance page
+### The attendance page of each class
 
-TapIn keeps one web page with the whole attendance record of every active class. You do not have to export anything: the page is made for you and kept up to date.
+TapIn keeps one web page for each active class, with the whole attendance record of that class. You do not have to export anything: the pages are made for you and kept up to date.
 
-- **Where it is.** `web/attendance.html` inside your data folder. Settings → Data → Web page shows the exact place, and Open page shows it in your browser. The class page's More menu has Open web page, which opens the page at that class.
-- **What it shows.** For each class: the attendance rate, the number of sessions, the policy, and a table with every student and every session (✓ present, L late, ✗ absent, – not recorded). The numbers are the same ones the class page shows. Students at risk are marked in words as well as colour. A box at the top finds a student by name or number.
+- **One class, one file.** A page shows only its own class: no other class, no list of classes. You can send it to the students of that class without showing them any other class.
+- **Where they are.** In the `web` folder inside your data folder, named like `attendance-comp101-1-fall-2026.html`. On the class page, More → Open web page opens that class's page in your browser, and More → Show web page file shows the file, ready to copy or attach to an email. Settings → Data → Web pages shows the folder.
+- **What it shows.** The attendance rate, the number of sessions, the policy, and a table with every student and every session (✓ present, L late, ✗ absent, – not recorded). The numbers are the same ones the class page shows. Students at risk are marked in words as well as colour. A box at the top finds a student by name or number.
 - **When it updates.** A moment after anything is saved: attendance submitted at the end of a session, a correction, a student added, removed or merged, a class edited, archived or deleted. Taps that are still waiting to be submitted are not in the page yet. Press Update now in Settings if you want to be sure. The page is in the language TapIn is set to.
-- **Archived classes** are left out.
-- **It is one file.** It has no links to anything outside itself, so you can open it by double-click, copy it, or send it by email. TapIn does not put it on the internet for you: it is a file on your computer. To give people a link, put the file on a web server you control.
-- **Be careful who gets it.** The page lists student names and numbers, and their absences. Share it only with people who may see them (see Privacy). It asks search engines not to list it, but that does not protect a page that is public.
+- **Archived classes** have no page. The page of a class you archive or delete is removed, and so is an old page when a class changes its name, section or term (it gets a new file name).
+- **Older versions made one page with every class** (`web/attendance.html`). TapIn removes that file the first time it runs, so it cannot be sent by mistake. TapIn only removes files it made itself; your own files in `web` are never touched.
+- **Each page is one file.** It has no links to anything outside itself, so you can open it by double-click, copy it, or send it by email. TapIn does not put it on the internet for you: it is a file on your computer. To give people a link, put the file on a web server you control.
+- **Be careful who gets it.** A page lists student names and numbers, and their absences. Share it only with people who may see them (see Privacy). It asks search engines not to list it, but that does not protect a page that is public.
 
 # Take attendance
 
@@ -543,7 +547,7 @@ Settings has five sections.
 | Data folder | Shows the open folder. Copy path copies it. Show in folder opens it. |
 | Switch data folder | Opens another folder of classes. Nothing is moved or deleted. |
 | Backups | When TapIn opens a folder whose files have changed, it saves a zip copy in the `.backups` folder inside it. The newest 5 are kept. Open backups folder shows them. |
-| Web page | Shows where the shared attendance page is and when it was last made. Open page shows it in your browser, Show in folder finds the file, and Update now makes it again. See The shared attendance page. |
+| Web pages | Shows where the attendance pages are and when they were last made. Show in folder opens the folder, and Update now makes them again. To open or find one class's page, use the class page's More menu. See The attendance page of each class. |
 | Settings file | Export settings saves your language, interface size, class list and inactivity choices into a file, to load on another computer with Import settings. The file is called `app_settings.json`. |
 
 ### Card reader
@@ -553,6 +557,8 @@ Connection (USB cable, Wi-Fi or Bluetooth) and the set-up for each. See The card
 ### Updates
 
 **Check for new versions** is off. See Privacy. When it is on, TapIn asks once each time it starts, and a note appears in the bell if a newer version exists; click the note to open the download page. You can also press Check now at any time. If a newer TapIn exists, Open download page takes you to it. TapIn never downloads or installs anything by itself.
+
+**Get news from the developer** is a second switch, also off. It is separate on purpose: turning on one does not turn on the other. When it is on, TapIn reads one small file from the TapIn website at startup and shows what is in it on the Announcements page. A line under the switch tells you how many items it found, or that this computer looks offline. The last news it read stays available without internet, until you turn the switch off. See Privacy.
 
 ### Help & about
 
@@ -584,7 +590,7 @@ your-data-folder/
 ├─ _class_order.json          your custom class order
 ├─ _session_templates.json    saved Take attendance defaults
 ├─ _offline_queue.json        attendance waiting to be saved
-├─ web/attendance.html        the shared attendance page, made from the data above
+├─ web/attendance-<class>.html one attendance page for each active class, made from the data above
 ├─ .lock                      says the folder is open
 └─ .backups/                  zip copies, the newest 5
 ```
@@ -613,12 +619,15 @@ Small settings files hold your language, your chosen data folder, your reader se
 
 - TapIn has no accounts, no cloud service and no analytics. It sends no usage data and no crash reports.
 - Out of the box, the only network connection it makes is to your own card reader, on the reader's own network.
-- The one exception is the Check for new versions switch, and it is off. If you turn it on, TapIn asks github.com once at startup for the newest version number. The request carries no student data, no folder path and no identifier.
+- There are two exceptions, and both are off. Settings → Updates has two separate switches:
+  - **Check for new versions.** If you turn it on, TapIn asks github.com once at startup for the newest version number.
+  - **Get news from the developer.** If you turn it on, TapIn reads one small public file (`news.json`) from the TapIn website, `imndllnuri.github.io`, once at startup, and shows it on the Announcements page. Nothing is installed, and the file can only hold text.
+  - Neither request carries student data, a folder path or an identifier. Like any website, GitHub can see the internet address the request comes from. With both switches off, TapIn contacts nothing but your card reader.
 - TapIn stores each student's number and name, their attendance, and the ID of their card. It asks for nothing else: no email addresses, no photographs, no grades.
 - Attendance records are personal data about identifiable students. Your university probably has rules for handling them, and so may the law: KVKK in Turkey, GDPR in the European Union. TapIn keeps the data on your computer, and keeping it lawfully is up to you. This is not legal advice: if you are unsure, ask your university's data protection office.
 - To delete data, delete a class, or delete the data folder. There is no other copy.
 - Report a bug and Send feedback only open a draft email, in Gmail in your browser or in your own mail program. Your mail sends it, and only when you press Send. The draft holds your TapIn version, your operating system and your language, and nothing else about your computer or your students.
-- The shared attendance page (`web/attendance.html`) is a copy of attendance and student names in a file you can send to anyone. It is rebuilt by TapIn after every change, but a copy you have sent or published stays as it was when you sent it.
+- The attendance pages (`web/attendance-<class>.html`, one for each class) are copies of one class's attendance and student names in a file you can send to anyone. Each page shows only its own class. TapIn rebuilds them after every change, but a copy you have sent or published stays as it was when you sent it.
 
 # Fixing problems
 
